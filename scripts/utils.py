@@ -7,7 +7,7 @@ def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
 
 
-def write_json(path: Path, payload: dict) -> None:
+def write_json(path: Path, payload) -> None:
     path.write_text(json.dumps(payload, indent=2), encoding='utf-8')
 
 

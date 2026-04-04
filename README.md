@@ -1,100 +1,47 @@
-# Premier League Data Repo Blueprint
+# Premier League Data Repo Blueprint v2
 
-This starter repository is designed to power a web app with regularly refreshed Premier League / FPL data.
+This version extends the starter repo with:
+- per-player `element-summary` pulls
+- derived app-ready tables
+- weekly snapshots
+- a schema reference for frontend use
 
-## What this repo does
+## Outputs
 
-- Pulls data from the public Fantasy Premier League API
-- Stores cleaned files for your app to read from GitHub raw URLs
-- Keeps both latest files and dated historical snapshots
-- Runs on a weekly schedule using GitHub Actions
+### Core current files
+- `data/current/bootstrap_static.json`
+- `data/current/players.csv`
+- `data/current/teams.csv`
+- `data/current/events.csv`
+- `data/current/fixtures.csv`
 
-## Suggested repo structure
+### Player detail files
+- `data/current/player_summaries/{player_id}.json`
+- `data/current/player_history.csv`
+- `data/current/player_future_fixtures.csv`
 
-```text
-.
-├── .github/
-│   └── workflows/
-│       └── update-data.yml
-├── data/
-│   ├── current/
-│   │   ├── bootstrap_static.json
-│   │   ├── players.csv
-│   │   ├── teams.csv
-│   │   ├── events.csv
-│   │   └── fixtures.csv
-│   ├── history/
-│   │   └── 2026-04-03/
-│   │       ├── bootstrap_static.json
-│   │       ├── players.csv
-│   │       ├── teams.csv
-│   │       ├── events.csv
-│   │       └── fixtures.csv
-│   └── reference/
-├── scripts/
-│   ├── update_fpl_data.py
-│   └── utils.py
-├── requirements.txt
-└── README.md
-```
+### Derived files
+- `data/current/player_prices.csv`
+- `data/current/player_form.csv`
+- `data/current/next_fixtures.csv`
+- `data/current/team_fixture_difficulty.csv`
 
-## FPL endpoints used
+### Snapshots
+Every run also stores dated copies under `data/history/YYYY-MM-DD/`.
 
-- `https://fantasy.premierleague.com/api/bootstrap-static/`
-- `https://fantasy.premierleague.com/api/fixtures/`
-- Optional later: `https://fantasy.premierleague.com/api/element-summary/{player_id}/`
-
-## Setup
-
-### 1. Create the repo
-
-Create a new public GitHub repo, for example:
-- `pl-data`
-- `premier-league-data`
-- `fpl-data-pipeline`
-
-### 2. Add files
-
-Copy this blueprint into the repo.
-
-### 3. Local install
+## Run locally
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-python scripts/update_fpl_data.py
+python3 scripts/update_fpl_data.py
 ```
 
-### 4. Enable Actions
+## App usage
 
-Push to GitHub, then enable GitHub Actions for the repository.
-
-## Output files
-
-### Latest files for app
-
-Your web app should read from `data/current/` because those files are overwritten with the latest refresh.
-
-Example raw URL pattern:
-
-```text
-https://raw.githubusercontent.com/<your-user>/<your-repo>/main/data/current/players.csv
-```
-
-### Historical snapshots
-
-Each run also writes a dated snapshot into `data/history/YYYY-MM-DD/`.
-
-## Recommended frontend usage
-
-Point the web app at:
-- `players.csv` for player master data
-- `teams.csv` for team mapping
-- `events.csv` for gameweeks and deadlines
-- `fixtures.csv` for match-level schedule data
-
-## Next upgrades
-
-- Add `element-summary` pulls for per-player history
-- Add data validation tests
-- Add derived files such as form tables, fixture difficulty, and weekly rankings
-- Add a small schema doc for each CSV
+Recommended app tables:
+- `player_form.csv` for rankings and cards
+- `next_fixtures.csv` for fixture views
+- `team_fixture_difficulty.csv` for schedule analysis
+- `player_history.csv` for trend charts
