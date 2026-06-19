@@ -61,15 +61,18 @@
     .brand h1 { font-size: var(--text-lg); margin: 0; }
     .muted { color: var(--color-text-muted); }
     .nav { display: grid; gap: var(--space-2); }
+    /* FIX 1: cursor:pointer since we removed href */
     .nav a {
       display: flex; align-items: center; gap: var(--space-3); padding: .85rem 1rem; border-radius: var(--radius-lg);
       color: var(--color-text-muted); transition: background var(--transition), color var(--transition);
+      cursor: pointer;
     }
     .nav a:hover, .nav a.active { background: var(--color-surface-2); color: var(--color-text); }
     .sidebar-card {
       margin-top: var(--space-8); padding: var(--space-4); border-radius: var(--radius-xl); background: var(--color-surface-2); border: 1px solid rgba(127,127,127,.12);
     }
-    .main-wrap { display: grid; grid-template-rows: auto 1fr; min-width: 0; }
+    /* FIX 2: overflow:hidden on .main-wrap so .main is the sole scroll region */
+    .main-wrap { display: grid; grid-template-rows: auto 1fr; min-width: 0; overflow: hidden; }
     .header {
       position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; gap: var(--space-4);
       padding: var(--space-4) var(--space-6); background: color-mix(in srgb, var(--color-bg) 84%, transparent); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(127,127,127,.12);
@@ -82,8 +85,10 @@
     .btn:hover, .theme-toggle:hover { background: var(--color-surface-2); transform: translateY(-1px); }
     .btn.primary { background: var(--color-primary); color: #f8fafc; border-color: transparent; }
     .btn.primary:hover { background: var(--color-primary-hover); }
+    /* FIX 3: scroll-behavior:smooth on .main — this is the actual scroll container */
     .main {
       overflow-y: auto; overscroll-behavior: contain; padding: var(--space-6); min-width: 0;
+      scroll-behavior: smooth;
     }
     .hero { display: flex; justify-content: space-between; gap: var(--space-6); align-items: end; margin-bottom: var(--space-6); flex-wrap: wrap; }
     .hero h2 { margin: 0 0 .4rem 0; font-size: var(--text-xl); }
@@ -112,7 +117,7 @@
     }
     table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums lining-nums; }
     th, td { text-align: left; padding: .9rem .75rem; border-bottom: 1px solid rgba(127,127,127,.12); font-size: var(--text-sm); }
-    th { color: var(--color-text-muted); font-weight: 500; position: sticky; top: 0; background: var(--color-surface); }
+    th { color: var(--color-text-muted); font-weight: 500; position: sticky; top: 0; background: var(--color-surface); z-index: 1; }
     tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 5%, var(--color-surface)); }
     .table-wrap { overflow: auto; max-height: 520px; }
     .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: .3rem .6rem; font-size: var(--text-xs); border: 1px solid rgba(127,127,127,.14); }
@@ -150,7 +155,7 @@
       html, body { overflow: auto; }
       .app { display: block; height: auto; }
       .sidebar { display: none; }
-      .main-wrap { min-height: 100dvh; }
+      .main-wrap { min-height: 100dvh; overflow: visible; }
       .main { overflow: visible; padding: var(--space-4); }
       .header { padding: var(--space-4); }
       .grid-kpi, .layout-2 { grid-template-columns: 1fr; }
@@ -176,11 +181,12 @@
           <div class="muted">Live repo-driven view</div>
         </div>
       </div>
-      <nav class="nav">
-        <a class="active" href="#overview"><span>Overview</span></a>
-        <a href="#players"><span>Players</span></a>
-        <a href="#fixtures"><span>Fixtures</span></a>
-        <a href="#teams"><span>Teams</span></a>
+      <!-- FIX: data-target replaces href="#..." so JS can scroll .main directly -->
+      <nav class="nav" id="sideNav">
+        <a data-target="overview" class="active"><span>Overview</span></a>
+        <a data-target="players"><span>Players</span></a>
+        <a data-target="fixtures"><span>Fixtures</span></a>
+        <a data-target="teams"><span>Teams</span></a>
       </nav>
       <div class="sidebar-card">
         <div class="kpi-label">Data sources</div>
@@ -193,7 +199,7 @@
           <div class="pill">Repo: arlind55/fplproject</div>
         </div>
         <div class="header-actions">
-          <button class="btn mobile-toggle" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">Top</button>
+          <button class="btn mobile-toggle" type="button" id="scrollTopBtn">Top</button>
           <button class="btn" type="button" id="exportPlayers">Export filtered players</button>
           <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">☀️</button>
         </div>
@@ -305,6 +311,44 @@
     const charts = {};
     let state = { players: [], playerForm: [], fixtures: [], teamDifficulty: [], events: [], filteredPlayers: [] };
 
+    // ── NAV SCROLL FIX ────────────────────────────────────────────────────────
+    // html/body have overflow:hidden, so href="#section" anchor scrolling is
+    // broken — the browser tries to scroll <body> which is locked.
+    // Solution: intercept clicks, find the target element, and scroll
+    // the .main container (the real scroll region) directly.
+    const mainEl = document.getElementById('main-content');
+
+    document.getElementById('sideNav').addEventListener('click', e => {
+      const link = e.target.closest('a[data-target]');
+      if (!link) return;
+      e.preventDefault();
+      const target = document.getElementById(link.dataset.target);
+      if (!target) return;
+      mainEl.scrollTo({ top: target.offsetTop - 16, behavior: 'smooth' });
+      setActiveLink(link.dataset.target);
+    });
+
+    document.getElementById('scrollTopBtn').addEventListener('click', () => {
+      mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    function setActiveLink(id) {
+      document.querySelectorAll('#sideNav a').forEach(a => {
+        a.classList.toggle('active', a.dataset.target === id);
+      });
+    }
+
+    // Keep active state in sync as user scrolls naturally
+    (function initObserver() {
+      const sections = ['overview', 'players', 'fixtures', 'teams']
+        .map(id => document.getElementById(id)).filter(Boolean);
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => { if (entry.isIntersecting) setActiveLink(entry.target.id); });
+      }, { root: mainEl, threshold: 0.25 });
+      sections.forEach(s => observer.observe(s));
+    })();
+    // ─────────────────────────────────────────────────────────────────────────
+
     function setTheme(next) {
       document.documentElement.setAttribute('data-theme', next);
       document.querySelector('[data-theme-toggle]').textContent = next === 'dark' ? '☀️' : '🌙';
@@ -338,10 +382,7 @@
       return body.map(r => Object.fromEntries(headers.map((h, i) => [h, (r[i] ?? '').trim()])));
     }
 
-    function number(v) {
-      const n = parseFloat(v);
-      return Number.isFinite(n) ? n : null;
-    }
+    function number(v) { const n = parseFloat(v); return Number.isFinite(n) ? n : null; }
     function formatPrice(v) { return v == null ? '—' : `£${v.toFixed(1)}m`; }
     function formatPct(v) { return v == null ? '—' : `${v.toFixed(1)}%`; }
     function formatDate(v) {
@@ -393,7 +434,6 @@
       const avgPrice = players.reduce((sum, p) => sum + (number(p.now_cost) || 0), 0) / (players.length || 1);
       const top = [...form].sort((a, b) => (number(b.form) || 0) - (number(a.form) || 0))[0];
       const easy = [...fixtures].sort((a, b) => (number(a.avg_difficulty_next_5) ?? 999) - (number(b.avg_difficulty_next_5) ?? 999))[0];
-
       document.getElementById('kpiPlayers').textContent = players.length || '—';
       document.getElementById('kpiAvgPrice').textContent = players.length ? formatPrice(avgPrice) : '—';
       document.getElementById('kpiTopForm').textContent = top ? top.web_name : '—';
@@ -424,25 +464,16 @@
         const avg = rows.reduce((sum, p) => sum + (number(p.now_cost) || 0), 0) / (rows.length || 1);
         return { pos: positionName(pos), avg };
       });
-
       if (charts.formChart) charts.formChart.destroy();
       if (charts.priceChart) charts.priceChart.destroy();
-
       charts.formChart = new Chart(document.getElementById('formChart'), {
         type: 'bar',
-        data: {
-          labels: top.map(p => p.web_name),
-          datasets: [{ label: 'Form', data: top.map(p => number(p.form) || 0), backgroundColor: colors.primary, borderRadius: 8 }]
-        },
+        data: { labels: top.map(p => p.web_name), datasets: [{ label: 'Form', data: top.map(p => number(p.form) || 0), backgroundColor: colors.primary, borderRadius: 8 }] },
         options: commonChartOptions(colors, false)
       });
-
       charts.priceChart = new Chart(document.getElementById('priceChart'), {
         type: 'doughnut',
-        data: {
-          labels: byPos.map(d => d.pos),
-          datasets: [{ data: byPos.map(d => d.avg.toFixed(2)), backgroundColor: [colors.success, colors.blue, colors.gold, colors.orange], borderWidth: 0 }]
-        },
+        data: { labels: byPos.map(d => d.pos), datasets: [{ data: byPos.map(d => d.avg.toFixed(2)), backgroundColor: [colors.success, colors.blue, colors.gold, colors.orange], borderWidth: 0 }] },
         options: commonChartOptions(colors, true)
       });
     }
@@ -461,16 +492,13 @@
       };
     }
 
-    function syncCharts() {
-      if (state.players.length) buildCharts();
-    }
+    function syncCharts() { if (state.players.length) buildCharts(); }
 
     function renderPlayers() {
       const q = document.getElementById('search').value.trim().toLowerCase();
       const position = document.getElementById('position').value;
       const team = document.getElementById('team').value;
       const maxPrice = number(document.getElementById('maxPrice').value);
-
       state.filteredPlayers = state.playerForm.filter(p => {
         const matchesSearch = !q || [p.web_name, p.team_name, p.team_short_name].some(v => String(v || '').toLowerCase().includes(q));
         const matchesPos = !position || positionName(p.element_type) === position;
@@ -478,7 +506,6 @@
         const matchesPrice = maxPrice == null || (number(p.now_cost) || 0) <= maxPrice;
         return matchesSearch && matchesPos && matchesTeam && matchesPrice;
       });
-
       const tbody = document.getElementById('playersTable');
       document.getElementById('playerCountStatus').textContent = `${state.filteredPlayers.length} rows`;
       if (!state.filteredPlayers.length) {
