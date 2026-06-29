@@ -1,0 +1,21 @@
+code,draw,form,id,loss,name,played,points,position,short_name,strength,team_division,unavailable,win,link_url,strength_overall_home,strength_overall_away,strength_attack_home,strength_attack_away,strength_defence_home,strength_defence_away,pulse_id
+3,0,,1,0,Arsenal,0,0,1,ARS,5,,False,0,,1305,1370,1340,1390,1270,1350,1
+7,0,,2,0,Aston Villa,0,0,4,AVL,3,,False,0,,1155,1230,1140,1190,1170,1270,2
+90,0,,3,0,Burnley,0,0,19,BUR,2,,False,0,,975,1045,910,1050,1040,1040,43
+91,0,,4,0,Bournemouth,0,0,6,BOU,3,,False,0,,1145,1200,1060,1160,1230,1240,127
+94,0,,5,0,Brentford,0,0,9,BRE,3,,False,0,,1125,1215,1110,1170,1140,1260,130
+36,0,,6,0,Brighton,0,0,8,BHA,3,,False,0,,1165,1230,1130,1200,1200,1260,131
+8,0,,7,0,Chelsea,0,0,10,CHE,4,,False,0,,1185,1225,1130,1170,1240,1280,4
+31,0,,8,0,Crystal Palace,0,0,15,CRY,3,,False,0,,1140,1160,1130,1150,1150,1170,6
+11,0,,9,0,Everton,0,0,13,EVE,3,,False,0,,1140,1145,1140,1140,1140,1150,7
+54,0,,10,0,Fulham,0,0,11,FUL,3,,False,0,,1095,1190,1080,1170,1110,1210,34
+2,0,,11,0,Leeds,0,0,14,LEE,3,,False,0,,1095,1195,1090,1160,1100,1230,9
+14,0,,12,0,Liverpool,0,0,5,LIV,4,,False,0,,1235,1275,1170,1200,1300,1350,10
+43,0,,13,0,Man City,0,0,2,MCI,4,,False,0,,1260,1350,1190,1310,1330,1390,11
+1,0,,14,0,Man Utd,0,0,3,MUN,4,,False,0,,1230,1250,1170,1170,1290,1330,12
+4,0,,15,0,Newcastle,0,0,12,NEW,3,,False,0,,1115,1205,1120,1120,1110,1290,23
+17,0,,16,0,Nott'm Forest,0,0,16,NFO,3,,False,0,,1130,1160,1110,1160,1150,1160,15
+56,0,,17,0,Sunderland,0,0,7,SUN,3,,False,0,,1090,1155,1090,1190,1090,1120,29
+6,0,,18,0,Spurs,0,0,17,TOT,3,,False,0,,1145,1145,1120,1120,1150,1190,21
+21,0,,19,0,West Ham,0,0,18,WHU,3,,False,0,,1095,1130,1060,1080,1130,1180,25
+39,0,,20,0,Wolves,0,0,20,WOL,2,,False,0,,975,1060,950,1050,1000,1070,38
