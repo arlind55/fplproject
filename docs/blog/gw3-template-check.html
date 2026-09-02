@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Template check: who&#x27;s earning their ownership? — FPL Value</title>
+<meta name="description" content="Every player owned by more than 25% of managers, measured against expected points, with the under-10%-owned alternative at the same price. Mbeumo, Szoboszlai, Calvert-Lewin and Rogers under the lens.">
+<link rel="canonical" href="https://fplvalue.co/blog/gw3-template-check.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="FPL Value">
+<meta property="og:title" content="Template check: who&#x27;s earning their ownership?">
+<meta property="og:description" content="Every player owned by more than 25% of managers, measured against expected points, with the under-10%-owned alternative at the same price. Mbeumo, Szoboszlai, Calvert-Lewin and Rogers under the lens.">
+<meta property="og:url" content="https://fplvalue.co/blog/gw3-template-check.html">
+<meta property="og:image" content="https://fplvalue.co/blog/img/gw3-template-check.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-09-02">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Template check: who&#x27;s earning their ownership?">
+<meta name="twitter:description" content="Every player owned by more than 25% of managers, measured against expected points, with the under-10%-owned alternative at the same price. Mbeumo, Szoboszlai, Calvert-Lewin and Rogers under the lens.">
+<meta name="twitter:image" content="https://fplvalue.co/blog/img/gw3-template-check.png">
+<meta name="theme-color" content="#131521" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface-2:#e9ebf2; --line:#d5d8e3; --line-strong:#b9bdcc;
+  --ink:#171a26; --ink-2:#4a4f63; --ink-3:#7a8096; --accent:#2f3fa8; --accent-ink:#ffffff;
+  --d1:#1f7a4d; --d2:#3fa66e; --d3:#c9ccd6; --d4:#d95f6a; --d5:#8f1f33;
+  --d1-ink:#ffffff; --d2-ink:#0f2a1c; --d3-ink:#2b2f3d; --d4-ink:#ffffff; --d5-ink:#ffffff;
+  --muted-cell:#f0f1f5; --ok:#1f7a4d; --warn:#b8741a; --err:#a8323f;
+  --shadow:0 1px 2px rgba(23,26,38,.06),0 6px 20px rgba(23,26,38,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+    --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+    --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+    --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+    --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+  --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+  --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+  --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+  --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
+/* ── Shared shell (keep in sync with index.html) ─────────────────────────────── */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px}
+.tabs a{padding:7px 16px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+.right{display:flex;align-items:center;gap:10px}
+.status{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:12px;white-space:nowrap}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block;flex:none}
+.status.ok i{background:var(--ok)} .status.warn i{background:var(--warn)} .status.err i{background:var(--err)}
+.status b{font:600 12px "IBM Plex Mono",monospace;color:var(--ink)}
+.theme{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink-2);display:grid;place-items:center}
+.theme:hover{color:var(--ink)}
+.theme svg{width:16px;height:16px}
+.tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+@media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+
+/* ── Article ─────────────────────────────────────────────────────────────────── */
+.article{display:grid;grid-template-columns:minmax(0,1fr);justify-content:center}
+.prose{max-width:72ch;margin:0 auto}
+.prose .kicker{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:8px 0 10px;display:flex;gap:12px;align-items:center}
+.prose .kicker time{color:var(--ink-3)}
+.prose h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:38px;line-height:1.02;margin:0 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.prose .lede{font-size:16px;color:var(--ink-2);margin:0 0 26px;line-height:1.55}
+.prose h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:25px;margin:36px 0 8px;letter-spacing:.005em;scroll-margin-top:20px}
+.prose h3 small{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3);margin-left:10px;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
+.prose p{margin:0 0 14px;font-size:15px;line-height:1.6;color:var(--ink)}
+.prose p.note{color:var(--ink-3);font-size:13px}
+.prose a{color:var(--accent)}
+.prose strong{font-weight:600}
+table.t{border-collapse:collapse;width:100%;margin:10px 0 18px;font-size:13px;font-variant-numeric:tabular-nums}
+table.t th,table.t td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+table.t th{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.04em;color:var(--ink-3);text-transform:uppercase}
+table.t td.n,table.t th.n{text-align:right;font-family:"IBM Plex Mono",monospace}
+table.t td.n{font-size:12.5px}
+table.t tr.hl td{background:var(--surface)}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px;margin:12px 0 18px}
+.tw table.t{margin:0}
+.pos{font:600 10px "IBM Plex Mono",monospace;padding:2px 6px;border-radius:3px;color:#fff;letter-spacing:.04em}
+.pos.GKP{background:var(--gkp)} .pos.DEF{background:var(--def)} .pos.MID{background:var(--mid)} .pos.FWD{background:var(--fwd)}
+.up{color:var(--ok)} .down{color:var(--err)}
+.callout{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin:18px 0;font-size:14px}
+.callout b{color:var(--accent)}
+.fixrow{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 14px}
+.fix{min-width:66px;height:36px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:600 12px "IBM Plex Mono",monospace;line-height:1.1}
+.fix small{font:500 9.5px "IBM Plex Mono",monospace;opacity:.8;margin-top:2px}
+.fix.d1{background:var(--d1);color:var(--d1-ink)} .fix.d2{background:var(--d2);color:var(--d2-ink)} .fix.d3{background:var(--d3);color:var(--d3-ink)} .fix.d4{background:var(--d4);color:var(--d4-ink)} .fix.d5{background:var(--d5);color:var(--d5-ink)}
+.teamrow{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin:8px 0}
+.teamrow .who{font-weight:600}
+.teamrow .who small{display:block;font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3)}
+hr{border:0;border-top:1px solid var(--line);margin:32px 0}
+.posts{display:grid;gap:12px;margin-top:8px}
+.post{display:block;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;text-decoration:none;color:inherit;box-shadow:var(--shadow)}
+.post:hover h3{color:var(--accent)}
+.post h3{margin:6px 0 6px;font-size:22px}
+.post p{margin:0;color:var(--ink-2);font-size:14px}
+.post-meta{display:flex;gap:10px;align-items:center;font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+.tag{background:var(--surface-2);border:1px solid var(--line);border-radius:3px;padding:2px 6px;color:var(--ink-2)}
+.next{display:flex;justify-content:space-between;gap:12px;margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:13px}
+/* ── Sidebar + hero ──────────────────────────────────────────────────────────── */
+.article.with-side{grid-template-columns:240px minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:900px){.article.with-side{grid-template-columns:1fr}.side{position:static}}
+.side{position:sticky;top:20px;font-size:13px}
+.side .label{margin-bottom:10px}
+.side details{border-left:2px solid var(--line);margin-bottom:6px}
+.side details[open]{border-color:var(--accent)}
+.side summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:6px 12px;color:var(--ink-2);font:500 12px "IBM Plex Mono",monospace;letter-spacing:.03em}
+.side summary::-webkit-details-marker{display:none}
+.side summary::before{content:"▸";margin-right:8px;color:var(--ink-3);font-size:11px}
+.side details[open] summary::before{content:"▾"}
+.side summary:hover{color:var(--ink)}
+.side summary .n{background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:0 7px;font-size:10px;color:var(--ink-3)}
+.side a.p{display:block;padding:6px 12px 6px 28px;color:var(--ink-2);text-decoration:none;line-height:1.35}
+.side a.p .tag{display:block;width:max-content;margin-bottom:3px;font-size:10px}
+.side a.p:hover{color:var(--accent)}
+.side a.p.cur{color:var(--ink);font-weight:600;background:var(--surface);border-radius:0 6px 6px 0}
+.side .secs{padding:2px 0 8px 28px;display:grid;gap:2px}
+.side .secs a{display:block;padding:3px 0 3px 10px;border-left:1px solid var(--line);color:var(--ink-3);text-decoration:none;font-size:12px}
+.side .secs a:hover{color:var(--accent);border-color:var(--accent)}
+.side .all{display:block;margin-top:12px;padding-left:12px;color:var(--accent);text-decoration:none;font-size:12px}
+.prose.wide{max-width:none}
+figure.hero{margin:0 0 24px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#131521}
+figure.hero img{display:block;width:100%;height:auto}
+.post{display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:center}
+.post img{width:100%;height:auto;border-radius:6px;border:1px solid var(--line);background:#131521}
+@media (max-width:640px){.post{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand"><div><h1><a href="../index.html" style="color:inherit;text-decoration:none">FPL Value</a></h1><small>Premier League 2026/27</small></div></div>
+  <nav class="tabs" aria-label="Pages"><a href="../index.html">Dashboard</a><a href="../planner.html">Fixture planner</a><a href="../metrics.html">Metrics</a><a href="./index.html" aria-current="page">Value Blog</a></nav>
+  <div class="right">
+    <span class="status"><i style="background:var(--accent)"></i><span>Template check · after GW2</span></span>
+    <button class="theme" id="themeBtn" type="button" aria-label="Toggle light / dark"></button>
+  </div>
+</header>
+
+<div class="article with-side"><nav class="side" aria-label="Posts"><div class="label">Value Blog</div><details open><summary><time datetime="2026-09-02">2 Sep 2026</time><span class="n">3</span></summary><a class="p cur" href="./gw3-template-check.html" aria-current="page"><span class="tag">Template check</span>Template check: who&#x27;s earning their ownership?</a><div class="secs"><a href="#the-template-ranked-by-ownership">The template, ranked by ownership</a><a href="#mbeumo">Mbeumo</a><a href="#szoboszlai">Szoboszlai</a><a href="#calvert-lewin">Calvert-Lewin</a><a href="#rogers">Rogers</a></div><a class="p" href="./gw3-value-report.html"><span class="tag">Value report</span>Value report: GW3</a><a class="p" href="./gw6-fixture-swing.html"><span class="tag">Fixtures</span>Fixture swing: whose run turns after the break</a></details><a class="all" href="./index.html">All posts →</a></nav>
+<article class="prose">
+<div class="kicker"><span>Template check</span><time datetime="2026-09-02">2 September 2026 · after GW2</time></div>
+<h2>The template, audited</h2>
+<p class="lede">Eleven players are owned by more than a quarter of all FPL managers. This piece puts each of them against their expected points and asks a simple question of the ones falling short: is there a player at the same price, owned by fewer than one in ten, who's doing better on the underlying numbers? It's the <a href="../index.html">dashboard</a>'s ownership-versus-points chart written out in prose.</p><figure class="hero"><img src="./img/gw3-template-check.png" alt="Template check: who&#x27;s earning their ownership? — chart" width="1200" height="630" loading="eager"></figure>
+
+<h3 id="the-template-ranked-by-ownership">The template, ranked by ownership</h3>
+<div class="tw"><table class="t">
+<thead><tr><th>Player</th><th>Pos</th><th class="n">Price</th><th class="n">Own</th><th class="n">PPG</th><th class="n">Pts</th><th class="n">xPts</th><th class="n">Δ</th><th class="n">xGI</th></tr></thead>
+<tbody>
+<tr><td>Haaland <span style="color:var(--ink-3)">MCI</span></td><td><span class="pos FWD">FWD</span></td><td class="n">£15.5m</td><td class="n">69.5%</td><td class="n">7.5</td><td class="n">15</td><td class="n">12.7</td><td class="n up">+2.3</td><td class="n">1.42</td></tr>
+<tr><td>João Pedro <span style="color:var(--ink-3)">CHE</span></td><td><span class="pos FWD">FWD</span></td><td class="n">£7.6m</td><td class="n">69.4%</td><td class="n">10.0</td><td class="n">20</td><td class="n">13.7</td><td class="n up">+6.3</td><td class="n">1.96</td></tr>
+<tr><td>B.Fernandes <span style="color:var(--ink-3)">MUN</span></td><td><span class="pos MID">MID</span></td><td class="n">£12.0m</td><td class="n">47.6%</td><td class="n">12.5</td><td class="n">25</td><td class="n">20.2</td><td class="n up">+4.8</td><td class="n">2.84</td></tr>
+<tr class="hl"><td>Szoboszlai <span style="color:var(--ink-3)">LIV</span></td><td><span class="pos MID">MID</span></td><td class="n">£7.0m</td><td class="n">42.3%</td><td class="n">6.0</td><td class="n">12</td><td class="n">13.7</td><td class="n down">−1.7</td><td class="n">1.45</td></tr>
+<tr><td>Calafiori <span style="color:var(--ink-3)">ARS</span> *</td><td><span class="pos DEF">DEF</span></td><td class="n">£5.6m</td><td class="n">41.5%</td><td class="n">9.0</td><td class="n">9</td><td class="n">6.3</td><td class="n up">+2.8</td><td class="n">0.13</td></tr>
+<tr><td>Raya <span style="color:var(--ink-3)">ARS</span> *</td><td><span class="pos GKP">GKP</span></td><td class="n">£6.0m</td><td class="n">38.0%</td><td class="n">6.0</td><td class="n">6</td><td class="n">5.2</td><td class="n up">+0.8</td><td class="n">—</td></tr>
+<tr class="hl"><td>Mbeumo <span style="color:var(--ink-3)">MUN</span></td><td><span class="pos MID">MID</span></td><td class="n">£8.0m</td><td class="n">32.3%</td><td class="n">6.5</td><td class="n">13</td><td class="n">18.1</td><td class="n down">−5.1</td><td class="n">2.70</td></tr>
+<tr><td>Gabriel <span style="color:var(--ink-3)">ARS</span> *</td><td><span class="pos DEF">DEF</span></td><td class="n">£8.0m</td><td class="n">27.9%</td><td class="n">5.0</td><td class="n">5</td><td class="n">4.5</td><td class="n up">+0.5</td><td class="n">0.06</td></tr>
+<tr class="hl"><td>Calvert-Lewin <span style="color:var(--ink-3)">LEE</span></td><td><span class="pos FWD">FWD</span></td><td class="n">£6.0m</td><td class="n">27.3%</td><td class="n">4.5</td><td class="n">9</td><td class="n">9.3</td><td class="n down">−0.3</td><td class="n">1.07</td></tr>
+<tr class="hl"><td>Rogers <span style="color:var(--ink-3)">CHE</span></td><td><span class="pos MID">MID</span></td><td class="n">£7.5m</td><td class="n">25.9%</td><td class="n">6.5</td><td class="n">13</td><td class="n">14.4</td><td class="n down">−1.4</td><td class="n">2.21</td></tr>
+<tr><td>Tzolis <span style="color:var(--ink-3)">ARS</span> *</td><td><span class="pos MID">MID</span></td><td class="n">£6.5m</td><td class="n">25.6%</td><td class="n">6.0</td><td class="n">6</td><td class="n">4.3</td><td class="n up">+1.7</td><td class="n">0.33</td></tr>
+</tbody></table></div>
+<p class="note">* Arsenal players have one match in this dataset; their GW2 fixture at Villa was pulled before kick-off. Ignore their rows until next week.</p>
+<p>The top of the template is fine. Haaland's 15 points are slightly ahead of his 12.7 expected, which for a £15.5m player is the concern rather than the reassurance: 1.42 xGI across two games is good but not the 1.0-per-game he's priced for. <strong>João Pedro</strong> at £7.6m is over-performing by 6.3 points, but 1.96 xGI is the third-highest of any forward, so the floor is high even when the finishing normalises. <strong>Bruno Fernandes</strong> leads the league in xGI (2.84) and xPts (20.2) and his 25 points are, if anything, about right.</p>
+<p>Four highly-owned players are behind their expected points. Two of them shouldn't worry you and two deserve a look.</p>
+
+<h3 id="mbeumo">Mbeumo <small>32.3% owned · £8.0m · Δ −5.1</small></h3>
+<p>This is the biggest gap in the template and it's the wrong way round to be a problem. Thirteen points looks ordinary next to 2.70 xGI — second only to his own team-mate — and an expected total of 18.1 that would place him fourth in the league. He was also sold by 282,000 managers this week, the most of any player, on the basis of one goal and one assist from chances worth nearly three. <strong>Verdict: hold.</strong> The differential alternatives at his price make the case for him:</p>
+<div class="tw"><table class="t">
+<thead><tr><th>Alternative</th><th class="n">Price</th><th class="n">Own</th><th class="n">PPG</th><th class="n">xPts</th><th class="n">xGI</th><th class="n">xGI/90</th></tr></thead>
+<tbody>
+<tr><td>Gibbs-White <span style="color:var(--ink-3)">NFO</span></td><td class="n">£7.9m</td><td class="n">8.7%</td><td class="n">7.5</td><td class="n">12.7</td><td class="n">1.02</td><td class="n">0.51</td></tr>
+<tr><td>Cunha <span style="color:var(--ink-3)">MUN</span></td><td class="n">£8.0m</td><td class="n">8.7%</td><td class="n">5.5</td><td class="n">8.5</td><td class="n">0.71</td><td class="n">0.40</td></tr>
+</tbody></table></div>
+<p>Gibbs-White has out-scored Mbeumo so far and is a fine player, but his expected points are five lower and his xGI is a third of Mbeumo's. There is no under-owned midfielder at £8m generating anything close to Mbeumo's chances. If you want a differential here, the differential is Mbeumo after this week's sales.</p>
+
+<h3 id="szoboszlai">Szoboszlai <small>42.3% owned · £7.0m · Δ −1.7</small></h3>
+<p>The most-owned midfielder under £8m, and the numbers are decent rather than good: 1.45 xGI, 13.7 xPts, 12 actual. He's doing what a £7.0m Liverpool midfielder should. The question is whether the 42% could do better for the same money, and here the answer is a qualified yes:</p>
+<div class="tw"><table class="t">
+<thead><tr><th>Alternative</th><th class="n">Price</th><th class="n">Own</th><th class="n">PPG</th><th class="n">xPts</th><th class="n">xGI</th><th class="n">xGI/90</th></tr></thead>
+<tbody>
+<tr class="hl"><td>Gakpo <span style="color:var(--ink-3)">LIV</span></td><td class="n">£7.0m</td><td class="n">7.2%</td><td class="n">8.5</td><td class="n">13.2</td><td class="n">1.10</td><td class="n">0.62</td></tr>
+<tr class="hl"><td>Foden <span style="color:var(--ink-3)">MCI</span></td><td class="n">£7.0m</td><td class="n">4.4%</td><td class="n">5.0</td><td class="n">12.5</td><td class="n">1.84</td><td class="n">0.97</td></tr>
+<tr><td>Dewsbury-Hall <span style="color:var(--ink-3)">EVE</span></td><td class="n">£6.5m</td><td class="n">4.6%</td><td class="n">6.5</td><td class="n">9.2</td><td class="n">0.51</td><td class="n">0.26</td></tr>
+</tbody></table></div>
+<p><strong>Gakpo</strong> is the same price, the same team, owned by a sixth as many managers, and has 17 points to Szoboszlai's 12 with an almost identical expected total — so the two are interchangeable on the numbers and Gakpo is the one with the goals. <strong>Foden</strong> is the more interesting one: 1.84 xGI in 171 minutes is 0.97 per 90, the best rate of any midfielder under £8m, and he's returned 10 points from it. At 4.4% ownership that's a proper differential with elite underlying numbers. The risk is minutes, as always with City. <strong>Verdict: Szoboszlai is a fine hold, but if you're making a move in this bracket, Foden is the upside play.</strong></p>
+
+<h3 id="calvert-lewin">Calvert-Lewin <small>27.3% owned · £6.0m · Δ −0.3</small></h3>
+<p>Nine points from nine expected, so nothing is wrong except the ceiling: 1.07 xGI in 180 minutes is 0.54 per 90, respectable for a £6.0m forward and not much more. The template owns him as a budget enabler and he's doing exactly that job. But the alternative at the same price is striking:</p>
+<div class="tw"><table class="t">
+<thead><tr><th>Alternative</th><th class="n">Price</th><th class="n">Own</th><th class="n">PPG</th><th class="n">xPts</th><th class="n">xGI</th><th class="n">xGI/90</th></tr></thead>
+<tbody>
+<tr class="hl"><td>Barry <span style="color:var(--ink-3)">EVE</span></td><td class="n">£5.5m</td><td class="n">3.9%</td><td class="n">5.0</td><td class="n">14.0</td><td class="n">2.02</td><td class="n">1.24</td></tr>
+<tr><td>Wissa <span style="color:var(--ink-3)">NEW</span></td><td class="n">£6.1m</td><td class="n">7.2%</td><td class="n">6.0</td><td class="n">10.5</td><td class="n">1.37</td><td class="n">0.72</td></tr>
+<tr><td>Gonzalo <span style="color:var(--ink-3)">FUL</span></td><td class="n">£6.0m</td><td class="n">4.4%</td><td class="n">4.0</td><td class="n">8.1</td><td class="n">1.02</td><td class="n">0.51</td></tr>
+</tbody></table></div>
+<p><strong>Thierno Barry</strong> has 2.02 xGI in 147 minutes — 1.24 per 90, which is Haaland territory — and has converted it into one goal and 10 points. His 14.0 xPts is the highest of any forward under £7m, he's £0.5m cheaper than Calvert-Lewin, and 3.9% of managers own him. The caveat is sample size and a modest Everton attack, and 147 minutes suggests he's not yet playing full games. But this is precisely the profile the under-performers list exists to find: high chance quality, low ownership, low price, behind on points. <strong>Verdict: Barry over Calvert-Lewin, and the £0.5m saved is a bonus.</strong></p>
+
+<h3 id="rogers">Rogers <small>25.9% owned · £7.5m · Δ −1.4</small></h3>
+<p>Thirteen points from 14.4 expected, 2.21 xGI — fourth among all midfielders. Rogers is playing well and the scoreboard is slightly behind. The same-price alternatives are the Szoboszlai list again (Gakpo and Foden at £7.0m), and neither has a stronger xGI than Rogers does. <strong>Verdict: hold, and if anything he's the under-owned member of the template rather than the over-owned one.</strong></p>
+
+<div class="callout"><b>Summary.</b> The template is in better shape than the scoreboard suggests. Mbeumo and Rogers are being under-rewarded for elite chance creation and should be kept. Szoboszlai is fine but Foden offers more at the same price for anyone who wants to be different. The genuine mismatch is at £6.0m up front, where Barry's numbers make Calvert-Lewin look like the wrong Everton-adjacent forward to own.</div>
+
+<p class="note">Methodology: template defined as ownership ≥ 25%. Alternatives are the same position, priced within £0.7m below to £0.3m above, owned by under 10%, available, and with 120+ minutes, ranked by xPts. xPts and Δ as defined on the <a href="../metrics.html">metrics page</a>. Data: FPL API after GW2.</p>
+<div class="next"><a href="./gw3-value-report.html">← Value report: GW3</a><a href="./index.html">All posts</a></div>
+</article>
+</div>
+
+<footer>
+  <span>FPL Value · independent and unaffiliated with the Premier League or Fantasy Premier League. Data: official FPL API via <a href="https://github.com/arlind55/fplproject">fplproject</a>.</span>
+  <span><a href="../index.html">Dashboard</a> · <a href="../planner.html">Fixture planner</a> · <a href="../metrics.html">Metrics</a></span>
+</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function currentTheme(){const t=document.documentElement.getAttribute("data-theme");if(t)return t;return matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme");$("themeBtn").innerHTML=currentTheme()==="dark"?SUN:MOON;}
+try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
+$("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);});
+
+</script>
+</body>
+</html>

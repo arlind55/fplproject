@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Value Blog — FPL Value</title>
+<meta name="description" content="FPL analysis from FPL Value: weekly value reports (VAPM, points per million, xPts under-performers), fixture swings and template checks.">
+<link rel="canonical" href="https://fplvalue.co/blog/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FPL Value">
+<meta property="og:title" content="Value Blog">
+<meta property="og:description" content="FPL analysis from FPL Value: weekly value reports (VAPM, points per million, xPts under-performers), fixture swings and template checks.">
+<meta property="og:url" content="https://fplvalue.co/blog/">
+<meta property="og:image" content="https://fplvalue.co/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Value Blog">
+<meta name="twitter:description" content="FPL analysis from FPL Value: weekly value reports (VAPM, points per million, xPts under-performers), fixture swings and template checks.">
+<meta name="twitter:image" content="https://fplvalue.co/og-image.png">
+<meta name="theme-color" content="#131521" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface-2:#e9ebf2; --line:#d5d8e3; --line-strong:#b9bdcc;
+  --ink:#171a26; --ink-2:#4a4f63; --ink-3:#7a8096; --accent:#2f3fa8; --accent-ink:#ffffff;
+  --d1:#1f7a4d; --d2:#3fa66e; --d3:#c9ccd6; --d4:#d95f6a; --d5:#8f1f33;
+  --d1-ink:#ffffff; --d2-ink:#0f2a1c; --d3-ink:#2b2f3d; --d4-ink:#ffffff; --d5-ink:#ffffff;
+  --muted-cell:#f0f1f5; --ok:#1f7a4d; --warn:#b8741a; --err:#a8323f;
+  --shadow:0 1px 2px rgba(23,26,38,.06),0 6px 20px rgba(23,26,38,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+    --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+    --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+    --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+    --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+  --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+  --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+  --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+  --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
+/* ── Shared shell (keep in sync with index.html) ─────────────────────────────── */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px}
+.tabs a{padding:7px 16px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+.right{display:flex;align-items:center;gap:10px}
+.status{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:12px;white-space:nowrap}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block;flex:none}
+.status.ok i{background:var(--ok)} .status.warn i{background:var(--warn)} .status.err i{background:var(--err)}
+.status b{font:600 12px "IBM Plex Mono",monospace;color:var(--ink)}
+.theme{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink-2);display:grid;place-items:center}
+.theme:hover{color:var(--ink)}
+.theme svg{width:16px;height:16px}
+.tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+@media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+
+/* ── Article ─────────────────────────────────────────────────────────────────── */
+.article{display:grid;grid-template-columns:minmax(0,1fr);justify-content:center}
+.prose{max-width:72ch;margin:0 auto}
+.prose .kicker{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:8px 0 10px;display:flex;gap:12px;align-items:center}
+.prose .kicker time{color:var(--ink-3)}
+.prose h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:38px;line-height:1.02;margin:0 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.prose .lede{font-size:16px;color:var(--ink-2);margin:0 0 26px;line-height:1.55}
+.prose h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:25px;margin:36px 0 8px;letter-spacing:.005em;scroll-margin-top:20px}
+.prose h3 small{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3);margin-left:10px;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
+.prose p{margin:0 0 14px;font-size:15px;line-height:1.6;color:var(--ink)}
+.prose p.note{color:var(--ink-3);font-size:13px}
+.prose a{color:var(--accent)}
+.prose strong{font-weight:600}
+table.t{border-collapse:collapse;width:100%;margin:10px 0 18px;font-size:13px;font-variant-numeric:tabular-nums}
+table.t th,table.t td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+table.t th{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.04em;color:var(--ink-3);text-transform:uppercase}
+table.t td.n,table.t th.n{text-align:right;font-family:"IBM Plex Mono",monospace}
+table.t td.n{font-size:12.5px}
+table.t tr.hl td{background:var(--surface)}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px;margin:12px 0 18px}
+.tw table.t{margin:0}
+.pos{font:600 10px "IBM Plex Mono",monospace;padding:2px 6px;border-radius:3px;color:#fff;letter-spacing:.04em}
+.pos.GKP{background:var(--gkp)} .pos.DEF{background:var(--def)} .pos.MID{background:var(--mid)} .pos.FWD{background:var(--fwd)}
+.up{color:var(--ok)} .down{color:var(--err)}
+.callout{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin:18px 0;font-size:14px}
+.callout b{color:var(--accent)}
+.fixrow{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 14px}
+.fix{min-width:66px;height:36px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:600 12px "IBM Plex Mono",monospace;line-height:1.1}
+.fix small{font:500 9.5px "IBM Plex Mono",monospace;opacity:.8;margin-top:2px}
+.fix.d1{background:var(--d1);color:var(--d1-ink)} .fix.d2{background:var(--d2);color:var(--d2-ink)} .fix.d3{background:var(--d3);color:var(--d3-ink)} .fix.d4{background:var(--d4);color:var(--d4-ink)} .fix.d5{background:var(--d5);color:var(--d5-ink)}
+.teamrow{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin:8px 0}
+.teamrow .who{font-weight:600}
+.teamrow .who small{display:block;font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3)}
+hr{border:0;border-top:1px solid var(--line);margin:32px 0}
+.posts{display:grid;gap:12px;margin-top:8px}
+.post{display:block;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;text-decoration:none;color:inherit;box-shadow:var(--shadow)}
+.post:hover h3{color:var(--accent)}
+.post h3{margin:6px 0 6px;font-size:22px}
+.post p{margin:0;color:var(--ink-2);font-size:14px}
+.post-meta{display:flex;gap:10px;align-items:center;font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+.tag{background:var(--surface-2);border:1px solid var(--line);border-radius:3px;padding:2px 6px;color:var(--ink-2)}
+.next{display:flex;justify-content:space-between;gap:12px;margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:13px}
+/* ── Sidebar + hero ──────────────────────────────────────────────────────────── */
+.article.with-side{grid-template-columns:240px minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:900px){.article.with-side{grid-template-columns:1fr}.side{position:static}}
+.side{position:sticky;top:20px;font-size:13px}
+.side .label{margin-bottom:10px}
+.side details{border-left:2px solid var(--line);margin-bottom:6px}
+.side details[open]{border-color:var(--accent)}
+.side summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:6px 12px;color:var(--ink-2);font:500 12px "IBM Plex Mono",monospace;letter-spacing:.03em}
+.side summary::-webkit-details-marker{display:none}
+.side summary::before{content:"▸";margin-right:8px;color:var(--ink-3);font-size:11px}
+.side details[open] summary::before{content:"▾"}
+.side summary:hover{color:var(--ink)}
+.side summary .n{background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:0 7px;font-size:10px;color:var(--ink-3)}
+.side a.p{display:block;padding:6px 12px 6px 28px;color:var(--ink-2);text-decoration:none;line-height:1.35}
+.side a.p .tag{display:block;width:max-content;margin-bottom:3px;font-size:10px}
+.side a.p:hover{color:var(--accent)}
+.side a.p.cur{color:var(--ink);font-weight:600;background:var(--surface);border-radius:0 6px 6px 0}
+.side .secs{padding:2px 0 8px 28px;display:grid;gap:2px}
+.side .secs a{display:block;padding:3px 0 3px 10px;border-left:1px solid var(--line);color:var(--ink-3);text-decoration:none;font-size:12px}
+.side .secs a:hover{color:var(--accent);border-color:var(--accent)}
+.side .all{display:block;margin-top:12px;padding-left:12px;color:var(--accent);text-decoration:none;font-size:12px}
+.prose.wide{max-width:none}
+figure.hero{margin:0 0 24px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#131521}
+figure.hero img{display:block;width:100%;height:auto}
+.post{display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:center}
+.post img{width:100%;height:auto;border-radius:6px;border:1px solid var(--line);background:#131521}
+@media (max-width:640px){.post{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand"><div><h1><a href="../index.html" style="color:inherit;text-decoration:none">FPL Value</a></h1><small>Premier League 2026/27</small></div></div>
+  <nav class="tabs" aria-label="Pages"><a href="../index.html">Dashboard</a><a href="../planner.html">Fixture planner</a><a href="../metrics.html">Metrics</a><a href="./index.html" aria-current="page">Value Blog</a></nav>
+  <div class="right">
+    <span class="status"><i style="background:var(--accent)"></i><span>3 posts</span></span>
+    <button class="theme" id="themeBtn" type="button" aria-label="Toggle light / dark"></button>
+  </div>
+</header>
+
+<div class="article with-side"><nav class="side" aria-label="Posts"><div class="label">Value Blog</div><details><summary><time datetime="2026-09-02">2 Sep 2026</time><span class="n">3</span></summary><a class="p" href="./gw3-template-check.html"><span class="tag">Template check</span>Template check: who&#x27;s earning their ownership?</a><a class="p" href="./gw3-value-report.html"><span class="tag">Value report</span>Value report: GW3</a><a class="p" href="./gw6-fixture-swing.html"><span class="tag">Fixtures</span>Fixture swing: whose run turns after the break</a></details><a class="all" href="./index.html">All posts →</a></nav>
+<article class="prose wide">
+<h2>Value Blog</h2>
+<p class="lede">Short, data-led pieces built from the numbers on the dashboard and planner: a weekly value report, template checks and fixture swings ahead of the breaks.</p>
+<div class="posts">
+  <a class="post" href="./gw3-template-check.html">
+    <img src="./img/gw3-template-check.png" alt="" loading="lazy">
+    <div>
+      <div class="post-meta"><span class="tag">Template check</span><time datetime="2026-09-02">2 Sep 2026</time></div>
+      <h3>Template check: who&#x27;s earning their ownership?</h3>
+      <p>Every player owned by more than 25% of managers, measured against expected points, with the under-10%-owned alternative at the same price. Mbeumo, Szoboszlai, Calvert-Lewin and Rogers under the lens.</p>
+    </div>
+  </a>
+  <a class="post" href="./gw3-value-report.html">
+    <img src="./img/gw3-value-report.png" alt="" loading="lazy">
+    <div>
+      <div class="post-meta"><span class="tag">Value report</span><time datetime="2026-09-02">2 Sep 2026</time></div>
+      <h3>Value report: GW3</h3>
+      <p>Top five by VAPM, top five by points per million, and the players whose points are lagging their expected numbers after two gameweeks. Hull&#x27;s defence, a Brentford midfielder nobody owns, and why Thiago is the buy.</p>
+    </div>
+  </a>
+  <a class="post" href="./gw6-fixture-swing.html">
+    <img src="./img/gw6-fixture-swing.png" alt="" loading="lazy">
+    <div>
+      <div class="post-meta"><span class="tag">Fixtures</span><time datetime="2026-09-02">2 Sep 2026</time></div>
+      <h3>Fixture swing: whose run turns after the break</h3>
+      <p>Five teams whose fixtures ease from GW6, the longest easy runs in the calendar to GW20, and the three sides to move off before the October international break. Built from the fixture planner.</p>
+    </div>
+  </a>
+</div>
+</article>
+</div>
+<footer>
+  <span>FPL Value · independent and unaffiliated with the Premier League or Fantasy Premier League. Data: official FPL API via <a href="https://github.com/arlind55/fplproject">fplproject</a>.</span>
+  <span><a href="../index.html">Dashboard</a> · <a href="../planner.html">Fixture planner</a> · <a href="../metrics.html">Metrics</a></span>
+</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function currentTheme(){const t=document.documentElement.getAttribute("data-theme");if(t)return t;return matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme");$("themeBtn").innerHTML=currentTheme()==="dark"?SUN:MOON;}
+try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
+$("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);});
+
+</script>
+</body>
+</html>
