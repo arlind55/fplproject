@@ -201,12 +201,15 @@ function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t
 try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
 $("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);});
 function setStatus(cls,html){const el=$("status");el.className="status "+cls;el.lastElementChild.innerHTML=html;}
-function describeData(events,meta){
+// events: events.csv rows; meta: meta.json or null; progress: {gw, played, total} for an in-progress GW, or null
+function describeData(events,meta,progress){
   const truthy=v=>/^(true|1)$/i.test(String(v));
   const fin=events.filter(e=>truthy(e.finished)).map(e=>+e.id);const lastDone=fin.length?Math.max(...fin):0;
-  const next=events.find(e=>truthy(e.is_next))||events.find(e=>truthy(e.is_current));
+  const cur=events.find(e=>truthy(e.is_current)),next=events.find(e=>truthy(e.is_next));
   let when="";if(meta?.updated_at){const d=new Date(meta.updated_at);when=d.toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
-  return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · <b>GW${lastDone}</b> complete · GW${next?next.id:"?"} next`;
+  let gw=`<b>GW${lastDone}</b> complete`;
+  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone){gw=`<b>GW${cur.id}</b> in progress${progress&&progress.gw==+cur.id?` (${progress.played}/${progress.total} played)`:""}`;}
+  return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · ${gw} · GW${next?next.id:"?"} next`;
 }
 async function fetchMeta(){try{const r=await fetch(`${BASE}/meta.json`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}
 
@@ -255,19 +258,22 @@ async function load(){
   NEXT_GW=int(next?.id)||1;
 
   BY_TEAM={};ids.forEach(id=>{BY_TEAM[id]=Array.from({length:MAX_GW+1},()=>[]);});
-  let n=0;
+  let n=0;const prog={};
   for(const f of fixtures){
     const gw=int(f.event),h=f.team_h,a=f.team_a;
     if(!gw||!BY_TEAM[h]||!BY_TEAM[a])continue;       // unscheduled / postponed fixtures have no GW yet
     const hd=int(f.team_h_difficulty),ad=int(f.team_a_difficulty);
     const hs=int(f.team_h_score),as=int(f.team_a_score);
     const played=truthy(f.finished)||truthy(f.finished_provisional)||(hs!==null&&as!==null&&truthy(f.started));
+    prog[gw]=prog[gw]||{played:0,total:0};prog[gw].total++;if(played)prog[gw].played++;
     BY_TEAM[h][gw].push({opp:a,venue:"H",diff:hd,score:played?`${hs}–${as}`:null});
     BY_TEAM[a][gw].push({opp:h,venue:"A",diff:ad,score:played?`${as}–${hs}`:null});
     n++;
   }
 
-  setStatus("ok",describeData(events,meta)+(source==="fixtures.csv"?` · ${n} fixtures (full file)`:""));
+  const cur=events.find(e=>truthy(e.is_current));
+  const progress=cur&&prog[+cur.id]?{gw:+cur.id,...prog[+cur.id]}:null;
+  setStatus("ok",describeData(events,meta,progress)+(source==="fixtures.csv"?` · ${n} fixtures (full file)`:""));
   return true;
 }
 

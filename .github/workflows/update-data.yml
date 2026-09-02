@@ -3,7 +3,8 @@ name: Update Premier League Data v2
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 6 * * 1'
+    # Tuesday 06:00 UTC: after any Monday-night fixture, so a full gameweek is captured
+    - cron: '0 6 * * 2'
 
 permissions:
   contents: write
