@@ -1,536 +1,364 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FPL Dashboard</title>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <style>
-    :root, [data-theme="light"] {
-      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
-      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
-      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
-      --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
-      --color-bg: #f7f6f2; --color-surface: #f9f8f5; --color-surface-2: #fbfbf9; --color-surface-offset: #f3f0ec; --color-surface-dynamic: #e6e4df;
-      --color-border: #d4d1ca; --color-divider: #dcd9d5; --color-text: #28251d; --color-text-muted: #7a7974; --color-text-faint: #bab9b4;
-      --color-primary: #01696f; --color-primary-hover: #0c4e54; --color-success: #437a22; --color-error: #a12c7b; --color-blue: #006494; --color-gold: #d19900; --color-orange: #da7101; --color-red: #b93a3a;
-      --d1:#2f8f5b; --d2:#6fb98a; --d3:#b9b6ad; --d4:#e0895c; --d5:#b93a3a;
-      --radius-sm: .375rem; --radius-md: .5rem; --radius-lg: .75rem; --radius-xl: 1rem; --shadow-sm: 0 1px 2px rgba(40,37,29,.06); --shadow-md: 0 4px 12px rgba(40,37,29,.08);
-      --content-wide: 1200px; --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1); --font-body: 'Satoshi', Inter, sans-serif;
-    }
-    [data-theme="dark"] {
-      --color-bg: #171614; --color-surface: #1c1b19; --color-surface-2: #201f1d; --color-surface-offset: #1d1c1a; --color-surface-dynamic: #2d2c2a;
-      --color-border: #393836; --color-divider: #262523; --color-text: #cdccca; --color-text-muted: #979693; --color-text-faint: #666562;
-      --color-primary: #4f98a3; --color-primary-hover: #227f8b; --color-success: #6daa45; --color-error: #d163a7; --color-blue: #5591c7; --color-gold: #e8af34; --color-orange: #fdab43; --color-red: #e06868;
-      --d1:#2f7a50; --d2:#3f8f62; --d3:#4a4946; --d4:#b3603e; --d5:#8f2c2c;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,.2); --shadow-md: 0 4px 12px rgba(0,0,0,.3);
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; overflow: hidden; }
-    body { font-family: var(--font-body); font-size: var(--text-base); background: var(--color-bg); color: var(--color-text); line-height: 1.5; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
-    button, input, select { font: inherit; color: inherit; }
-    a { color: inherit; text-decoration: none; }
-    .app { display: grid; grid-template-columns: 280px 1fr; height: 100dvh; }
-    .sidebar { background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-offset) 100%); border-right: 1px solid rgba(127,127,127,.16); padding: var(--space-6); overflow-y: auto; overscroll-behavior: contain; }
-    .brand { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-8); }
-    .brand-mark { width: 40px; height: 40px; border-radius: 12px; background: color-mix(in srgb, var(--color-primary) 16%, var(--color-surface)); display: grid; place-items: center; color: var(--color-primary); border: 1px solid rgba(127,127,127,.14); }
-    .brand h1 { font-size: var(--text-lg); margin: 0; }
-    .muted { color: var(--color-text-muted); }
-    .nav { display: grid; gap: var(--space-2); }
-    .nav a { display: flex; align-items: center; gap: var(--space-3); padding: .85rem 1rem; border-radius: var(--radius-lg); color: var(--color-text-muted); transition: background var(--transition), color var(--transition); cursor: pointer; }
-    .nav a:hover, .nav a.active { background: var(--color-surface-2); color: var(--color-text); }
-    .nav a.ext::after { content: "↗"; margin-left: auto; color: var(--color-text-faint); font-size: var(--text-xs); }
-    .sidebar-card { margin-top: var(--space-8); padding: var(--space-4); border-radius: var(--radius-xl); background: var(--color-surface-2); border: 1px solid rgba(127,127,127,.12); }
-    .main-wrap { display: grid; grid-template-rows: auto 1fr; min-width: 0; overflow: hidden; }
-    .header { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); padding: var(--space-4) var(--space-6); background: color-mix(in srgb, var(--color-bg) 84%, transparent); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(127,127,127,.12); }
-    .header-actions { display: flex; gap: var(--space-3); align-items: center; }
-    .btn, .theme-toggle { border: 1px solid rgba(127,127,127,.14); background: var(--color-surface); padding: .8rem 1rem; border-radius: var(--radius-lg); cursor: pointer; transition: background var(--transition), border-color var(--transition), transform var(--transition); }
-    .btn:hover, .theme-toggle:hover { background: var(--color-surface-2); transform: translateY(-1px); }
-    .btn.primary { background: var(--color-primary); color: #f8fafc; border-color: transparent; }
-    .main { overflow-y: auto; overscroll-behavior: contain; padding: var(--space-6); min-width: 0; scroll-behavior: smooth; }
-    .hero { display: flex; justify-content: space-between; gap: var(--space-6); align-items: end; margin-bottom: var(--space-6); flex-wrap: wrap; }
-    .hero h2 { margin: 0 0 .4rem 0; font-size: var(--text-xl); }
-    .hero p { margin: 0; color: var(--color-text-muted); max-width: 72ch; }
-    .pill { display: inline-flex; align-items: center; gap: .5rem; padding: .45rem .8rem; border-radius: 999px; background: var(--color-surface); border: 1px solid rgba(127,127,127,.14); color: var(--color-text-muted); font-size: var(--text-xs); }
-    .grid-kpi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6); }
-    .card { background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-2) 100%); border: 1px solid rgba(127,127,127,.12); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); padding: var(--space-5); min-width: 0; }
-    .card h3, .card h4 { margin: 0 0 .75rem 0; font-size: var(--text-lg); }
-    .kpi-label { color: var(--color-text-muted); font-size: var(--text-sm); }
-    .kpi-value { font-size: clamp(1.5rem, 1.2rem + 1vw, 2.2rem); font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; margin: .35rem 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .kpi-meta { color: var(--color-text-muted); font-size: var(--text-xs); }
-    .layout-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-6); }
-    .chart-wrap { position: relative; min-height: 320px; }
-    .filters { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4); align-items: end; }
-    .field { display: grid; gap: .45rem; }
-    .field label { font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .06em; }
-    .field input, .field select { min-width: 130px; background: var(--color-bg); border: 1px solid rgba(127,127,127,.14); border-radius: var(--radius-md); padding: .8rem .85rem; }
-    .seg { display: inline-flex; border: 1px solid rgba(127,127,127,.18); border-radius: var(--radius-md); overflow: hidden; background: var(--color-bg); }
-    .seg button { background: transparent; border: 0; padding: .75rem .9rem; cursor: pointer; color: var(--color-text-muted); font-size: var(--text-sm); }
-    .seg button[aria-pressed="true"] { background: var(--color-primary); color: #fff; }
-    table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums lining-nums; }
-    th, td { text-align: left; padding: .75rem .6rem; border-bottom: 1px solid rgba(127,127,127,.12); font-size: var(--text-sm); white-space: nowrap; }
-    th { color: var(--color-text-muted); font-weight: 500; position: sticky; top: 0; background: var(--color-surface); z-index: 1; cursor: pointer; user-select: none; }
-    th:hover { color: var(--color-text); }
-    th.sorted { color: var(--color-primary); }
-    th.sorted::after { content: " ▾"; font-size: .8em; }
-    th.sorted.asc::after { content: " ▴"; }
-    th.num, td.num { text-align: right; }
-    tbody tr.row { cursor: pointer; }
-    tbody tr.row:hover { background: color-mix(in srgb, var(--color-primary) 5%, var(--color-surface)); }
-    tbody tr.row.open { background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)); }
-    tr.detail td { background: var(--color-surface-offset); padding: var(--space-4) var(--space-5); white-space: normal; }
-    .detail-grid { display: grid; grid-template-columns: 1fr auto; gap: var(--space-5); align-items: start; }
-    .fixrow { display: flex; gap: .4rem; flex-wrap: wrap; }
-    .fix { min-width: 74px; padding: .45rem .55rem; border-radius: var(--radius-md); color: #fff; font-size: var(--text-xs); line-height: 1.25; text-align: center; }
-    .fix small { display: block; opacity: .8; }
-    .fix.d1{background:var(--d1)} .fix.d2{background:var(--d2)} .fix.d3{background:var(--d3);color:var(--color-text)} .fix.d4{background:var(--d4)} .fix.d5{background:var(--d5)}
-    .fix.blank { background: transparent; border: 1px dashed rgba(127,127,127,.3); color: var(--color-text-muted); }
-    .stats-mini { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: .6rem var(--space-4); font-size: var(--text-xs); color: var(--color-text-muted); }
-    .stats-mini b { display: block; color: var(--color-text); font-size: var(--text-sm); font-weight: 500; }
-    .news { margin-top: .6rem; font-size: var(--text-sm); color: var(--color-orange); }
-    .table-wrap { overflow: auto; max-height: 640px; }
-    .badge { display: inline-flex; align-items: center; gap: .3rem; border-radius: 999px; padding: .25rem .55rem; font-size: var(--text-xs); border: 1px solid rgba(127,127,127,.14); }
-    .badge.a { color: var(--color-success); } .badge.d { color: var(--color-orange); } .badge.i, .badge.s, .badge.u, .badge.n { color: var(--color-red); }
-    .pos { font-size: var(--text-xs); padding: .15rem .4rem; border-radius: 4px; background: var(--color-surface-dynamic); color: var(--color-text-muted); }
-    .delta { font-size: var(--text-xs); color: var(--color-text-muted); margin-left: .35rem; }
-    .delta.up { color: var(--color-success); } .delta.down { color: var(--color-red); }
-    .section { margin-bottom: var(--space-6); }
-    .section-head { display: flex; justify-content: space-between; gap: var(--space-4); align-items: end; margin-bottom: var(--space-4); flex-wrap: wrap; }
-    .section-head p, .legend { color: var(--color-text-muted); font-size: var(--text-sm); margin: 0; }
-    .status { color: var(--color-text-muted); font-size: var(--text-sm); }
-    .empty { padding: var(--space-8); text-align: center; color: var(--color-text-muted); }
-    .mobile-toggle { display: none; }
-    @media (max-width: 1100px) {
-      .grid-kpi { grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .layout-2 { grid-template-columns: 1fr; }
-      .app { grid-template-columns: 88px 1fr; }
-      .brand-copy, .nav span, .sidebar-card { display: none; }
-      .sidebar { padding-inline: var(--space-3); }
-      .brand { justify-content: center; }
-      .nav a { justify-content: center; padding-inline: 0; }
-      .nav a.ext::after { display: none; }
-    }
-    @media (max-width: 760px) {
-      html, body { overflow: auto; }
-      .app { display: block; height: auto; }
-      .sidebar { display: none; }
-      .main-wrap { min-height: 100dvh; overflow: visible; }
-      .main { overflow: visible; padding: var(--space-4); }
-      .header { padding: var(--space-4); }
-      .grid-kpi, .layout-2 { grid-template-columns: 1fr; }
-      .detail-grid { grid-template-columns: 1fr; }
-      .mobile-toggle { display: inline-flex; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FPL Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ── Shared shell (keep in sync with planner.html) ─────────────────────────── */
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface-2:#e9ebf2; --line:#d5d8e3; --line-strong:#b9bdcc;
+  --ink:#171a26; --ink-2:#4a4f63; --ink-3:#7a8096; --accent:#2f3fa8; --accent-ink:#ffffff;
+  --d1:#1f7a4d; --d2:#3fa66e; --d3:#c9ccd6; --d4:#d95f6a; --d5:#8f1f33;
+  --d1-ink:#ffffff; --d2-ink:#0f2a1c; --d3-ink:#2b2f3d; --d4-ink:#ffffff; --d5-ink:#ffffff;
+  --muted-cell:#f0f1f5; --ok:#1f7a4d; --warn:#b8741a; --err:#a8323f;
+  --gkp:#b8860b; --def:#2f6fb5; --mid:#2f8f5b; --fwd:#d0663a;
+  --shadow:0 1px 2px rgba(23,26,38,.06),0 6px 20px rgba(23,26,38,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+    --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+    --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+    --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+    --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+    --gkp:#e0b23a; --def:#6fa3e6; --mid:#5fc48f; --fwd:#f08a5c;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+  --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+  --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+  --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+  --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+  --gkp:#e0b23a; --def:#6fa3e6; --mid:#5fc48f; --fwd:#f08a5c;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px}
+.tabs a{padding:7px 16px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+.right{display:flex;align-items:center;gap:10px}
+.status{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:12px;white-space:nowrap}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block;flex:none}
+.status.ok i{background:var(--ok)} .status.warn i{background:var(--warn)} .status.err i{background:var(--err)}
+.status b{font:600 12px "IBM Plex Mono",monospace;color:var(--ink)}
+.theme{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink-2);display:grid;place-items:center}
+.theme:hover{color:var(--ink)}
+.theme svg{width:16px;height:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;gap:8px}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{flex:1;background:var(--surface);color:var(--ink-2);border:0;border-right:1px solid var(--line);padding:7px 10px;font:500 13px "IBM Plex Sans",sans-serif;cursor:pointer;white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible,.tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{color:inherit}
+@media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+
+/* ── Dashboard ──────────────────────────────────────────────────────────────── */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi .v{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:28px;line-height:1.05;margin:4px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .m{color:var(--ink-3);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.chart-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}
+.chart-head h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:20px;margin:0;letter-spacing:.005em}
+.chart-head p{margin:0;color:var(--ink-3);font-size:12px;text-align:right}
+.chart-wrap{position:relative;height:300px}
+.screener-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.screener-head h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:22px;margin:0}
+.screener-head p{margin:2px 0 0;color:var(--ink-3);font-size:12px}
+.count{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3)}
+.filters{display:grid;grid-template-columns:minmax(180px,1.4fr) repeat(4,minmax(110px,.8fr)) auto auto;gap:10px;margin-bottom:12px;align-items:end}
+@media (max-width:1100px){.filters{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.filters{grid-template-columns:1fr 1fr}.kpis,.charts{grid-template-columns:1fr}}
+.field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+.field input,.field select{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font:inherit;color:var(--ink)}
+.field input:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);cursor:pointer;padding:8px 0}
+.check input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font:500 13px "IBM Plex Sans",sans-serif;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.btn:hover{color:var(--ink);border-color:var(--line-strong)}
+.tablewrap{border:1px solid var(--line);border-radius:8px;overflow:auto;max-height:680px;background:var(--surface)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:0 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px}
+thead th{position:sticky;top:0;z-index:2;background:var(--surface-2);color:var(--ink-3);font:600 11px "IBM Plex Mono",monospace;letter-spacing:.04em;text-align:left;padding:9px 10px;border-bottom:1px solid var(--line-strong);cursor:pointer;user-select:none}
+thead th:hover{color:var(--ink)}
+thead th.sorted{color:var(--accent)}
+thead th.sorted::after{content:" ▾"} thead th.sorted.asc::after{content:" ▴"}
+th.num,td.num{text-align:right;font-family:"IBM Plex Mono",monospace}
+td.num{font-size:12.5px}
+tbody tr.row{height:40px;cursor:pointer}
+tbody tr.row:hover td{background:var(--muted-cell)}
+tbody tr.row.open td{background:var(--surface-2)}
+td.name{font-weight:600;color:var(--ink)}
+.pos{font:600 10px "IBM Plex Mono",monospace;padding:2px 6px;border-radius:3px;color:#fff;letter-spacing:.04em}
+.pos.GKP{background:var(--gkp)} .pos.DEF{background:var(--def)} .pos.MID{background:var(--mid)} .pos.FWD{background:var(--fwd)}
+.delta{font-size:11px;margin-left:4px}
+.delta.up{color:var(--ok)} .delta.down{color:var(--err)}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-2)}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
+.badge.a::before{background:var(--ok)} .badge.d::before{background:var(--warn)} .badge.i::before,.badge.s::before,.badge.u::before,.badge.n::before{background:var(--err)}
+tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;border-bottom:1px solid var(--line-strong)}
+.detail-grid{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start}
+@media (max-width:900px){.detail-grid{grid-template-columns:1fr}}
+.fixrow{display:flex;gap:4px;flex-wrap:wrap}
+.fix{min-width:72px;height:38px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:600 13px "IBM Plex Mono",monospace;line-height:1.1}
+.fix small{font:500 10px "IBM Plex Mono",monospace;opacity:.8;margin-top:2px}
+.fix.d1{background:var(--d1);color:var(--d1-ink)} .fix.d2{background:var(--d2);color:var(--d2-ink)} .fix.d3{background:var(--d3);color:var(--d3-ink)} .fix.d4{background:var(--d4);color:var(--d4-ink)} .fix.d5{background:var(--d5);color:var(--d5-ink)}
+.fix.blank{background:transparent;border:1px dashed var(--line);color:var(--ink-3);font-weight:500;font-size:11px;padding:0 10px}
+.stats-mini{display:grid;grid-template-columns:repeat(4,minmax(100px,1fr));gap:10px 20px;font-size:11px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+.stats-mini b{display:block;font:600 14px "IBM Plex Mono",monospace;color:var(--ink);letter-spacing:0;text-transform:none;margin-top:2px}
+.stats-mini .muted{font-weight:400;color:var(--ink-3);font-size:11px}
+.news{margin-top:10px;font-size:13px;color:var(--warn)}
+.empty{padding:32px;text-align:center;color:var(--ink-3)}
+.empty.err{color:var(--err)}
+@media (prefers-reduced-motion:no-preference){.tabs a,.btn,.seg button{transition:background-color .15s,color .15s}}
+</style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar" aria-label="Primary">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-label="FPL mark">
-            <path d="M5 18V6h12"/><path d="M5 12h8"/><path d="M11 18V6"/><circle cx="17" cy="7" r="2.5" fill="currentColor" stroke="none"/>
-          </svg>
-        </div>
-        <div class="brand-copy">
-          <h1>FPL Dashboard</h1>
-          <div class="muted">Live repo-driven view</div>
-        </div>
-      </div>
-      <nav class="nav" id="sideNav">
-        <a data-target="overview" class="active"><span>Overview</span></a>
-        <a data-target="charts"><span>Charts</span></a>
-        <a data-target="players"><span>Player screener</span></a>
-        <a href="./planner.html" class="ext"><span>Fixture planner</span></a>
-      </nav>
-      <div class="sidebar-card">
-        <div class="kpi-label">Data sources</div>
-        <p class="muted">players.csv, player_history.csv, player_future_fixtures.csv, teams.csv, team_fixture_difficulty.csv, events.csv.</p>
-        <p class="muted" id="updatedAt"></p>
-      </div>
-    </aside>
-    <div class="main-wrap">
-      <header class="header">
-        <div><div class="pill">Repo: arlind55/fplproject</div></div>
-        <div class="header-actions">
-          <button class="btn mobile-toggle" type="button" id="scrollTopBtn">Top</button>
-          <button class="btn" type="button" id="exportPlayers">Export filtered players</button>
-          <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">☀️</button>
-        </div>
-      </header>
-      <main class="main" id="main-content">
-        <section class="hero" id="overview">
-          <div>
-            <h2>Premier League decision board</h2>
-            <p>Form, expected stats and fixtures for every FPL player, refreshed from the data your pipeline commits.</p>
-          </div>
-          <div><div class="pill" id="statusPill">Loading latest repo data…</div></div>
-        </section>
-
-        <section class="grid-kpi" id="kpis">
-          <article class="card"><div class="kpi-label">Best current form</div><div class="kpi-value" id="kpiTopForm">—</div><div class="kpi-meta" id="kpiTopFormMeta">—</div></article>
-          <article class="card"><div class="kpi-label">Top xGI per 90</div><div class="kpi-value" id="kpiTopXgi">—</div><div class="kpi-meta" id="kpiTopXgiMeta">—</div></article>
-          <article class="card"><div class="kpi-label">Most transferred in</div><div class="kpi-value" id="kpiTransfers">—</div><div class="kpi-meta" id="kpiTransfersMeta">—</div></article>
-          <article class="card"><div class="kpi-label">Easiest next five</div><div class="kpi-value" id="kpiBestFixtures">—</div><div class="kpi-meta" id="kpiBestFixturesMeta">—</div></article>
-        </section>
-
-        <div id="charts"></div>
-        <section class="layout-2 section">
-          <article class="card">
-            <div class="section-head"><div><h3>Value map: xGI per 90 vs price</h3><p>Players with 90+ minutes. Top-left is cheap and productive.</p></div></div>
-            <div class="chart-wrap"><canvas id="valueChart"></canvas></div>
-          </article>
-          <article class="card">
-            <div class="section-head"><div><h3>Points vs projected</h3><p>Top 15 by form: points per game so far against FPL's expected points for next GW.</p></div></div>
-            <div class="chart-wrap"><canvas id="xpChart"></canvas></div>
-          </article>
-        </section>
-        <section class="layout-2 section">
-          <article class="card">
-            <div class="section-head"><div><h3>Form leaders</h3><p>Top 10 players by current form.</p></div></div>
-            <div class="chart-wrap"><canvas id="formChart"></canvas></div>
-          </article>
-          <article class="card">
-            <div class="section-head"><div><h3>Ownership vs form</h3><p>Bottom-right: template players underperforming. Top-left: differentials in form.</p></div></div>
-            <div class="chart-wrap"><canvas id="ownChart"></canvas></div>
-          </article>
-        </section>
-
-        <section class="card section" id="players">
-          <div class="section-head">
-            <div>
-              <h3>Player screener</h3>
-              <p>Click a column to sort, click a row for next fixtures and detail. Metrics follow the Total / Per game / Per 90 toggle.</p>
-            </div>
-            <div class="status" id="playerCountStatus">0 rows</div>
-          </div>
-          <div class="filters">
-            <div class="field"><label for="search">Search</label><input id="search" type="text" placeholder="Saka, Palmer, Haaland" /></div>
-            <div class="field"><label for="position">Position</label><select id="position"><option value="">All</option></select></div>
-            <div class="field"><label for="team">Team</label><select id="team"><option value="">All</option></select></div>
-            <div class="field"><label for="maxPrice">Max price</label><input id="maxPrice" type="number" step="0.1" min="0" placeholder="e.g. 8.0" /></div>
-            <div class="field"><label for="minMins">Min minutes</label><input id="minMins" type="number" step="10" min="0" value="0" /></div>
-            <div class="field"><label>Metric basis</label>
-              <div class="seg" id="basis" role="group">
-                <button data-b="total" aria-pressed="true">Total</button>
-                <button data-b="game" aria-pressed="false">Per game</button>
-                <button data-b="p90" aria-pressed="false">Per 90</button>
-              </div>
-            </div>
-            <div class="field"><label for="hideUnavail">&nbsp;</label><label style="text-transform:none;letter-spacing:0;display:flex;gap:.5rem;align-items:center;font-size:var(--text-sm);color:var(--color-text)"><input type="checkbox" id="hideUnavail" style="min-width:0;padding:0"> Hide injured/unavailable</label></div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr id="playersHead"></tr></thead>
-              <tbody id="playersTable"></tbody>
-            </table>
-          </div>
-        </section>
-      </main>
-    </div>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand">
+    <div><h1>FPL Dashboard</h1><small>Premier League 2026/27</small></div>
   </div>
+  <nav class="tabs" aria-label="Pages">
+    <a href="./index.html" aria-current="page">Dashboard</a>
+    <a href="./planner.html">Fixture planner</a>
+  </nav>
+  <div class="right">
+    <span class="status" id="status"><i></i><span>Loading data…</span></span>
+    <button class="theme" id="themeBtn" type="button" aria-label="Toggle light / dark"></button>
+  </div>
+</header>
 
-  <script>
-    const REPO = { owner: 'arlind55', repo: 'fplproject', branch: 'main' };
-    const BASE = `https://raw.githubusercontent.com/${REPO.owner}/${REPO.repo}/${REPO.branch}/data/current`;
-    const charts = {};
-    let state = { players: [], teams: {}, teamDifficulty: [], events: [], apps: {}, future: null, filtered: [], basis: 'total', sort: { key: 'form', dir: 'desc' }, open: null };
+<section class="kpis">
+  <div class="card kpi"><div class="label">Best form</div><div class="v" id="kpiTopForm">—</div><div class="m" id="kpiTopFormMeta">—</div></div>
+  <div class="card kpi"><div class="label">Top xGI per 90 <span>90+ mins</span></div><div class="v" id="kpiTopXgi">—</div><div class="m" id="kpiTopXgiMeta">—</div></div>
+  <div class="card kpi"><div class="label">Most transferred in <span>this GW</span></div><div class="v" id="kpiTransfers">—</div><div class="m" id="kpiTransfersMeta">—</div></div>
+  <div class="card kpi"><div class="label">Easiest next five <a href="./planner.html" style="color:var(--accent);text-transform:none;letter-spacing:0;font-weight:500">Planner →</a></div><div class="v" id="kpiBestFixtures">—</div><div class="m" id="kpiBestFixturesMeta">—</div></div>
+</section>
 
-    // ── Nav ─────────────────────────────────────────────────────────────────
-    const mainEl = document.getElementById('main-content');
-    document.getElementById('sideNav').addEventListener('click', e => {
-      const link = e.target.closest('a[data-target]');
-      if (!link) return;
-      e.preventDefault();
-      const target = document.getElementById(link.dataset.target);
-      if (target) mainEl.scrollTo({ top: target.offsetTop - 16, behavior: 'smooth' });
-      setActiveLink(link.dataset.target);
-    });
-    document.getElementById('scrollTopBtn').addEventListener('click', () => mainEl.scrollTo({ top: 0, behavior: 'smooth' }));
-    function setActiveLink(id) { document.querySelectorAll('#sideNav a[data-target]').forEach(a => a.classList.toggle('active', a.dataset.target === id)); }
-    (function initObserver() {
-      const sections = ['overview', 'charts', 'players'].map(id => document.getElementById(id)).filter(Boolean);
-      const observer = new IntersectionObserver(entries => { entries.forEach(entry => { if (entry.isIntersecting) setActiveLink(entry.target.id); }); }, { root: mainEl, threshold: 0.25 });
-      sections.forEach(s => observer.observe(s));
-    })();
+<section class="charts">
+  <div class="card"><div class="chart-head"><h3>Value map · xGI/90 vs price</h3><p>90+ mins. Top-left = cheap and productive</p></div><div class="chart-wrap"><canvas id="valueChart"></canvas></div></div>
+  <div class="card"><div class="chart-head"><h3>Points vs projected</h3><p>Top 15 by form · PPG vs FPL xPts next GW</p></div><div class="chart-wrap"><canvas id="xpChart"></canvas></div></div>
+  <div class="card"><div class="chart-head"><h3>Form leaders</h3><p>Top 10 · coloured by position</p></div><div class="chart-wrap"><canvas id="formChart"></canvas></div></div>
+  <div class="card"><div class="chart-head"><h3>Ownership vs form</h3><p>Top-left = differentials · bottom-right = template dead weight</p></div><div class="chart-wrap"><canvas id="ownChart"></canvas></div></div>
+</section>
 
-    // ── Theme ───────────────────────────────────────────────────────────────
-    function setTheme(next) {
-      document.documentElement.setAttribute('data-theme', next);
-      document.querySelector('[data-theme-toggle]').textContent = next === 'dark' ? '☀️' : '🌙';
-      if (state.players.length) buildCharts();
-    }
-    document.querySelector('[data-theme-toggle]').addEventListener('click', () => setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
-    setTheme(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+<section class="card" id="players">
+  <div class="screener-head">
+    <div><h3>Player screener</h3><p>Click a column to sort · click a row for next fixtures and detail · metrics follow the Total / Per game / Per 90 toggle</p></div>
+    <span class="count" id="playerCountStatus">0 players</span>
+  </div>
+  <div class="filters">
+    <div class="field"><label for="search">Search</label><input id="search" type="text" placeholder="Saka, Palmer, Haaland"></div>
+    <div class="field"><label for="position">Position</label><select id="position"><option value="">All</option></select></div>
+    <div class="field"><label for="team">Team</label><select id="team"><option value="">All</option></select></div>
+    <div class="field"><label for="maxPrice">Max price</label><input id="maxPrice" type="number" step="0.1" min="0" placeholder="8.0"></div>
+    <div class="field"><label for="minMins">Min minutes</label><input id="minMins" type="number" step="10" min="0" value="0"></div>
+    <div class="field"><label>Metric basis</label>
+      <div class="seg" id="basis" role="group"><button data-b="total" aria-pressed="true">Total</button><button data-b="game" aria-pressed="false">Per game</button><button data-b="p90" aria-pressed="false">Per 90</button></div>
+    </div>
+    <div class="field"><label>&nbsp;</label><div style="display:flex;gap:10px;align-items:center"><label class="check"><input type="checkbox" id="hideUnavail"> Hide unavailable</label><button class="btn" id="exportPlayers" type="button">Export CSV</button></div></div>
+  </div>
+  <div class="tablewrap">
+    <table><thead><tr id="playersHead"></tr></thead><tbody id="playersTable"><tr><td class="empty" colspan="15">Loading players…</td></tr></tbody></table>
+  </div>
+</section>
 
-    // ── Data helpers ────────────────────────────────────────────────────────
-    function csvToObjects(text) {
-      const rows = []; let row = [], cell = '', q = false;
-      for (let i = 0; i < text.length; i++) {
-        const c = text[i], n = text[i + 1];
-        if (c === '"') { if (q && n === '"') { cell += '"'; i++; } else q = !q; }
-        else if (c === ',' && !q) { row.push(cell); cell = ''; }
-        else if ((c === '\n' || c === '\r') && !q) { if (c === '\r' && n === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
-        else cell += c;
-      }
-      if (cell.length || row.length) { row.push(cell); rows.push(row); }
-      const [headers, ...body] = rows.filter(r => r.some(v => v !== ''));
-      return body.map(r => Object.fromEntries(headers.map((h, i) => [h, (r[i] ?? '').trim()])));
-    }
-    async function fetchCsv(file) {
-      const res = await fetch(`${BASE}/${file}`, { cache: 'no-cache' });
-      if (!res.ok) throw new Error(`Failed to load ${file} (HTTP ${res.status})`);
-      return csvToObjects(await res.text());
-    }
-    const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : null; };
-    const truthy = v => /^(true|1)$/i.test(String(v));
-    const fmt = (v, d = 1) => v == null ? '—' : v.toFixed(d);
-    const price = v => v == null ? '—' : `£${v.toFixed(1)}m`;
-    const POS = { '1': 'GKP', '2': 'DEF', '3': 'MID', '4': 'FWD' };
-    const posName = v => POS[String(v)] || '—';
-    const STATUS = { a: 'Available', d: 'Doubtful', i: 'Injured', s: 'Suspended', u: 'Unavailable', n: 'Not in squad' };
-    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+<footer>
+  <span>Form, PPG, xG, xA, xGI, ICT, DefCon and xPts are FPL's official figures. Per game divides by appearances with minutes; per 90 by minutes played.</span>
+  <span>Source: <a href="https://github.com/arlind55/fplproject">arlind55/fplproject</a> · data/current</span>
+</footer>
+</div>
 
-    // Normalise one raw players.csv row into typed fields
-    function shape(p, apps) {
-      const mins = num(p.minutes) || 0;
-      const games = apps[p.id] ?? (num(p.starts) || 0);
-      return {
-        id: p.id, name: p.web_name, team: p.team_short_name || p.team_name, teamName: p.team_name, teamId: p.team, pos: posName(p.element_type),
-        price: num(p.now_cost), form: num(p.form), ppg: num(p.points_per_game), points: num(p.total_points) || 0, mins, games,
-        goals: num(p.goals_scored) || 0, assists: num(p.assists) || 0, cs: num(p.clean_sheets) || 0, bonus: num(p.bonus) || 0,
-        xg: num(p.expected_goals) || 0, xa: num(p.expected_assists) || 0, xgi: num(p.expected_goal_involvements) || 0, xgc: num(p.expected_goals_conceded) || 0,
-        ict: num(p.ict_index) || 0, defcon: num(p.defensive_contribution) || 0,
-        own: num(p.selected_by_percent), tin: num(p.transfers_in_event) || 0, tout: num(p.transfers_out_event) || 0, dprice: num(p.cost_change_event) || 0,
-        epNext: num(p.ep_next), status: (p.status || 'a').toLowerCase(), news: p.news || '', chance: num(p.chance_of_playing_next_round),
-      };
-    }
-    // Metric under the current basis
-    function per(pl, v) {
-      if (state.basis === 'p90') return pl.mins ? v / pl.mins * 90 : null;
-      if (state.basis === 'game') return pl.games ? v / pl.games : null;
-      return v;
-    }
-    const p90 = (pl, v) => pl.mins ? v / pl.mins * 90 : null;
+<script>
+// ── Shared: theme + data status (keep in sync with planner.html) ──────────────
+const REPO={owner:"arlind55",repo:"fplproject",branch:"main"};
+const BASE=`https://raw.githubusercontent.com/${REPO.owner}/${REPO.repo}/${REPO.branch}/data/current`;
+const $=id=>document.getElementById(id);
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function currentTheme(){const t=document.documentElement.getAttribute("data-theme");if(t)return t;return matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme");$("themeBtn").innerHTML=currentTheme()==="dark"?SUN:MOON;}
+try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
+$("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);if(typeof onThemeChange==="function")onThemeChange();});
+function setStatus(cls,html){const el=$("status");el.className="status "+cls;el.lastElementChild.innerHTML=html;}
+function describeData(events,meta){
+  const truthy=v=>/^(true|1)$/i.test(String(v));
+  const fin=events.filter(e=>truthy(e.finished)).map(e=>+e.id);const lastDone=fin.length?Math.max(...fin):0;
+  const next=events.find(e=>truthy(e.is_next))||events.find(e=>truthy(e.is_current));
+  let when="";if(meta?.updated_at){const d=new Date(meta.updated_at);when=d.toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
+  return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · <b>GW${lastDone}</b> complete · GW${next?next.id:"?"} next`;
+}
+async function fetchMeta(){try{const r=await fetch(`${BASE}/meta.json`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}
 
-    // ── Screener columns ────────────────────────────────────────────────────
-    const COLS = [
-      { key: 'name', label: 'Player', render: p => `<strong>${esc(p.name)}</strong>${p.dprice ? `<span class="delta ${p.dprice > 0 ? 'up' : 'down'}">${p.dprice > 0 ? '▲' : '▼'}</span>` : ''}` },
-      { key: 'team', label: 'Team', render: p => esc(p.team) },
-      { key: 'pos', label: 'Pos', render: p => `<span class="pos">${p.pos}</span>` },
-      { key: 'price', label: 'Price', num: true, render: p => price(p.price) },
-      { key: 'form', label: 'Form', num: true, render: p => fmt(p.form) },
-      { key: 'ppg', label: 'PPG', num: true, render: p => fmt(p.ppg) },
-      { key: 'points', label: 'Pts', num: true, basis: true, render: p => fmt(per(p, p.points), state.basis === 'total' ? 0 : 1) },
-      { key: 'mins', label: 'Mins', num: true, render: p => String(p.mins) },
-      { key: 'xg', label: 'xG', num: true, basis: true, render: p => fmt(per(p, p.xg), 2) },
-      { key: 'xa', label: 'xA', num: true, basis: true, render: p => fmt(per(p, p.xa), 2) },
-      { key: 'xgi', label: 'xGI', num: true, basis: true, render: p => fmt(per(p, p.xgi), 2) },
-      { key: 'ict', label: 'ICT', num: true, basis: true, render: p => fmt(per(p, p.ict), 1) },
-      { key: 'defcon', label: 'DefCon', num: true, basis: true, render: p => fmt(per(p, p.defcon), state.basis === 'total' ? 0 : 1) },
-      { key: 'own', label: 'Own %', num: true, render: p => fmt(p.own) },
-      { key: 'status', label: 'Status', render: p => `<span class="badge ${p.status}" title="${esc(p.news)}">${STATUS[p.status] || p.status.toUpperCase()}${p.chance != null && p.chance < 100 ? ` ${p.chance}%` : ''}</span>` },
-    ];
-    function sortValue(p, key) {
-      const col = COLS.find(c => c.key === key);
-      if (col?.basis) return per(p, p[key]);
-      return p[key];
-    }
+// ── Data ─────────────────────────────────────────────────────────────────────
+const charts={};
+let state={players:[],teams:{},teamDifficulty:[],events:[],future:null,filtered:[],basis:"total",sort:{key:"form",dir:"desc"},open:null};
+function csvToObjects(text){
+  const rows=[];let row=[],cell="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+    if(c==='"'){if(q&&n==='"'){cell+='"';i++;}else q=!q;}
+    else if(c===","&&!q){row.push(cell);cell="";}
+    else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&n==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";}
+    else cell+=c;}
+  if(cell.length||row.length){row.push(cell);rows.push(row);}
+  const [h,...b]=rows.filter(r=>r.some(v=>v!==""));
+  return b.map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]??"").trim()])));
+}
+async function fetchCsv(file){const res=await fetch(`${BASE}/${file}`,{cache:"no-cache"});if(!res.ok)throw new Error(`${file}: HTTP ${res.status}`);return csvToObjects(await res.text());}
+const num=v=>{const n=parseFloat(v);return Number.isFinite(n)?n:null;};
+const truthy=v=>/^(true|1)$/i.test(String(v));
+const fmt=(v,d=1)=>v==null?"—":v.toFixed(d);
+const price=v=>v==null?"—":`£${v.toFixed(1)}m`;
+const POS={"1":"GKP","2":"DEF","3":"MID","4":"FWD"};
+const STATUS={a:"Available",d:"Doubtful",i:"Injured",s:"Suspended",u:"Unavailable",n:"Not in squad"};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-    function renderHead() {
-      document.getElementById('playersHead').innerHTML = COLS.map(c => {
-        const sorted = state.sort.key === c.key ? `sorted ${state.sort.dir}` : '';
-        const label = c.basis && state.basis !== 'total' ? `${c.label}${state.basis === 'p90' ? '/90' : '/gm'}` : c.label;
-        return `<th class="${c.num ? 'num' : ''} ${sorted}" data-key="${c.key}">${label}</th>`;
-      }).join('');
-    }
-    document.getElementById('playersHead').addEventListener('click', e => {
-      const th = e.target.closest('th[data-key]'); if (!th) return;
-      const key = th.dataset.key;
-      if (state.sort.key === key) state.sort.dir = state.sort.dir === 'desc' ? 'asc' : 'desc';
-      else state.sort = { key, dir: ['name', 'team', 'pos', 'status'].includes(key) ? 'asc' : 'desc' };
-      renderPlayers();
-    });
+function shape(p,apps){
+  const mins=num(p.minutes)||0;
+  return{id:p.id,name:p.web_name,team:p.team_short_name||p.team_name,teamName:p.team_name,pos:POS[String(p.element_type)]||"—",
+    price:num(p.now_cost),form:num(p.form),ppg:num(p.points_per_game),points:num(p.total_points)||0,mins,games:apps[p.id]??(num(p.starts)||0),
+    goals:num(p.goals_scored)||0,assists:num(p.assists)||0,cs:num(p.clean_sheets)||0,bonus:num(p.bonus)||0,
+    xg:num(p.expected_goals)||0,xa:num(p.expected_assists)||0,xgi:num(p.expected_goal_involvements)||0,xgc:num(p.expected_goals_conceded)||0,
+    ict:num(p.ict_index)||0,defcon:num(p.defensive_contribution)||0,
+    own:num(p.selected_by_percent),tin:num(p.transfers_in_event)||0,tout:num(p.transfers_out_event)||0,dprice:num(p.cost_change_event)||0,
+    epNext:num(p.ep_next),status:(p.status||"a").toLowerCase(),news:p.news||"",chance:num(p.chance_of_playing_next_round)};
+}
+function per(pl,v){if(state.basis==="p90")return pl.mins?v/pl.mins*90:null;if(state.basis==="game")return pl.games?v/pl.games:null;return v;}
+const p90=(pl,v)=>pl.mins?v/pl.mins*90:null;
 
-    function renderPlayers() {
-      const q = document.getElementById('search').value.trim().toLowerCase();
-      const position = document.getElementById('position').value;
-      const team = document.getElementById('team').value;
-      const maxPrice = num(document.getElementById('maxPrice').value);
-      const minMins = num(document.getElementById('minMins').value) || 0;
-      const hideUnavail = document.getElementById('hideUnavail').checked;
-      let rows = state.players.filter(p =>
-        (!q || [p.name, p.teamName, p.team].some(v => String(v || '').toLowerCase().includes(q))) &&
-        (!position || p.pos === position) && (!team || p.team === team) &&
-        (maxPrice == null || (p.price || 0) <= maxPrice) && p.mins >= minMins &&
-        (!hideUnavail || p.status === 'a' || p.status === 'd')
-      );
-      const { key, dir } = state.sort;
-      const strKey = ['name', 'team', 'pos', 'status'].includes(key);
-      rows.sort((a, b) => {
-        const av = sortValue(a, key), bv = sortValue(b, key);
-        if (av == null && bv == null) return 0; if (av == null) return 1; if (bv == null) return -1;
-        const r = strKey ? String(av).localeCompare(String(bv)) : av - bv;
-        return dir === 'asc' ? r : -r;
-      });
-      state.filtered = rows;
-      renderHead();
-      document.getElementById('playerCountStatus').textContent = `${rows.length} players`;
-      const tbody = document.getElementById('playersTable');
-      if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${COLS.length}" class="empty">No players match the current filters.</td></tr>`; return; }
-      tbody.innerHTML = rows.slice(0, 150).map(p => `<tr class="row ${state.open === p.id ? 'open' : ''}" data-id="${p.id}">${COLS.map(c => `<td class="${c.num ? 'num' : ''}">${c.render(p)}</td>`).join('')}</tr>${state.open === p.id ? detailRow(p) : ''}`).join('')
-        + (rows.length > 150 ? `<tr><td colspan="${COLS.length}" class="empty">Showing 150 of ${rows.length} — narrow the filters to see more.</td></tr>` : '');
-    }
+// ── Screener ─────────────────────────────────────────────────────────────────
+const COLS=[
+  {key:"name",label:"Player",cls:"name",render:p=>`${esc(p.name)}${p.dprice?`<span class="delta ${p.dprice>0?"up":"down"}">${p.dprice>0?"▲":"▼"}</span>`:""}`},
+  {key:"team",label:"Team",render:p=>esc(p.team)},
+  {key:"pos",label:"Pos",render:p=>`<span class="pos ${p.pos}">${p.pos}</span>`},
+  {key:"price",label:"Price",num:true,render:p=>price(p.price)},
+  {key:"form",label:"Form",num:true,render:p=>fmt(p.form)},
+  {key:"ppg",label:"PPG",num:true,render:p=>fmt(p.ppg)},
+  {key:"points",label:"Pts",num:true,basis:true,render:p=>fmt(per(p,p.points),state.basis==="total"?0:1)},
+  {key:"mins",label:"Mins",num:true,render:p=>String(p.mins)},
+  {key:"xg",label:"xG",num:true,basis:true,render:p=>fmt(per(p,p.xg),2)},
+  {key:"xa",label:"xA",num:true,basis:true,render:p=>fmt(per(p,p.xa),2)},
+  {key:"xgi",label:"xGI",num:true,basis:true,render:p=>fmt(per(p,p.xgi),2)},
+  {key:"ict",label:"ICT",num:true,basis:true,render:p=>fmt(per(p,p.ict),1)},
+  {key:"defcon",label:"DefCon",num:true,basis:true,render:p=>fmt(per(p,p.defcon),state.basis==="total"?0:1)},
+  {key:"own",label:"Own %",num:true,render:p=>fmt(p.own)},
+  {key:"status",label:"Status",render:p=>`<span class="badge ${p.status}" title="${esc(p.news)}">${STATUS[p.status]||p.status.toUpperCase()}${p.chance!=null&&p.chance<100?` ${p.chance}%`:""}</span>`},
+];
+const STR=["name","team","pos","status"];
+const sortValue=(p,key)=>COLS.find(c=>c.key===key)?.basis?per(p,p[key]):p[key];
+function renderHead(){
+  $("playersHead").innerHTML=COLS.map(c=>{const s=state.sort.key===c.key?`sorted ${state.sort.dir}`:"";
+    const label=c.basis&&state.basis!=="total"?`${c.label}${state.basis==="p90"?"/90":"/gm"}`:c.label;
+    return `<th class="${c.num?"num":""} ${s}" data-key="${c.key}">${label}</th>`;}).join("");
+}
+$("playersHead").addEventListener("click",e=>{const th=e.target.closest("th[data-key]");if(!th)return;const key=th.dataset.key;
+  if(state.sort.key===key)state.sort.dir=state.sort.dir==="desc"?"asc":"desc";else state.sort={key,dir:STR.includes(key)?"asc":"desc"};renderPlayers();});
 
-    document.getElementById('playersTable').addEventListener('click', async e => {
-      const tr = e.target.closest('tr.row'); if (!tr) return;
-      const id = tr.dataset.id;
-      state.open = state.open === id ? null : id;
-      if (state.open && !state.future) await loadFuture();
-      renderPlayers();
-    });
+function renderPlayers(){
+  const q=$("search").value.trim().toLowerCase(),position=$("position").value,team=$("team").value,maxPrice=num($("maxPrice").value),minMins=num($("minMins").value)||0,hide=$("hideUnavail").checked;
+  const rows=state.players.filter(p=>(!q||[p.name,p.teamName,p.team].some(v=>String(v||"").toLowerCase().includes(q)))&&(!position||p.pos===position)&&(!team||p.team===team)&&(maxPrice==null||(p.price||0)<=maxPrice)&&p.mins>=minMins&&(!hide||p.status==="a"||p.status==="d"));
+  const {key,dir}=state.sort,str=STR.includes(key);
+  rows.sort((a,b)=>{const av=sortValue(a,key),bv=sortValue(b,key);if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return -1;const r=str?String(av).localeCompare(String(bv)):av-bv;return dir==="asc"?r:-r;});
+  state.filtered=rows;renderHead();$("playerCountStatus").textContent=`${rows.length} players`;
+  const tb=$("playersTable");
+  if(!rows.length){tb.innerHTML=`<tr><td colspan="${COLS.length}" class="empty">No players match the current filters.</td></tr>`;return;}
+  tb.innerHTML=rows.slice(0,150).map(p=>`<tr class="row ${state.open===p.id?"open":""}" data-id="${p.id}">${COLS.map(c=>`<td class="${c.num?"num":""} ${c.cls||""}">${c.render(p)}</td>`).join("")}</tr>${state.open===p.id?detailRow(p):""}`).join("")
+    +(rows.length>150?`<tr><td colspan="${COLS.length}" class="empty">Showing 150 of ${rows.length} — narrow the filters to see more.</td></tr>`:"");
+}
+$("playersTable").addEventListener("click",async e=>{const tr=e.target.closest("tr.row");if(!tr)return;const id=tr.dataset.id;state.open=state.open===id?null:id;if(state.open&&!state.future)await loadFuture();renderPlayers();});
+async function loadFuture(){try{const rows=await fetchCsv("player_future_fixtures.csv");const map={};rows.forEach(f=>{(map[f.player_id]=map[f.player_id]||[]).push(f);});Object.values(map).forEach(l=>l.sort((a,b)=>(num(a.event)||99)-(num(b.event)||99)));state.future=map;}catch(e){state.future={};}}
+function detailRow(p){
+  const fixtures=(state.future?.[p.id]||[]).slice(0,5);
+  const fixHtml=fixtures.length?fixtures.map(f=>{const home=truthy(f.is_home);const opp=state.teams[home?f.team_a:f.team_h]?.short||"?";const d=num(f.difficulty)||3;return `<div class="fix d${d}">${opp} <span style="font-size:10px;opacity:.75;margin-left:3px">${home?"H":"A"}</span><small>GW${f.event||"—"}</small></div>`;}).join(""):`<div class="fix blank">No upcoming fixtures loaded</div>`;
+  const diff=p.goals+p.assists-p.xgi;
+  return `<tr class="detail"><td colspan="${COLS.length}"><div class="detail-grid">
+    <div><div class="label">Next 5 fixtures</div><div class="fixrow">${fixHtml}</div>${p.news?`<div class="news">⚠ ${esc(p.news)}${p.chance!=null?` · ${p.chance}% chance of playing`:""}</div>`:""}</div>
+    <div class="stats-mini">
+      <div>Appearances<b>${p.games} <span class="muted">${p.mins} mins</span></b></div>
+      <div>G + A<b>${p.goals} + ${p.assists}</b></div>
+      <div>xGI vs actual<b>${fmt(p.xgi,2)} <span class="delta ${diff>0?"up":diff<0?"down":""}">${diff>0?"+":""}${fmt(diff,2)}</span></b></div>
+      <div>xGC / 90<b>${fmt(p90(p,p.xgc),2)}</b></div>
+      <div>Clean sheets<b>${p.cs}</b></div>
+      <div>Bonus<b>${p.bonus}</b></div>
+      <div>Transfers this GW<b><span class="delta up">+${p.tin.toLocaleString()}</span> <span class="delta down">−${p.tout.toLocaleString()}</span></b></div>
+      <div>xPts next GW<b>${fmt(p.epNext)}</b></div>
+    </div></div></td></tr>`;
+}
 
-    async function loadFuture() {
-      try {
-        const rows = await fetchCsv('player_future_fixtures.csv');
-        const map = {};
-        rows.forEach(f => { (map[f.player_id] = map[f.player_id] || []).push(f); });
-        Object.values(map).forEach(list => list.sort((a, b) => (num(a.event) || 99) - (num(b.event) || 99)));
-        state.future = map;
-      } catch (err) { state.future = {}; }
-    }
-    function detailRow(p) {
-      const fixtures = (state.future?.[p.id] || []).slice(0, 5);
-      const fixHtml = fixtures.length ? fixtures.map(f => {
-        const home = truthy(f.is_home); const oppId = home ? f.team_a : f.team_h; const opp = state.teams[oppId]?.short || '?'; const d = num(f.difficulty) || 3;
-        return `<div class="fix d${d}">${opp} (${home ? 'H' : 'A'})<small>GW${f.event || '—'} · ${d}</small></div>`;
-      }).join('') : `<div class="fix blank">No upcoming fixtures loaded</div>`;
-      const gi = p.goals + p.assists, diff = gi - p.xgi;
-      return `<tr class="detail"><td colspan="${COLS.length}">
-        <div class="detail-grid">
-          <div>
-            <div class="kpi-label" style="margin-bottom:.5rem">Next 5 fixtures</div>
-            <div class="fixrow">${fixHtml}</div>
-            ${p.news ? `<div class="news">⚠ ${esc(p.news)}${p.chance != null ? ` · ${p.chance}% chance of playing` : ''}</div>` : ''}
-          </div>
-          <div class="stats-mini">
-            <div>Appearances<b>${p.games} <span class="muted">(${p.mins} mins)</span></b></div>
-            <div>G + A<b>${p.goals} + ${p.assists}</b></div>
-            <div>xGI vs actual<b>${fmt(p.xgi, 2)} <span class="delta ${diff > 0 ? 'up' : diff < 0 ? 'down' : ''}">${diff > 0 ? '+' : ''}${fmt(diff, 2)}</span></b></div>
-            <div>xGC / 90<b>${fmt(p90(p, p.xgc), 2)}</b></div>
-            <div>Clean sheets<b>${p.cs}</b></div>
-            <div>Bonus<b>${p.bonus}</b></div>
-            <div>Transfers this GW<b><span class="delta up">+${p.tin.toLocaleString()}</span> <span class="delta down">−${p.tout.toLocaleString()}</span></b></div>
-            <div>xPts next GW<b>${fmt(p.epNext)}</b></div>
-          </div>
-        </div></td></tr>`;
-    }
+// ── KPIs ─────────────────────────────────────────────────────────────────────
+function updateKPIs(){
+  const P=state.players,set=(id,v)=>$(id).textContent=v;
+  const top=[...P].sort((a,b)=>(b.form||0)-(a.form||0))[0];
+  const xgi=[...P].filter(p=>p.mins>=90).sort((a,b)=>p90(b,b.xgi)-p90(a,a.xgi))[0];
+  const tr=[...P].sort((a,b)=>b.tin-a.tin)[0];
+  const easy=[...state.teamDifficulty].sort((a,b)=>(num(a.avg_difficulty_next_5)??999)-(num(b.avg_difficulty_next_5)??999))[0];
+  set("kpiTopForm",top?.name||"—");set("kpiTopFormMeta",top?`${top.team} · ${top.pos} · form ${fmt(top.form)} · ${price(top.price)}`:"—");
+  set("kpiTopXgi",xgi?.name||"—");set("kpiTopXgiMeta",xgi?`${xgi.team} · ${fmt(p90(xgi,xgi.xgi),2)} xGI/90 · ${xgi.mins} mins`:"—");
+  set("kpiTransfers",tr?.name||"—");set("kpiTransfersMeta",tr?`${tr.team} · +${tr.tin.toLocaleString()} · ${tr.own}% owned`:"—");
+  set("kpiBestFixtures",easy?(easy.team_name||easy.team_short_name):"—");set("kpiBestFixturesMeta",easy?`Avg ${fmt(num(easy.avg_difficulty_next_5),2)} · ${easy.opponents_next_5||""}`:"—");
+}
 
-    // ── KPIs ────────────────────────────────────────────────────────────────
-    function updateKPIs() {
-      const P = state.players;
-      const top = [...P].sort((a, b) => (b.form || 0) - (a.form || 0))[0];
-      const xgi = [...P].filter(p => p.mins >= 90).sort((a, b) => p90(b, b.xgi) - p90(a, a.xgi))[0];
-      const tr = [...P].sort((a, b) => b.tin - a.tin)[0];
-      const easy = [...state.teamDifficulty].sort((a, b) => (num(a.avg_difficulty_next_5) ?? 999) - (num(b.avg_difficulty_next_5) ?? 999))[0];
-      const set = (id, v) => document.getElementById(id).textContent = v;
-      set('kpiTopForm', top?.name || '—'); set('kpiTopFormMeta', top ? `${top.team} · ${top.pos} · form ${fmt(top.form)} · ${price(top.price)}` : '—');
-      set('kpiTopXgi', xgi?.name || '—'); set('kpiTopXgiMeta', xgi ? `${xgi.team} · ${fmt(p90(xgi, xgi.xgi), 2)} xGI/90 · ${xgi.mins} mins` : '—');
-      set('kpiTransfers', tr?.name || '—'); set('kpiTransfersMeta', tr ? `${tr.team} · +${tr.tin.toLocaleString()} this GW · ${tr.own}% owned` : '—');
-      set('kpiBestFixtures', easy ? (easy.team_short_name || easy.team_name) : '—'); set('kpiBestFixturesMeta', easy ? `Avg diff ${fmt(num(easy.avg_difficulty_next_5), 2)} · ${easy.opponents_next_5 || ''}` : '—');
-    }
+// ── Charts ───────────────────────────────────────────────────────────────────
+function tok(){const s=getComputedStyle(document.documentElement),g=k=>s.getPropertyValue(k).trim();return{ink:g("--ink"),muted:g("--ink-3"),accent:g("--accent"),line:g("--line"),surface:g("--surface"),GKP:g("--gkp"),DEF:g("--def"),MID:g("--mid"),FWD:g("--fwd"),gold:g("--warn")};}
+function base(c,x,y){return{maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:c.ink,font:{family:"IBM Plex Sans",size:11},boxWidth:10,boxHeight:10}},tooltip:{backgroundColor:c.ink,titleColor:c.surface,bodyColor:c.surface,titleFont:{family:"IBM Plex Sans"},bodyFont:{family:"IBM Plex Mono"}}},
+  scales:{x:{ticks:{color:c.muted,font:{family:"IBM Plex Mono",size:10}},grid:{color:c.line},title:{display:!!x,text:x,color:c.muted,font:{family:"IBM Plex Sans",size:11}}},y:{ticks:{color:c.muted,font:{family:"IBM Plex Mono",size:10}},grid:{color:c.line},title:{display:!!y,text:y,color:c.muted,font:{family:"IBM Plex Sans",size:11}}}}};}
+function scatterOpts(c,x,y,lab){const o=base(c,x,y);o.plugins.tooltip.callbacks={label:ctx=>lab(ctx.raw)};return o;}
+function buildCharts(){
+  const c=tok(),P=state.players,posList=["GKP","DEF","MID","FWD"];
+  Object.values(charts).forEach(ch=>ch.destroy());
+  const eligible=P.filter(p=>p.mins>=90&&p.price);
+  charts.value=new Chart($("valueChart"),{type:"scatter",data:{datasets:posList.map(pos=>({label:pos,backgroundColor:c[pos],pointRadius:4,pointHoverRadius:7,data:eligible.filter(p=>p.pos===pos).map(p=>({x:p.price,y:+p90(p,p.xgi).toFixed(2),n:p.name,t:p.team}))}))},options:scatterOpts(c,"Price (£m)","xGI per 90",r=>`${r.n} (${r.t}) · £${r.x}m · ${r.y} xGI/90`)});
+  const top15=[...P].filter(p=>p.mins>0).sort((a,b)=>(b.form||0)-(a.form||0)).slice(0,15);
+  const xp=base(c);xp.scales.x.grid.display=false;xp.scales.x.ticks.maxRotation=60;xp.scales.x.ticks.minRotation=45;xp.scales.x.ticks.font={family:"IBM Plex Sans",size:11};
+  charts.xp=new Chart($("xpChart"),{type:"bar",data:{labels:top15.map(p=>p.name),datasets:[{label:"Points per game",data:top15.map(p=>p.ppg),backgroundColor:c.accent,borderRadius:3},{label:"xPts next GW",data:top15.map(p=>p.epNext),backgroundColor:c.gold,borderRadius:3}]},options:xp});
+  const top10=[...P].sort((a,b)=>(b.form||0)-(a.form||0)).slice(0,10);
+  const fo=base(c);fo.indexAxis="y";fo.plugins.legend.display=false;fo.scales.y.grid.display=false;fo.scales.y.ticks.font={family:"IBM Plex Sans",size:12};
+  charts.form=new Chart($("formChart"),{type:"bar",data:{labels:top10.map(p=>p.name),datasets:[{label:"Form",data:top10.map(p=>p.form),backgroundColor:top10.map(p=>c[p.pos]),borderRadius:3}]},options:fo});
+  const owned=P.filter(p=>p.mins>=45&&p.own!=null);
+  charts.own=new Chart($("ownChart"),{type:"scatter",data:{datasets:posList.map(pos=>({label:pos,backgroundColor:c[pos],pointRadius:4,pointHoverRadius:7,data:owned.filter(p=>p.pos===pos).map(p=>({x:p.own,y:p.form,n:p.name,t:p.team}))}))},options:scatterOpts(c,"Selected by %","Form",r=>`${r.n} (${r.t}) · ${r.x}% owned · form ${r.y}`)});
+}
+function onThemeChange(){if(state.players.length)buildCharts();}
 
-    // ── Charts ──────────────────────────────────────────────────────────────
-    function colors() {
-      const s = getComputedStyle(document.documentElement), g = k => s.getPropertyValue(k).trim();
-      return { text: g('--color-text'), muted: g('--color-text-muted'), primary: g('--color-primary'), blue: g('--color-blue'), orange: g('--color-orange'), gold: g('--color-gold'), success: g('--color-success'), error: g('--color-error'), border: 'rgba(127,127,127,.16)' };
-    }
-    function base(c, extra = {}) {
-      return { maintainAspectRatio: false, plugins: { legend: { labels: { color: c.text, font: { family: 'Satoshi' } } }, tooltip: { backgroundColor: c.text, titleColor: '#fff', bodyColor: '#fff' } },
-        scales: { x: { ticks: { color: c.muted }, grid: { color: c.border }, title: { color: c.muted, display: !!extra.x, text: extra.x } }, y: { ticks: { color: c.muted }, grid: { color: c.border }, title: { color: c.muted, display: !!extra.y, text: extra.y } } } };
-    }
-    const posColor = c => ({ GKP: c.gold, DEF: c.blue, MID: c.success, FWD: c.orange });
-    function scatterTip(fmtFn) { return { callbacks: { label: ctx => fmtFn(ctx.raw) } }; }
-    function buildCharts() {
-      const c = colors(), P = state.players, pc = posColor(c);
-      Object.values(charts).forEach(ch => ch.destroy());
+// ── Filters / export ─────────────────────────────────────────────────────────
+function fillSelect(id,values){const el=$(id),cur=el.value;el.innerHTML='<option value="">All</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");el.value=values.includes(cur)?cur:"";}
+function bindFilters(){
+  ["search","position","team","maxPrice","minMins","hideUnavail"].forEach(id=>$(id).addEventListener("input",renderPlayers));
+  document.querySelectorAll("#basis button").forEach(b=>b.addEventListener("click",()=>{state.basis=b.dataset.b;document.querySelectorAll("#basis button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderPlayers();}));
+  $("exportPlayers").addEventListener("click",()=>{const keys=["name","team","pos","price","form","ppg","points","mins","games","goals","assists","xg","xa","xgi","xgc","ict","defcon","own","tin","tout","epNext","status","news"];
+    const lines=[keys.join(",")].concat(state.filtered.map(p=>keys.map(k=>`"${String(p[k]??"").replace(/"/g,'""')}"`).join(",")));
+    const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8;"}));a.download="fpl-players-filtered.csv";a.click();URL.revokeObjectURL(a.href);});
+}
 
-      // 1. xGI/90 vs price
-      const eligible = P.filter(p => p.mins >= 90 && p.price);
-      charts.value = new Chart(document.getElementById('valueChart'), { type: 'scatter',
-        data: { datasets: ['GKP', 'DEF', 'MID', 'FWD'].map(pos => ({ label: pos, backgroundColor: pc[pos], pointRadius: 4, pointHoverRadius: 7,
-          data: eligible.filter(p => p.pos === pos).map(p => ({ x: p.price, y: +p90(p, p.xgi).toFixed(2), n: p.name, t: p.team })) })) },
-        options: { ...base(c, { x: 'Price (£m)', y: 'xGI per 90' }), plugins: { ...base(c).plugins, tooltip: { ...base(c).plugins.tooltip, ...scatterTip(r => `${r.n} (${r.t}) · £${r.x}m · ${r.y} xGI/90`) } } } });
-
-      // 2. PPG vs xPts next
-      const top15 = [...P].filter(p => p.mins > 0).sort((a, b) => (b.form || 0) - (a.form || 0)).slice(0, 15);
-      charts.xp = new Chart(document.getElementById('xpChart'), { type: 'bar',
-        data: { labels: top15.map(p => p.name), datasets: [
-          { label: 'Points per game', data: top15.map(p => p.ppg), backgroundColor: c.primary, borderRadius: 6 },
-          { label: 'xPts next GW', data: top15.map(p => p.epNext), backgroundColor: c.gold, borderRadius: 6 }] },
-        options: { ...base(c), scales: { x: { ticks: { color: c.muted, maxRotation: 60, minRotation: 45 }, grid: { display: false } }, y: { ticks: { color: c.muted }, grid: { color: c.border } } } } });
-
-      // 3. Form leaders
-      const top10 = [...P].sort((a, b) => (b.form || 0) - (a.form || 0)).slice(0, 10);
-      charts.form = new Chart(document.getElementById('formChart'), { type: 'bar',
-        data: { labels: top10.map(p => p.name), datasets: [{ label: 'Form', data: top10.map(p => p.form), backgroundColor: top10.map(p => pc[p.pos]), borderRadius: 8 }] },
-        options: { ...base(c), indexAxis: 'y', plugins: { ...base(c).plugins, legend: { display: false } } } });
-
-      // 4. Ownership vs form
-      const owned = P.filter(p => p.mins >= 45 && p.own != null);
-      charts.own = new Chart(document.getElementById('ownChart'), { type: 'scatter',
-        data: { datasets: ['GKP', 'DEF', 'MID', 'FWD'].map(pos => ({ label: pos, backgroundColor: pc[pos], pointRadius: 4, pointHoverRadius: 7,
-          data: owned.filter(p => p.pos === pos).map(p => ({ x: p.own, y: p.form, n: p.name, t: p.team })) })) },
-        options: { ...base(c, { x: 'Selected by %', y: 'Form' }), plugins: { ...base(c).plugins, tooltip: { ...base(c).plugins.tooltip, ...scatterTip(r => `${r.n} (${r.t}) · ${r.x}% owned · form ${r.y}`) } } } });
-    }
-
-    // ── Filters / export ────────────────────────────────────────────────────
-    function fillSelect(id, values) {
-      const el = document.getElementById(id); const cur = el.value;
-      el.innerHTML = '<option value="">All</option>' + values.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
-      el.value = values.includes(cur) ? cur : '';
-    }
-    function bindFilters() {
-      ['search', 'position', 'team', 'maxPrice', 'minMins', 'hideUnavail'].forEach(id => document.getElementById(id).addEventListener('input', renderPlayers));
-      document.querySelectorAll('#basis button').forEach(b => b.addEventListener('click', () => {
-        state.basis = b.dataset.b;
-        document.querySelectorAll('#basis button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-        renderPlayers();
-      }));
-      document.getElementById('exportPlayers').addEventListener('click', () => {
-        const keys = ['name', 'team', 'pos', 'price', 'form', 'ppg', 'points', 'mins', 'games', 'goals', 'assists', 'xg', 'xa', 'xgi', 'xgc', 'ict', 'defcon', 'own', 'tin', 'tout', 'epNext', 'status', 'news'];
-        const lines = [keys.join(',')].concat(state.filtered.map(p => keys.map(k => `"${String(p[k] ?? '').replace(/"/g, '""')}"`).join(',')));
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' }));
-        a.download = 'fpl-players-filtered.csv'; a.click(); URL.revokeObjectURL(a.href);
-      });
-    }
-
-    // ── Init ────────────────────────────────────────────────────────────────
-    async function init() {
-      try {
-        const [players, history, teams, teamDifficulty, events] = await Promise.all([
-          fetchCsv('players.csv'), fetchCsv('player_history.csv'), fetchCsv('teams.csv'), fetchCsv('team_fixture_difficulty.csv'), fetchCsv('events.csv')]);
-        const apps = {};
-        history.forEach(h => { if ((num(h.minutes) || 0) > 0) apps[h.player_id] = (apps[h.player_id] || 0) + 1; });
-        teams.forEach(t => { state.teams[t.id] = { short: t.short_name, name: t.name }; });
-        state.players = players.map(p => shape(p, apps)).filter(p => p.name);
-        state.teamDifficulty = teamDifficulty; state.events = events;
-        fillSelect('position', ['GKP', 'DEF', 'MID', 'FWD']);
-        fillSelect('team', [...new Set(state.players.map(p => p.team))].filter(Boolean).sort());
-        updateKPIs(); buildCharts(); renderPlayers(); bindFilters();
-        const cur = events.find(e => truthy(e.is_current)), next = events.find(e => truthy(e.is_next));
-        document.getElementById('statusPill').textContent = `${state.players.length} players · GW${cur?.id || '?'} ${cur && truthy(cur.finished) ? 'complete' : 'live'} · GW${next?.id || '?'} next`;
-        try { const m = await (await fetch(`${BASE}/meta.json`, { cache: 'no-cache' })).json(); if (m.updated_at) document.getElementById('updatedAt').textContent = `Updated ${new Date(m.updated_at).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}`; } catch (e) {}
-      } catch (error) {
-        document.getElementById('statusPill').textContent = 'Dashboard could not load repo data';
-        document.getElementById('playersTable').innerHTML = `<tr><td colspan="15" class="empty">${esc(error.message)}</td></tr>`;
-      }
-    }
-    init();
-  </script>
+// ── Init ─────────────────────────────────────────────────────────────────────
+(async()=>{
+  try{
+    const [players,history,teams,teamDifficulty,events,meta]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("team_fixture_difficulty.csv"),fetchCsv("events.csv"),fetchMeta()]);
+    const apps={};history.forEach(h=>{if((num(h.minutes)||0)>0)apps[h.player_id]=(apps[h.player_id]||0)+1;});
+    teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
+    state.players=players.map(p=>shape(p,apps)).filter(p=>p.name);state.teamDifficulty=teamDifficulty;state.events=events;
+    fillSelect("position",["GKP","DEF","MID","FWD"]);fillSelect("team",[...new Set(state.players.map(p=>p.team))].filter(Boolean).sort());
+    updateKPIs();buildCharts();renderPlayers();bindFilters();
+    setStatus("ok",describeData(events,meta));
+  }catch(err){
+    setStatus("err","Could not load repo data");
+    $("playersTable").innerHTML=`<tr><td colspan="15" class="empty err">Couldn't load data from ${BASE}. ${esc(err.message)}. Check the latest "Update Premier League Data v2" run in Actions.</td></tr>`;
+  }
+})();
+</script>
 </body>
 </html>
