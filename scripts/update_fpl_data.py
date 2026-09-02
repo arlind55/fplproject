@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime, timezone
 import time
 import requests
 import pandas as pd
@@ -120,6 +121,41 @@ def build_team_fixture_difficulty(next_fixtures_df: pd.DataFrame, teams_df: pd.D
     return pd.DataFrame(rows).sort_values(['avg_difficulty_next_5', 'team_name'], na_position='last').reset_index(drop=True)
 
 
+LITE_COLS = [
+    'id', 'code', 'event', 'kickoff_time', 'started', 'finished', 'finished_provisional',
+    'team_h', 'team_a', 'team_h_score', 'team_a_score', 'team_h_difficulty', 'team_a_difficulty',
+]
+
+
+def build_fixtures_lite(fixtures_df: pd.DataFrame) -> pd.DataFrame:
+    """Full-season fixture list without the per-match stats column, for docs/planner.html."""
+    existing = [c for c in LITE_COLS if c in fixtures_df.columns]
+    out = fixtures_df[existing].copy()
+    for col in ('event', 'team_h_score', 'team_a_score', 'team_h_difficulty', 'team_a_difficulty'):
+        if col in out.columns:
+            out[col] = pd.to_numeric(out[col], errors='coerce').astype('Int64')
+    sort_cols = [c for c in ['event', 'kickoff_time', 'id'] if c in out.columns]
+    return out.sort_values(sort_cols, na_position='last').reset_index(drop=True)
+
+
+def write_meta(events_df: pd.DataFrame) -> None:
+    """Timestamp + gameweek pointers so the frontend can show when data was last refreshed."""
+    def _first_id(flag):
+        if flag in events_df.columns:
+            hits = events_df.loc[events_df[flag] == True, 'id']
+            if len(hits):
+                return int(hits.iloc[0])
+        return None
+
+    meta = {
+        'updated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'current_event': _first_id('is_current'),
+        'next_event': _first_id('is_next'),
+    }
+    write_json(CURRENT_DIR / 'meta.json', meta)
+    write_json(HISTORY_DIR / 'meta.json', meta)
+
+
 def fetch_player_summaries(player_ids):
     history_rows = []
     fixture_rows = []
@@ -162,6 +198,8 @@ def main() -> None:
     save_csv(teams_df, 'teams.csv')
     save_csv(events_df, 'events.csv')
     save_csv(fixtures_df, 'fixtures.csv')
+    save_csv(build_fixtures_lite(fixtures_df), 'fixtures_lite.csv')
+    write_meta(events_df)
 
     save_csv(build_player_prices(players_df), 'player_prices.csv')
     save_csv(build_player_form(players_df), 'player_form.csv')

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixture Run Planner · FPL</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface-2:#e9ebf2; --line:#d5d8e3; --line-strong:#b9bdcc;
+  --ink:#171a26; --ink-2:#4a4f63; --ink-3:#7a8096; --accent:#2f3fa8; --accent-ink:#ffffff;
+  --d1:#1f7a4d; --d2:#3fa66e; --d3:#c9ccd6; --d4:#d95f6a; --d5:#8f1f33;
+  --d1-ink:#ffffff; --d2-ink:#0f2a1c; --d3-ink:#2b2f3d; --d4-ink:#ffffff; --d5-ink:#ffffff;
+  --muted-cell:#f0f1f5; --ok:#1f7a4d; --warn:#b8741a; --err:#a8323f;
+  --shadow:0 1px 2px rgba(23,26,38,.06),0 6px 20px rgba(23,26,38,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+    --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+    --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+    --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+    --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+  --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+  --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+  --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+  --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:1400px;margin:0 auto;padding:28px 24px 48px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:40px;line-height:1;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.sub{color:var(--ink-3);font-size:13px;margin-top:6px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sub a{color:var(--accent);text-decoration:none}
+.sub a:hover{text-decoration:underline}
+.status{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:12px}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block}
+.status.ok i{background:var(--ok)} .status.warn i{background:var(--warn)} .status.err i{background:var(--err)}
+.legend{display:flex;gap:6px;align-items:center;color:var(--ink-3);font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+.legend span{display:inline-block;width:26px;height:18px;border-radius:3px;font:600 11px "IBM Plex Mono",monospace;text-align:center;line-height:18px;letter-spacing:0}
+.controls{display:grid;grid-template-columns:minmax(260px,1.3fr) repeat(3,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+@media (max-width:900px){.controls{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.controls{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;box-shadow:var(--shadow)}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between}
+.label output{font-family:"IBM Plex Mono",monospace;color:var(--accent);letter-spacing:0;text-transform:none}
+.range{position:relative;height:28px}
+.range input[type=range]{position:absolute;left:0;right:0;top:0;width:100%;margin:0;-webkit-appearance:none;appearance:none;background:none;pointer-events:none;height:28px}
+.range input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:18px;height:18px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
+.range input[type=range]::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);cursor:pointer}
+.range input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--ink);outline-offset:2px}
+.track{position:absolute;left:9px;right:9px;top:12px;height:4px;border-radius:2px;background:var(--line)}
+.track .fill{position:absolute;top:0;bottom:0;background:var(--accent);border-radius:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{flex:1;background:var(--surface);color:var(--ink-2);border:0;border-right:1px solid var(--line);padding:7px 6px;font:500 13px "IBM Plex Sans",sans-serif;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.checks{display:flex;flex-direction:column;gap:6px}
+.checks label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);cursor:pointer}
+.checks input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+.tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);overflow-x:auto;min-height:200px}
+.msg{padding:40px 20px;text-align:center;color:var(--ink-3)}
+.msg.err{color:var(--err)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:0;border-bottom:1px solid var(--line)}
+thead th{position:sticky;top:0;z-index:2;background:var(--surface-2);color:var(--ink-3);font:600 11px "IBM Plex Mono",monospace;letter-spacing:.04em;text-align:center;padding:9px 4px;border-bottom:1px solid var(--line-strong);white-space:nowrap}
+thead th.team,tbody td.team{position:sticky;left:0;z-index:3;text-align:left;background:var(--surface);padding:0 14px;min-width:150px;border-right:1px solid var(--line-strong)}
+thead th.team{background:var(--surface-2);z-index:4}
+thead th.stat,tbody td.stat{text-align:right;padding:0 12px;white-space:nowrap}
+tbody td.team{font-weight:600;font-size:14px;color:var(--ink)}
+tbody td.team small{display:block;font-weight:400;font-size:11px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+tbody tr{height:44px}
+tbody tr:hover td.team{color:var(--accent)}
+td.cell{padding:3px}
+.fx{display:flex;flex-direction:column;gap:2px;height:100%}
+.chip{display:flex;align-items:center;justify-content:center;gap:4px;min-width:64px;height:38px;border-radius:4px;font:600 13px "IBM Plex Mono",monospace;letter-spacing:.02em;padding:0 6px}
+.chip.multi{height:18px;font-size:11px}
+.chip .ha{font-size:10px;opacity:.75;font-weight:500}
+.chip .sc{font-size:11px;opacity:.9;font-weight:500}
+.chip.d1{background:var(--d1);color:var(--d1-ink)}
+.chip.d2{background:var(--d2);color:var(--d2-ink)}
+.chip.d3{background:var(--d3);color:var(--d3-ink)}
+.chip.d4{background:var(--d4);color:var(--d4-ink)}
+.chip.d5{background:var(--d5);color:var(--d5-ink)}
+.chip.off{background:var(--muted-cell);color:var(--ink-3);opacity:.55}
+.chip.blank{background:transparent;color:var(--ink-3);border:1px dashed var(--line)}
+.avg{font:600 15px "IBM Plex Mono",monospace;color:var(--ink)}
+.bar{display:inline-block;width:56px;height:6px;border-radius:3px;background:var(--surface-2);vertical-align:middle;margin-left:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.easy{font:500 13px "IBM Plex Mono",monospace;color:var(--ink-2)}
+.rank{font:600 12px "IBM Plex Mono",monospace;color:var(--ink-3);width:34px;text-align:center}
+th.rank{width:34px}
+footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media (prefers-reduced-motion:no-preference){.chip,.bar i{transition:background-color .15s,width .2s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Fixture Run Planner</h1>
+    <div class="sub">
+      <span>Premier League 2026/27 · FPL difficulty ratings</span>
+      <span class="status" id="status"><i></i><span>Loading repo data…</span></span>
+      <a href="./index.html">← Dashboard</a>
+    </div>
+  </div>
+  <div class="legend">Difficulty
+    <span style="background:var(--d1);color:var(--d1-ink)">1</span>
+    <span style="background:var(--d2);color:var(--d2-ink)">2</span>
+    <span style="background:var(--d3);color:var(--d3-ink)">3</span>
+    <span style="background:var(--d4);color:var(--d4-ink)">4</span>
+    <span style="background:var(--d5);color:var(--d5-ink)">5</span>
+  </div>
+</header>
+
+<section class="controls">
+  <div class="card">
+    <div class="label">Gameweeks <output id="gwOut"></output></div>
+    <div class="range">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <input type="range" id="gwFrom" min="1" max="38" step="1" aria-label="First gameweek">
+      <input type="range" id="gwTo" min="1" max="38" step="1" aria-label="Last gameweek">
+    </div>
+  </div>
+  <div class="card">
+    <div class="label">Venue</div>
+    <div class="seg" id="venue" role="group" aria-label="Venue filter">
+      <button data-v="all" aria-pressed="true">All</button>
+      <button data-v="H" aria-pressed="false">Home only</button>
+      <button data-v="A" aria-pressed="false">Away only</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="label">Order teams</div>
+    <div class="seg" id="sort" role="group" aria-label="Sort order">
+      <button data-s="easy" aria-pressed="true">Easiest run</button>
+      <button data-s="hard" aria-pressed="false">Hardest</button>
+      <button data-s="az" aria-pressed="false">A–Z</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="label">Display</div>
+    <div class="checks">
+      <label><input type="checkbox" id="showScores" checked> Show scores for played matches</label>
+      <label><input type="checkbox" id="hideOut"> Hide gameweeks outside range</label>
+    </div>
+  </div>
+</section>
+
+<div class="tablewrap">
+  <div class="msg" id="msg">Loading fixtures…</div>
+  <table id="grid" hidden>
+    <thead><tr id="head"></tr></thead>
+    <tbody id="body"></tbody>
+  </table>
+</div>
+
+<footer>
+  <span>Avg = mean FPL difficulty of the team's fixtures in the selected range and venue (lower is easier). Easy = fixtures rated 2 or below. Ratings are FPL's official FDR and can change week to week.</span>
+  <span>Source: <a href="https://github.com/arlind55/fplproject" style="color:inherit">arlind55/fplproject</a> · data/current</span>
+</footer>
+</div>
+
+<script>
+// ─── Data source ──────────────────────────────────────────────────────────────
+// Reads the CSVs your pipeline commits to data/current. Same approach as index.html.
+const REPO={owner:"arlind55",repo:"fplproject",branch:"main"};
+const BASE=`https://raw.githubusercontent.com/${REPO.owner}/${REPO.repo}/${REPO.branch}/data/current`;
+
+let TEAMS={};      // id -> [short, name]
+let BY_TEAM={};    // id -> [gw][] of {opp, venue, diff, score}
+let NEXT_GW=1, MAX_GW=38;
+
+const $=id=>document.getElementById(id);
+const state={from:null,to:null,venue:"all",sort:"easy",scores:true,hideOut:false};
+try{const s=JSON.parse(localStorage.getItem("fdr-planner")||"null");if(s&&typeof s==="object")Object.assign(state,s);}catch(e){}
+function save(){try{localStorage.setItem("fdr-planner",JSON.stringify(state));}catch(e){}}
+
+function setStatus(cls,text){const el=$("status");el.className="status "+cls;el.lastElementChild.textContent=text;}
+
+function csvToObjects(text){
+  const rows=[];let row=[],cell="",q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i],n=text[i+1];
+    if(c==='"'){if(q&&n==='"'){cell+='"';i++;}else q=!q;}
+    else if(c===","&&!q){row.push(cell);cell="";}
+    else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&n==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";}
+    else cell+=c;
+  }
+  if(cell.length||row.length){row.push(cell);rows.push(row);}
+  const [h,...b]=rows.filter(r=>r.some(v=>v!==""));
+  return b.map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]??"").trim()])));
+}
+async function fetchCsv(file){
+  const res=await fetch(`${BASE}/${file}`,{cache:"no-cache"});
+  if(!res.ok)throw new Error(`${file}: HTTP ${res.status}`);
+  return csvToObjects(await res.text());
+}
+const int=v=>{const n=parseInt(v,10);return Number.isFinite(n)?n:null;};
+const truthy=v=>/^(true|1)$/i.test(String(v));
+
+async function load(){
+  // teams + events are small; fixtures_lite.csv is written by the pipeline patch,
+  // fall back to the full fixtures.csv if it isn't there yet.
+  const [teams,events]=await Promise.all([fetchCsv("teams.csv"),fetchCsv("events.csv")]);
+  let fixtures,source="fixtures_lite.csv";
+  try{fixtures=await fetchCsv("fixtures_lite.csv");}
+  catch(e){source="fixtures.csv";fixtures=await fetchCsv("fixtures.csv");}
+
+  TEAMS={};teams.forEach(t=>{TEAMS[t.id]=[t.short_name,t.name];});
+  const ids=Object.keys(TEAMS);
+  MAX_GW=Math.max(38,...events.map(e=>int(e.id)||0));
+  const next=events.find(e=>truthy(e.is_next))||events.find(e=>truthy(e.is_current))||events[0];
+  NEXT_GW=int(next?.id)||1;
+  const finishedGws=events.filter(e=>truthy(e.finished)).map(e=>int(e.id));
+  const lastDone=finishedGws.length?Math.max(...finishedGws):0;
+
+  BY_TEAM={};ids.forEach(id=>{BY_TEAM[id]=Array.from({length:MAX_GW+1},()=>[]);});
+  let n=0;
+  for(const f of fixtures){
+    const gw=int(f.event),h=f.team_h,a=f.team_a;
+    if(!gw||!BY_TEAM[h]||!BY_TEAM[a])continue;       // unscheduled / postponed fixtures have no GW yet
+    const hd=int(f.team_h_difficulty),ad=int(f.team_a_difficulty);
+    const hs=int(f.team_h_score),as=int(f.team_a_score);
+    const played=truthy(f.finished)||truthy(f.finished_provisional)||(hs!==null&&as!==null&&truthy(f.started));
+    BY_TEAM[h][gw].push({opp:a,venue:"H",diff:hd,score:played?`${hs}–${as}`:null});
+    BY_TEAM[a][gw].push({opp:h,venue:"A",diff:ad,score:played?`${as}–${hs}`:null});
+    n++;
+  }
+
+  // Optional meta.json from the pipeline patch gives us a real "updated" timestamp.
+  let updated="";
+  try{const m=await (await fetch(`${BASE}/meta.json`,{cache:"no-cache"})).json();if(m.updated_at)updated=new Date(m.updated_at).toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}catch(e){}
+
+  setStatus("ok",`${n} fixtures · GW${lastDone} complete, GW${NEXT_GW} next${updated?` · updated ${updated}`:""}${source==="fixtures.csv"?" · full file":""}`);
+  return true;
+}
+
+// ─── Controls ─────────────────────────────────────────────────────────────────
+const fromEl=$("gwFrom"),toEl=$("gwTo");
+function syncRange(src){
+  let f=+fromEl.value,t=+toEl.value;
+  if(f>t){if(src==="from")t=f;else f=t;}
+  fromEl.value=f;toEl.value=t;state.from=f;state.to=t;
+  $("gwOut").textContent=f===t?`GW${f}`:`GW${f}–${t}`;
+  const pct=v=>((v-1)/(MAX_GW-1)*100);
+  $("fill").style.left=pct(f)+"%";$("fill").style.right=(100-pct(t))+"%";
+  save();render();
+}
+fromEl.addEventListener("input",()=>syncRange("from"));
+toEl.addEventListener("input",()=>syncRange("to"));
+function seg(id,key,attr){
+  const el=$(id);
+  el.querySelectorAll("button").forEach(b=>{
+    b.setAttribute("aria-pressed",String(b.dataset[attr]===state[key]));
+    b.addEventListener("click",()=>{
+      state[key]=b.dataset[attr];
+      el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+      save();render();
+    });
+  });
+}
+seg("venue","venue","v");seg("sort","sort","s");
+$("showScores").checked=state.scores;$("hideOut").checked=state.hideOut;
+$("showScores").addEventListener("change",e=>{state.scores=e.target.checked;save();render();});
+$("hideOut").addEventListener("change",e=>{state.hideOut=e.target.checked;save();render();});
+
+function inScope(fx,gw){return gw>=state.from&&gw<=state.to&&(state.venue==="all"||fx.venue===state.venue);}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function render(){
+  if(!Object.keys(TEAMS).length)return;
+  const gws=[];for(let g=1;g<=MAX_GW;g++){if(!state.hideOut||(g>=state.from&&g<=state.to))gws.push(g);}
+  const rows=Object.keys(TEAMS).map(id=>{
+    let sum=0,n=0,easy=0;
+    for(let g=state.from;g<=state.to;g++)for(const fx of BY_TEAM[id][g])if(inScope(fx,g)&&fx.diff!==null){sum+=fx.diff;n++;if(fx.diff<=2)easy++;}
+    return{id,avg:n?sum/n:null,n,easy};
+  });
+  const name=id=>TEAMS[id][1];
+  const cmp={
+    easy:(a,b)=>(a.avg??99)-(b.avg??99)||b.easy-a.easy||name(a.id).localeCompare(name(b.id)),
+    hard:(a,b)=>(b.avg??-1)-(a.avg??-1)||a.easy-b.easy||name(a.id).localeCompare(name(b.id)),
+    az:(a,b)=>name(a.id).localeCompare(name(b.id))
+  }[state.sort];
+  rows.sort(cmp);
+
+  let h=`<th class="rank">#</th><th class="team">Team</th><th class="stat">Avg</th><th class="stat">Easy</th>`;
+  for(const g of gws){const on=g>=state.from&&g<=state.to;h+=`<th style="${on?"color:var(--ink)":""}">GW${g}</th>`;}
+  $("head").innerHTML=h;
+
+  let out="";
+  rows.forEach((r,i)=>{
+    const [short,nm]=TEAMS[r.id];
+    const avgTxt=r.avg===null?"—":r.avg.toFixed(2);
+    const pct=r.avg===null?0:Math.max(0,Math.min(100,(5-r.avg)/3*100));
+    out+=`<tr><td class="rank">${state.sort==="az"?"":i+1}</td><td class="team">${nm}<small>${short} · ${r.n} fixture${r.n===1?"":"s"}</small></td>`;
+    out+=`<td class="stat"><span class="avg">${avgTxt}</span><span class="bar" title="Easier →"><i style="width:${pct}%"></i></span></td>`;
+    out+=`<td class="stat"><span class="easy">${r.easy}</span></td>`;
+    for(const g of gws){
+      const list=BY_TEAM[r.id][g];
+      out+=`<td class="cell"><div class="fx">`;
+      if(!list.length)out+=`<div class="chip blank">—</div>`;
+      for(const fx of list){
+        const on=inScope(fx,g);
+        const cls=on&&fx.diff!==null?`d${fx.diff}`:"off";
+        const showScore=state.scores&&fx.score;
+        const [oShort,oName]=TEAMS[fx.opp];
+        out+=`<div class="chip ${cls}${list.length>1?" multi":""}" title="${nm} ${fx.venue==="H"?"vs":"at"} ${oName} · difficulty ${fx.diff??"?"}${fx.score?" · "+fx.score:""}">${oShort}<span class="ha">${fx.venue}</span>${showScore?`<span class="sc">${fx.score}</span>`:""}</div>`;
+      }
+      out+=`</div></td>`;
+    }
+    out+=`</tr>`;
+  });
+  $("body").innerHTML=out;
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+(async()=>{
+  try{
+    await load();
+    fromEl.max=toEl.max=MAX_GW;
+    // Default window: next GW + 5, unless the user has a saved range that's still in the future.
+    if(state.from===null||state.to===null||state.to<NEXT_GW){state.from=NEXT_GW;state.to=Math.min(MAX_GW,NEXT_GW+5);}
+    fromEl.value=state.from;toEl.value=state.to;
+    $("msg").hidden=true;$("grid").hidden=false;
+    syncRange();
+  }catch(err){
+    setStatus("err","Could not load repo data");
+    const m=$("msg");m.className="msg err";
+    m.textContent=`Couldn't load data from ${BASE}. ${err.message}. Check the latest "Update Premier League Data v2" run in Actions.`;
+  }
+})();
+</script>
+</body>
+</html>
