@@ -168,6 +168,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
   <nav class="tabs" aria-label="Pages">
     <a href="./index.html" aria-current="page">Dashboard</a>
     <a href="./planner.html">Fixture planner</a>
+    <a href="./metrics.html">Metrics</a>
   </nav>
   <div class="right">
     <span class="status" id="status"><i></i><span>Loading data…</span></span>
@@ -252,7 +253,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
 </section>
 
 <footer>
-  <span>VAPM = (points per game − 2) ÷ price. xPts replaces goals, assists, clean sheets and goals conceded with their expected equivalents (xG × goal value, xA × 3, P(clean sheet) = e<sup>−xGC</sup>, xGC ÷ 2); appearance, bonus, saves, cards and DefCon points are taken as scored. Δ = points − xPts.</span>
+  <span>PPM = points ÷ price. VAPM = (points per game − 2) ÷ price. xPts replaces goals, assists, clean sheets and goals conceded with their expected equivalents (xG × goal value, xA × 3, P(clean sheet) = e<sup>−xGC</sup>, xGC ÷ 2); appearance, bonus, saves, cards and DefCon points are taken as scored. Δ = points − xPts. <a href="./metrics.html">Full definitions →</a></span>
   <span>Source: <a href="https://github.com/arlind55/fplproject">arlind55/fplproject</a> · data/current</span>
 </footer>
 </div>
@@ -339,6 +340,7 @@ function aggregate(p){
   for(const h of rows){if(h.mins>0){a.games++;}a.gwsPlayed++;for(const k of ["mins","pts","goals","assists","cs","gc","bonus","xg","xa","xgi","xgc","ict","defcon"])a[k]+=h[k];a.xpts+=xPtsRow(h,p.pos);}
   a.ppg=a.games?a.pts/a.games:null;
   a.p90pts=a.mins?a.pts/a.mins*90:null;
+  a.ppm=p.price&&a.games?a.pts/p.price:null;
   a.vapm=a.games&&p.price?(a.ppg-2)/p.price:null;
   a.vapm90=a.mins&&p.price?(a.p90pts-2)/p.price:null;
   a.delta=a.games?a.pts-a.xpts:null;
@@ -387,7 +389,8 @@ const COLS=[
   {key:"points",label:"Pts",num:true,basis:true,src:"pts",render:p=>fmt(per(p,p.pts),state.basis==="total"?0:1)},
   {key:"xpts",label:"xPts",num:true,basis:true,src:"xpts",render:p=>fmt(per(p,p.xpts),1)},
   {key:"delta",label:"Δ",num:true,basis:true,src:"delta",title:"Points minus expected points",render:p=>p.delta==null?"—":`<span class="${p.delta>0.5?"up":p.delta<-0.5?"down":""}">${signed(per(p,p.delta))}</span>`},
-  {key:"vapm",label:"VAPM",num:true,grp:true,title:"(points per game − 2) ÷ price",render:p=>fmt(vapm(p),2)},
+  {key:"ppm",label:"PPM",num:true,grp:true,title:"Points per million: points in window ÷ price",render:p=>fmt(p.ppm,2)},
+  {key:"vapm",label:"VAPM",num:true,title:"(points per game − 2) ÷ price",render:p=>fmt(vapm(p),2)},
   {key:"xg",label:"xG",num:true,basis:true,grp:true,render:p=>fmt(per(p,p.xg),2)},
   {key:"xa",label:"xA",num:true,basis:true,render:p=>fmt(per(p,p.xa),2)},
   {key:"xgi",label:"xGI",num:true,basis:true,render:p=>fmt(per(p,p.xgi),2)},
@@ -483,7 +486,7 @@ function onThemeChange(){if(state.rows.length)buildCharts();}
 function fillSelect(id,values){const el=$(id),cur=el.value;el.innerHTML='<option value="">All</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");el.value=values.includes(cur)?cur:"";}
 function bindFilters(){
   ["search","position","team","maxPrice","minMins","hideUnavail"].forEach(id=>$(id).addEventListener("input",renderPlayers));
-  $("exportPlayers").addEventListener("click",()=>{const keys=["name","team","pos","price","games","mins","ppg","pts","xpts","delta","vapm","goals","assists","xg","xa","xgi","xgc","ict","defcon","bonus","own","tin","tout","status","news"];
+  $("exportPlayers").addEventListener("click",()=>{const keys=["name","team","pos","price","games","mins","ppg","pts","xpts","delta","ppm","vapm","goals","assists","xg","xa","xgi","xgc","ict","defcon","bonus","own","tin","tout","status","news"];
     const lines=[`# window ${windowLabel()} venue ${state.venue}`,keys.join(",")].concat(state.filtered.map(p=>keys.map(k=>`"${String(typeof p[k]==="number"?+p[k].toFixed(3):(p[k]??"")).replace(/"/g,'""')}"`).join(",")));
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8;"}));a.download=`fpl-players-${windowLabel().replace("–","-")}.csv`;a.click();URL.revokeObjectURL(a.href);});
 }

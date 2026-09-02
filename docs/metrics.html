@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metrics explained — FPL Value</title>
+<meta name="description" content="Plain-English definitions of the FPL metrics used on FPL Value: points per game, points per million, VAPM, xG, xA, xGI, xGC, expected points (xPts) and the over/under-performance delta — with formulas, examples and caveats.">
+<link rel="canonical" href="https://fplvalue.co/metrics.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="FPL Value">
+<meta property="og:title" content="FPL metrics explained: PPG, PPM, VAPM, xG and xPts">
+<meta property="og:description" content="What each number on FPL Value means, how it's calculated, and when to trust it.">
+<meta property="og:url" content="https://fplvalue.co/metrics.html">
+<meta property="og:image" content="https://fplvalue.co/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FPL metrics explained: PPG, PPM, VAPM, xG and xPts">
+<meta name="twitter:image" content="https://fplvalue.co/og-image.png">
+<meta name="theme-color" content="#131521" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface-2:#e9ebf2; --line:#d5d8e3; --line-strong:#b9bdcc;
+  --ink:#171a26; --ink-2:#4a4f63; --ink-3:#7a8096; --accent:#2f3fa8; --accent-ink:#ffffff;
+  --d1:#1f7a4d; --d2:#3fa66e; --d3:#c9ccd6; --d4:#d95f6a; --d5:#8f1f33;
+  --d1-ink:#ffffff; --d2-ink:#0f2a1c; --d3-ink:#2b2f3d; --d4-ink:#ffffff; --d5-ink:#ffffff;
+  --muted-cell:#f0f1f5; --ok:#1f7a4d; --warn:#b8741a; --err:#a8323f;
+  --shadow:0 1px 2px rgba(23,26,38,.06),0 6px 20px rgba(23,26,38,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+    --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+    --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+    --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+    --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+  --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+  --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+  --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+  --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
+/* ── Shared shell (keep in sync with index.html) ─────────────────────────────── */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px}
+.tabs a{padding:7px 16px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+.right{display:flex;align-items:center;gap:10px}
+.status{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:12px;white-space:nowrap}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block;flex:none}
+.status.ok i{background:var(--ok)} .status.warn i{background:var(--warn)} .status.err i{background:var(--err)}
+.status b{font:600 12px "IBM Plex Mono",monospace;color:var(--ink)}
+.theme{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink-2);display:grid;place-items:center}
+.theme:hover{color:var(--ink)}
+.theme svg{width:16px;height:16px}
+.tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+@media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+/* ── Article ─────────────────────────────────────────────────────────────────── */
+.article{display:grid;grid-template-columns:220px minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:900px){.article{grid-template-columns:1fr}.toc{position:static}}
+.toc{position:sticky;top:20px;font-size:13px}
+.toc .label{margin-bottom:10px}
+.toc a{display:block;padding:5px 0;color:var(--ink-2);text-decoration:none;border-left:2px solid var(--line);padding-left:12px}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+.toc a.sub{padding-left:24px;color:var(--ink-3);font-size:12px}
+.prose{max-width:72ch}
+.prose h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:34px;line-height:1.05;margin:0 0 8px;letter-spacing:-.01em;text-wrap:balance}
+.prose .lede{font-size:16px;color:var(--ink-2);margin:0 0 28px;line-height:1.55}
+.prose h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:24px;margin:40px 0 8px;letter-spacing:.005em;scroll-margin-top:20px}
+.prose h3 small{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3);margin-left:10px;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
+.prose h4{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:26px 0 6px}
+.prose p{margin:0 0 14px;font-size:15px;line-height:1.6;color:var(--ink)}
+.prose p.note{color:var(--ink-3);font-size:13px}
+.formula{font:500 14px "IBM Plex Mono",monospace;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;padding:12px 16px;margin:12px 0 16px;color:var(--ink);overflow-x:auto;white-space:nowrap}
+.formula .c{color:var(--ink-3)}
+.ex{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0 18px}
+.ex div{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.ex .who{font-weight:600;font-size:13px}
+.ex .who span{font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3);margin-left:6px}
+.ex .val{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:26px;line-height:1.1;margin:4px 0 2px}
+.ex .how{font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3)}
+.pts{display:inline-block;font:600 11px "IBM Plex Mono",monospace;padding:2px 6px;border-radius:3px;background:var(--surface-2);color:var(--ink-2)}
+table.t{border-collapse:collapse;width:100%;margin:10px 0 18px;font-size:13px}
+table.t th,table.t td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left}
+table.t th{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.04em;color:var(--ink-3);text-transform:uppercase}
+table.t td.n{font-family:"IBM Plex Mono",monospace;text-align:right}
+table.t th.n{text-align:right}
+.callout{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin:18px 0}
+.callout b{color:var(--accent)}
+.up{color:var(--ok)} .down{color:var(--err)}
+hr{border:0;border-top:1px solid var(--line);margin:36px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand"><div><h1>FPL Value</h1><small>Premier League 2026/27</small></div></div>
+  <nav class="tabs" aria-label="Pages">
+    <a href="./index.html">Dashboard</a>
+    <a href="./planner.html">Fixture planner</a>
+    <a href="./metrics.html" aria-current="page">Metrics</a>
+  </nav>
+  <div class="right">
+    <span class="status"><i style="background:var(--accent)"></i><span>Reference · updated for 2026/27 scoring</span></span>
+    <button class="theme" id="themeBtn" type="button" aria-label="Toggle light / dark"></button>
+  </div>
+</header>
+
+<div class="article">
+<nav class="toc" aria-label="On this page">
+  <div class="label">On this page</div>
+  <a href="#scoring">How FPL scores</a>
+  <a href="#ppg">Points per game</a>
+  <a href="#ppm">Points per million</a>
+  <a href="#vapm">VAPM</a>
+  <a href="#expected">Expected stats</a>
+  <a href="#xg" class="sub">xG, xA, xGI</a>
+  <a href="#xgc" class="sub">xGC</a>
+  <a href="#xpts">Expected points (xPts)</a>
+  <a href="#delta">Over / under-performance (Δ)</a>
+  <a href="#other">ICT, DefCon, form</a>
+  <a href="#windows">Windows, per game, per 90</a>
+  <a href="#caveats">When not to trust the numbers</a>
+</nav>
+
+<article class="prose">
+<h2>The metrics, explained</h2>
+<p class="lede">Every number on FPL Value is either published by Fantasy Premier League or derived from FPL's own data with a formula shown on this page. Nothing is a black box. Here is what each one means, how it's calculated, and when it will mislead you.</p>
+
+<h3 id="scoring">How FPL scores a player</h3>
+<p>Everything below is built on the FPL points system, so it's worth having it to hand. A player earns <span class="pts">1</span> for playing up to 60 minutes and <span class="pts">2</span> for 60 or more. Goals are worth <span class="pts">6</span> for goalkeepers and defenders, <span class="pts">5</span> for midfielders and <span class="pts">4</span> for forwards. An assist is <span class="pts">3</span> for everyone. A clean sheet is <span class="pts">4</span> for goalkeepers and defenders, <span class="pts">1</span> for midfielders and nothing for forwards, and only counts if the player was on the pitch for 60 minutes. Goalkeepers and defenders lose <span class="pts">1</span> for every two goals their team concedes. Goalkeepers also get <span class="pts">1</span> per three saves and <span class="pts">5</span> for a penalty save. Defensive contribution pays <span class="pts">2</span> when a defender reaches 10 combined clearances, blocks, interceptions and tackles in a match, or a midfielder or forward reaches 12 including recoveries. Then there are the usual deductions for cards, own goals and missed penalties, and up to <span class="pts">3</span> bonus points per match for the top performers on the Bonus Points System.</p>
+<p>The reason this matters: two of those components, appearance and bonus, are earned almost regardless of what a player does, while goals, assists and clean sheets are the ones that separate good picks from bad. Several metrics below exist to strip out the first group and focus on the second.</p>
+
+<h3 id="ppg">Points per game <small>PPG</small></h3>
+<div class="formula">PPG = total points ÷ appearances <span class="c">// an appearance is any match with at least one minute</span></div>
+<p>The most basic rate stat and still the most useful single number for comparing players who play similar minutes. It answers "when this player is on the pitch, what do I get?" FPL publishes its own version on the site; ours is recomputed for whatever gameweek window and venue you've selected on the dashboard, so you can ask for PPG over the last six weeks, or PPG at home only.</p>
+<p>Its weakness is that a one-minute cameo counts as a game. A player who comes on for the final minute and scores has a PPG of 1.0 for that match, which drags his average down; conversely a sub who scores from the bench in ten minutes looks like a superstar on PPG. Per-90 figures (below) fix this at the cost of exaggerating players with tiny minutes.</p>
+
+<h3 id="ppm">Points per million <small>PPM</small></h3>
+<div class="formula">PPM = total points ÷ current price (£m)</div>
+<p>How many points a player has returned for every million spent. It's the simplest value measure and the one most people mean when they say a player is "good value". A £4.0m defender on 20 points (5.0 PPM) has done more for your budget than a £15.5m forward on 15 (0.97 PPM), even though you'd obviously rather have the forward's ceiling.</p>
+<p>PPM has two blind spots. It's a total, not a rate, so it favours players who have simply played more games. And it doesn't account for the points everyone gets for showing up: a £4.0m defender who plays 90 minutes every week and does nothing else collects 2 points a game, or 0.5 PPM per match, purely for existing. That baseline is what VAPM removes.</p>
+<div class="ex">
+  <div><div class="who">Ajayi <span>HUL · £4.0m</span></div><div class="val">5.00</div><div class="how">20 pts ÷ 4.0</div></div>
+  <div><div class="who">B.Fernandes <span>MUN · £12.0m</span></div><div class="val">2.08</div><div class="how">25 pts ÷ 12.0</div></div>
+  <div><div class="who">Haaland <span>MCI · £15.5m</span></div><div class="val">0.97</div><div class="how">15 pts ÷ 15.5</div></div>
+</div>
+<p class="note">Examples on this page use data after GW2 of 2026/27 and will drift from the live dashboard.</p>
+
+<h3 id="vapm">Value added per million <small>VAPM</small></h3>
+<div class="formula">VAPM = (PPG − 2) ÷ current price (£m)</div>
+<p>VAPM is points per million with the appearance points removed. Subtracting 2 from a player's points per game leaves only what he actively earned — goals, assists, clean sheets, bonus, saves — and dividing by price tells you how much of that active return you're getting per million. It was popularised on r/FantasyPL as a way to find the cheap players who genuinely contribute rather than just fill a bench slot.</p>
+<p>The subtraction changes the picture more than you'd expect. A £4.5m defender averaging 3.0 PPG looks respectable on PPM (0.67 per game per million) but has a VAPM of just 0.22: two-thirds of his points were for turning up. Meanwhile a premium on 8.0 PPG at £12.5m has a VAPM of 0.48, so despite the price he's adding more than twice as much per million above baseline. That is the comparison VAPM is designed to make.</p>
+<div class="ex">
+  <div><div class="who">Ajayi <span>HUL · £4.0m</span></div><div class="val">2.00</div><div class="how">(10.0 − 2) ÷ 4.0</div></div>
+  <div><div class="who">B.Fernandes <span>MUN · £12.0m</span></div><div class="val">0.88</div><div class="how">(12.5 − 2) ÷ 12.0</div></div>
+  <div><div class="who">Haaland <span>MCI · £15.5m</span></div><div class="val">0.35</div><div class="how">(7.5 − 2) ÷ 15.5</div></div>
+</div>
+<p>Two practical notes. VAPM can be negative: a player averaging under 2 PPG is costing you relative to a blank. And because it's built on PPG, it inherits PPG's small-sample problem — after two gameweeks a single haul dominates. Use the minimum-minutes filter on the dashboard (90 or 180 early on, 450 or more once the season settles) before reading anything into a VAPM ranking. When the dashboard's metric basis is set to per 90, VAPM uses points per 90 instead of PPG.</p>
+<div class="callout"><b>Rule of thumb.</b> Early season, a VAPM above 1.0 with 180+ minutes is exceptional and probably won't last; above 0.5 sustained over ten gameweeks is elite value. A defender or goalkeeper who holds 0.3 all season is doing his job.</div>
+
+<h3 id="expected">Expected stats</h3>
+<p>FPL publishes Opta's expected-goals family for every player and every match. These are estimates of the <em>quality</em> of chances rather than the outcome — they answer "how often would a typical player score from these situations?" — which makes them the best predictor we have of what happens next, because finishing luck evens out and chance creation tends to persist.</p>
+
+<h3 id="xg">xG, xA and xGI <small>expected goals · assists · involvements</small></h3>
+<div class="formula">xGI = xG + xA</div>
+<p><strong>xG</strong> sums the probability of each shot a player took being a goal, based on shot location, angle, body part, type of assist and defensive pressure. A tap-in from two yards is worth about 0.9 xG; a speculative 30-yarder about 0.03. <strong>xA</strong> does the same for passes: the xG of the shot that followed each pass a player made. <strong>xGI</strong> adds the two and is the number to look at for attacking returns, since FPL rewards both.</p>
+<p>The dashboard shows totals for the selected window, or per game or per 90 depending on the basis toggle. Per 90 is the fairest way to compare players with different minutes, and 0.5 xGI per 90 is roughly the line between a good attacking asset and an elite one. In the detail panel for each player you'll also see xGI against actual goals plus assists — a big positive gap means he's been finishing above his chances and is due a quieter spell; a negative gap means the reverse.</p>
+
+<h3 id="xgc">xGC <small>expected goals conceded</small></h3>
+<p>The defensive equivalent: the total xG of the shots a player's team faced while he was on the pitch. It's the right lens for goalkeepers and defenders because clean sheets are noisy — a team can keep three clean sheets while conceding 4.0 xGC and it will catch up with them. Lower is better, and the dashboard shows it per 90 in the player detail. Under about 1.0 xGC per 90 is a defence you want a piece of; over 1.6 and clean sheets are a lottery.</p>
+
+<h3 id="xpts">Expected points <small>xPts</small></h3>
+<p>FPL's own "expected points" figure (<code>ep_next</code> in its data) is, on inspection, just the player's form with a small fixture adjustment — for 94% of players it's identical to form. So FPL Value calculates its own. The idea is simple: take the points a player actually scored in each match and replace the four components that depend on finishing and defensive luck with what the underlying chances say they should have been. Everything else stays as scored.</p>
+<div class="formula">xPts = actual points<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;− (goals × goal value + assists × 3 + clean sheet × CS value − ⌊conceded ÷ 2⌋)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ (xG × goal value + xA × 3 + P(clean sheet) × CS value − xGC ÷ 2)</div>
+<p>where goal value and clean-sheet value are the position-specific points from the scoring table above, the conceded deduction applies only to goalkeepers and defenders, and the probability of a clean sheet is estimated from xGC as <em>e</em><sup>−xGC</sup> (the chance of zero goals if goals arrive at the expected rate) for players who played 60 minutes. Appearance points, bonus, saves, cards, penalties and defensive-contribution points are taken exactly as scored. Doing this per match and then summing over the window is what the dashboard calls xPts.</p>
+<table class="t">
+  <thead><tr><th>Component</th><th>Actual</th><th>Expected</th></tr></thead>
+  <tbody>
+    <tr><td>Goals</td><td>goals scored × 6 / 5 / 4</td><td>xG × 6 / 5 / 4</td></tr>
+    <tr><td>Assists</td><td>assists × 3</td><td>xA × 3</td></tr>
+    <tr><td>Clean sheet</td><td>4 / 1 / 0 if kept and 60+ mins</td><td><em>e</em><sup>−xGC</sup> × 4 / 1 / 0 if 60+ mins</td></tr>
+    <tr><td>Conceded (GK, DEF)</td><td>−1 per 2 goals</td><td>−xGC ÷ 2</td></tr>
+    <tr><td>Appearance, bonus, saves, cards, DefCon</td><td colspan="2">as scored (not modelled)</td></tr>
+  </tbody>
+</table>
+<p>What xPts is for: it tells you how many points a player's performances <em>deserved</em>. Two players on 25 points after four games can have very different xPts — one earned it through 3.5 xGI and steady involvement, the other through two 30-yard screamers and 0.6 xGI. The second player's 25 points are real and count, but they tell you little about his next four games. His xPts does.</p>
+<p class="note">Bonus points are left as scored even though they partly follow goals and assists, so a player's Δ slightly understates luck in both directions. Leaving them is more honest than inventing a bonus model.</p>
+
+<h3 id="delta">Over- and under-performance <small>Δ = points − xPts</small></h3>
+<div class="formula">Δ = actual points − xPts <span class="c">// positive = scoring more than the chances warrant</span></div>
+<p>The gap between what a player scored and what the model says he should have. A large positive Δ is a warning sign for anyone thinking of buying: the returns have been real, but they rest on finishing or clean-sheet luck that tends not to repeat. A large negative Δ is the more interesting case — a player generating chances and getting nothing for it is exactly who you want to buy before his price and ownership catch up.</p>
+<div class="ex">
+  <div><div class="who">Cherki <span>MCI · MID</span></div><div class="val up">+10.6</div><div class="how">22 pts vs 11.4 xPts</div></div>
+  <div><div class="who">Ajayi <span>HUL · DEF</span></div><div class="val up">+9.2</div><div class="how">20 pts vs 10.8 xPts</div></div>
+</div>
+<p>The dashboard's Δ column and the "Most over expected" card use the same figure, and both respect the gameweek window, so you can check whether an over-performance is a two-week blip or a season-long pattern (some players — elite finishers, set-piece takers — do sustain a positive Δ, and the window view is how you tell them apart from the lucky ones).</p>
+
+<h3 id="other">ICT, DefCon and form</h3>
+<p><strong>ICT index</strong> is FPL's composite of Influence (decisive actions in the match), Creativity (chance creation) and Threat (goal threat). It's a reasonable proxy for involvement when you don't want to read three columns, but it's opaque and unit-less, so use it for sorting rather than for reasoning. <strong>DefCon</strong> is the raw count of defensive actions — clearances, blocks, interceptions and tackles for defenders, plus recoveries for midfielders and forwards — that feeds the 2-point defensive contribution bonus. The per-game view is the useful one: a defender averaging 10+ is banking those 2 points most weeks, which at £4.5m is a quietly large return. <strong>Form</strong> is FPL's own figure, average points over the last 30 days; it's shown on the site for reference but the window-based PPG does the same job with control over the period.</p>
+
+<h3 id="windows">Windows, per game and per 90</h3>
+<p>Every metric on the dashboard is computed over the gameweek window you select — the whole season, the last 3, 6 or 10 gameweeks, or a custom range — and can be restricted to home or away matches. This is worth using deliberately. Season totals reward availability; a six-week window catches a change in role or a new manager; the home/away split shows the players whose returns are heavily venue-dependent, which matters when you're deciding on a captain.</p>
+<p>The <em>basis</em> toggle changes how counting stats are expressed. <strong>Total</strong> is the raw sum over the window. <strong>Per game</strong> divides by appearances (matches with at least one minute) and is the right basis for VAPM and for comparing regular starters. <strong>Per 90</strong> divides by minutes and scales to a full match, which is the fair comparison between starters and substitutes but will produce absurd numbers for players with 20 minutes — always pair it with a minimum-minutes filter.</p>
+
+<hr>
+<h3 id="caveats">When not to trust the numbers</h3>
+<p><strong>Small samples.</strong> Everything on this page is a rate, and rates from two or three games are mostly noise. Set a minimum-minutes filter of at least 180 before ranking anything, and treat any early-season list as a set of names to watch rather than a set of transfers to make.</p>
+<p><strong>Expected stats are about the chance, not the player.</strong> A deliberately elite finisher will outscore his xG year after year; xG models don't know who is shooting. Persistent positive Δ over a whole season is usually skill, not luck. Persistent positive Δ over three weeks usually isn't.</p>
+<p><strong>Penalties.</strong> A penalty is worth about 0.78 xG, so penalty takers carry structurally higher xG and xPts. That's correct — they really will score more — but it means comparing a taker's xGI to a non-taker's tells you as much about set-piece duties as about open play.</p>
+<p><strong>Fixtures aren't in the model.</strong> xPts is a measure of what a player's performances were worth, not a forecast of next week. For that, combine it with the <a href="./planner.html" style="color:var(--accent)">fixture planner</a>: a player with strong underlying numbers and a soft run of fixtures is the combination you're looking for.</p>
+<p><strong>Price changes.</strong> VAPM and PPM use the current price, not what you paid or what he cost at the time of the points. A player who has risen £0.5m looks slightly worse value than he was for the people who bought him early — which is the right way round if you're deciding whether to buy now.</p>
+
+<p class="note" style="margin-top:36px">Source data: the official Fantasy Premier League API, refreshed weekly by the <a href="https://github.com/arlind55/fplproject" style="color:inherit">fplproject</a> pipeline. Expected stats are Opta's, as published by FPL. xPts and Δ are FPL Value's own calculations as described above.</p>
+</article>
+</div>
+
+<footer>
+  <span>FPL Value · independent and unaffiliated with the Premier League or Fantasy Premier League.</span>
+  <span><a href="./index.html">Dashboard</a> · <a href="./planner.html">Fixture planner</a></span>
+</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function currentTheme(){const t=document.documentElement.getAttribute("data-theme");if(t)return t;return matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme");$("themeBtn").innerHTML=currentTheme()==="dark"?SUN:MOON;}
+try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
+$("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);});
+</script>
+</body>
+</html>
