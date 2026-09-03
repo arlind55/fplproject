@@ -36,6 +36,9 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/
           git diff --staged --quiet || git commit -m "Weekly Premier League data refresh v2"
-          git fetch origin main
-          git rebase origin/main
-          git push origin main
+          # Someone may have pushed while the refresh ran (it takes a few minutes).
+          # Rebase our data commit onto whatever is on main now, then push; retry a couple of times.
+          for attempt in 1 2 3; do
+            git pull --rebase origin main && git push && break
+            echo "push attempt $attempt failed, retrying…"; sleep 15
+          done
