@@ -2,13 +2,13 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 330,Bogle,Leeds,LEE,2,4.5,9.2,9.2,37,2.8,299,2,0,3,6,a
 124,Groß,Brighton,BHA,3,5.6,8.2,8.2,33,18.4,360,2,3,2,6,a
 165,João Pedro,Chelsea,CHE,4,7.8,8.2,8.2,33,75.2,360,3,3,0,7,a
-391,Gvardiol,Man City,MCI,2,5.7,8.2,8.2,33,22.7,344,1,2,2,6,a
+391,Gvardiol,Man City,MCI,2,5.7,8.2,8.2,33,22.8,344,1,2,2,6,a
 411,Haaland,Man City,MCI,4,15.5,8.2,8.2,33,72.3,360,4,0,2,9,a
 115,De Cuyper,Brighton,BHA,2,4.8,8.0,8.0,32,23.5,333,1,3,2,4,a
 12,Saka,Arsenal,ARS,3,9.5,7.5,7.5,30,12.1,336,3,0,3,4,a
 94,Schade,Brentford,BRE,3,6.0,7.5,7.5,30,5.8,357,3,0,1,6,a
 1,Raya,Arsenal,ARS,1,6.0,7.2,7.2,29,40.3,360,0,0,3,3,a
-68,Tavernier,Bournemouth,BOU,3,6.1,7.2,7.2,29,5.2,350,3,0,0,8,a
+68,Tavernier,Bournemouth,BOU,3,6.1,7.2,7.2,29,5.3,350,3,0,0,8,a
 229,Tarkowski,Everton,EVE,2,6.1,7.2,7.2,29,13.1,360,1,0,2,4,a
 367,Gakpo,Liverpool,LIV,3,7.2,7.2,7.2,29,12.1,280,1,3,1,5,a
 426,B.Fernandes,Man Utd,MUN,3,12.0,7.2,7.2,29,41.8,360,3,1,0,3,a
@@ -22,15 +22,15 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 279,Ajayi,Hull City,HUL,2,4.2,6.5,6.5,26,13.6,333,1,0,3,2,a
 388,Guéhi,Man City,MCI,2,6.0,6.5,6.5,26,18.5,360,1,0,2,4,a
 399,Cherki,Man City,MCI,3,7.8,6.5,6.5,26,28.5,218,2,2,1,4,a
-480,Gibbs-White,Nott'm Forest,NFO,3,7.9,6.5,6.5,26,11.5,360,1,2,1,6,a
+480,Gibbs-White,Nott'm Forest,NFO,3,7.9,6.5,6.5,26,11.6,360,1,2,1,6,a
 649,Maitland-Niles,Everton,EVE,2,4.5,6.5,6.5,13,0.7,87,1,0,1,0,a
 98,Janelt,Brentford,BRE,3,5.0,6.2,6.2,25,2.4,360,2,0,1,3,a
 277,Egan,Hull City,HUL,2,4.1,6.2,6.2,25,6.7,360,0,0,3,1,a
 586,Mendy,Hull City,HUL,2,4.1,6.2,6.2,25,7.4,249,1,0,2,1,d
-379,Isak,Liverpool,LIV,4,9.1,6.2,6.2,25,22.2,333,3,0,2,5,a
+379,Isak,Liverpool,LIV,4,9.1,6.2,6.2,25,22.1,333,3,0,2,5,a
 4,Gabriel,Arsenal,ARS,2,8.0,6.0,6.0,24,23.5,360,0,0,3,2,a
 504,Vuskovic,Brighton,BHA,2,5.0,6.0,6.0,24,3.2,347,1,0,2,2,a
-282,Giles,Hull City,HUL,2,4.0,6.0,6.0,24,2.3,354,0,1,3,2,a
+282,Giles,Hull City,HUL,2,4.0,6.0,6.0,24,2.4,354,0,1,3,2,a
 316,Emersonn,Ipswich Town,IPS,4,5.5,6.0,6.0,24,2.5,237,2,1,0,6,a
 305,Davis,Ipswich Town,IPS,2,4.0,5.8,5.8,23,6.1,360,2,2,0,1,a
 427,Mbeumo,Man Utd,MUN,3,7.9,5.8,5.8,23,22.9,360,2,1,0,3,a
@@ -41,7 +41,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 335,Stach,Leeds,LEE,3,6.0,5.5,5.5,22,2.7,357,1,0,2,3,a
 10,White,Arsenal,ARS,2,5.5,5.2,5.2,21,6.8,315,0,1,2,3,a
 334,Muharemović,Leeds,LEE,2,5.0,5.2,5.2,21,4.0,360,0,1,1,0,a
-346,Calvert-Lewin,Leeds,LEE,4,6.0,5.0,5.0,20,22.3,329,2,1,2,4,a
+346,Calvert-Lewin,Leeds,LEE,4,6.0,5.0,5.0,20,22.4,329,2,1,2,4,a
 13,Rice,Arsenal,ARS,3,7.4,4.8,4.8,19,12.7,321,0,2,3,0,a
 86,Lewis-Potter,Brentford,BRE,3,5.5,4.8,4.8,19,1.9,326,1,1,1,3,a
 605,Yalcouyé,Brighton,BHA,3,4.5,4.8,4.8,19,3.7,231,2,0,1,1,a
@@ -51,14 +51,14 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 453,Barnes,Newcastle,NEW,3,6.0,4.8,4.8,19,3.0,360,1,1,1,2,a
 472,Murillo,Nott'm Forest,NFO,2,5.5,4.8,4.8,19,1.9,359,0,1,1,0,a
 544,Xhaka,Sunderland,SUN,3,5.5,4.8,4.8,19,4.0,360,0,1,1,5,a
-454,Elanga,Newcastle,NEW,3,6.2,4.5,6.0,18,10.1,232,2,0,1,2,i
+454,Elanga,Newcastle,NEW,3,6.2,4.5,6.0,18,10.0,232,2,0,1,2,i
 138,Kostoulas,Brighton,BHA,4,5.5,4.5,4.5,18,0.7,278,1,2,1,1,a
 214,Kamada,Crystal Palace,CRY,3,5.0,4.5,4.5,18,0.5,351,0,3,0,0,a
 242,George,Everton,EVE,3,5.5,4.5,4.5,18,0.8,298,1,0,2,3,a
 332,Justin,Leeds,LEE,2,4.5,4.5,4.5,18,1.5,360,0,0,1,2,a
 385,Trafford,Leeds,LEE,1,5.0,4.5,4.5,18,5.4,360,0,0,1,2,a
 362,Jacquet,Liverpool,LIV,2,5.0,4.5,4.5,18,3.1,325,0,0,2,3,a
-368,Szoboszlai,Liverpool,LIV,3,7.0,4.5,4.5,18,36.4,360,1,0,2,1,a
+368,Szoboszlai,Liverpool,LIV,3,7.0,4.5,4.5,18,36.3,360,1,0,2,1,a
 432,Mainoo,Man Utd,MUN,3,5.5,4.5,4.5,18,1.5,275,0,1,0,2,a
 449,Hall,Newcastle,NEW,2,5.2,4.5,4.5,18,14.4,359,0,1,1,3,a
 112,Van Hecke,Spurs,TOT,2,4.9,4.5,4.5,18,6.8,360,0,0,2,2,a
@@ -91,7 +91,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 464,Wissa,Newcastle,NEW,4,6.2,3.8,3.8,15,18.3,351,1,1,1,2,a
 597,Suzuki,Aston Villa,AVL,1,5.0,3.5,4.7,14,1.8,270,0,0,1,3,a
 557,Tzolis,Arsenal,ARS,3,6.4,3.5,3.5,14,14.8,290,0,2,2,1,a
-82,Kelleher,Brentford,BRE,1,5.0,3.5,3.5,14,6.4,360,0,0,1,0,a
+82,Kelleher,Brentford,BRE,1,5.0,3.5,3.5,14,6.3,360,0,0,1,0,a
 87,Ajer,Brentford,BRE,2,4.5,3.5,3.5,14,4.4,360,0,0,1,0,a
 244,Armstrong,Everton,EVE,3,5.0,3.5,3.5,14,0.4,356,0,1,2,0,a
 249,Barry,Everton,EVE,4,5.6,3.5,3.5,14,6.5,327,1,0,2,2,a
@@ -152,7 +152,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 486,McAtee,Nott'm Forest,NFO,3,5.5,2.5,2.5,10,0.1,334,0,0,2,0,a
 313,Clarke,Ipswich Town,IPS,3,5.4,2.2,3.0,9,0.2,105,1,0,0,1,a
 393,Khusanov,Man City,MCI,2,5.5,2.2,3.0,9,1.5,268,0,0,1,0,a
-534,Hume,Sunderland,SUN,2,4.4,2.2,3.0,9,3.6,195,0,0,1,0,a
+534,Hume,Sunderland,SUN,2,4.4,2.2,3.0,9,3.5,195,0,0,1,0,a
 7,Lewis-Skelly,Arsenal,ARS,3,5.5,2.2,2.2,9,0.6,271,0,0,2,0,a
 36,Maatsen,Aston Villa,AVL,2,4.5,2.2,2.2,9,0.7,335,0,0,1,1,d
 41,Buendía,Aston Villa,AVL,3,5.9,2.2,2.2,9,1.0,311,0,0,1,0,a
@@ -165,9 +165,9 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 267,Lukić,Ipswich Town,IPS,3,5.0,2.2,2.2,9,0.1,328,0,1,0,0,a
 315,Fatawu,Ipswich Town,IPS,3,5.5,2.2,2.2,9,0.2,286,0,1,0,0,a
 398,Foden,Man City,MCI,3,7.0,2.2,2.2,9,3.1,217,0,2,0,1,s
-452,Bruno G.,Arsenal,ARS,3,6.7,2.0,4.0,8,1.7,64,1,0,0,1,a
+452,Bruno G.,Arsenal,ARS,3,6.7,2.0,4.0,8,1.8,64,1,0,0,1,a
 331,Gudmundsson,Leeds,LEE,2,4.5,2.0,4.0,8,0.1,162,0,0,1,0,a
-499,Pedro Porro,Spurs,TOT,2,5.5,2.0,4.0,8,9.4,180,0,0,1,1,d
+499,Pedro Porro,Spurs,TOT,2,5.5,2.0,4.0,8,9.3,180,0,0,1,1,d
 113,F.Kadıoğlu,Brighton,BHA,2,4.4,2.0,2.7,8,1.7,257,0,0,1,0,a
 167,Delap,Nott'm Forest,NFO,4,5.5,2.0,2.7,8,1.4,187,1,0,1,0,a
 51,George Hemmings,Aston Villa,AVL,3,4.5,2.0,2.0,8,1.3,279,0,0,1,0,a
@@ -245,7 +245,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 581,Diomande,Nott'm Forest,NFO,2,5.4,1.2,2.5,5,0.5,91,0,0,0,0,a
 543,Diarra,Sunderland,SUN,3,5.4,1.2,2.5,5,0.0,28,0,1,0,0,i
 151,Acheampong,Chelsea,CHE,2,4.5,1.2,1.7,5,0.4,202,0,0,0,0,a
-198,Henderson,Crystal Palace,CRY,1,5.0,1.2,1.7,5,1.7,270,0,0,0,0,i
+198,Henderson,Crystal Palace,CRY,1,5.0,1.2,1.7,5,1.6,270,0,0,0,0,i
 387,O'Reilly,Man City,MCI,2,6.4,1.2,1.7,5,12.5,158,0,0,0,0,a
 405,N.Gonzalez,Newcastle,NEW,3,5.5,1.2,1.7,5,0.2,164,0,0,1,0,d
 105,Anthony,Brentford,BRE,3,5.9,1.2,1.2,5,0.1,187,0,0,1,0,a
@@ -310,7 +310,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 512,Kudus,Spurs,TOT,3,6.5,0.8,1.0,3,0.1,78,0,0,0,0,a
 17,Merino,Arsenal,ARS,3,5.8,0.8,0.8,3,0.4,51,0,0,0,0,a
 119,Costinha,Brighton,BHA,2,4.5,0.8,0.8,3,0.0,54,0,0,0,0,a
-142,James,Chelsea,CHE,2,5.4,0.8,0.8,3,7.3,292,0,0,0,0,a
+142,James,Chelsea,CHE,2,5.4,0.8,0.8,3,7.2,292,0,0,0,0,a
 492,Awoniyi,Coventry City,COV,4,5.5,0.8,0.8,3,0.6,232,0,0,0,0,s
 306,Greaves,Ipswich Town,IPS,2,4.0,0.8,0.8,3,1.2,357,0,0,0,0,a
 616,Bouaddi,Man City,MCI,3,5.5,0.7,1.0,2,0.2,22,0,0,0,0,a
