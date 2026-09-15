@@ -4,6 +4,7 @@ import time
 import requests
 import pandas as pd
 from utils import ensure_dir, write_json, today_str
+from team_model import build as build_team_model
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 CURRENT_DIR = BASE_DIR / 'data' / 'current'
@@ -211,6 +212,11 @@ def main() -> None:
     player_history_df, player_future_fixtures_df = fetch_player_summaries(players_df['id'].tolist())
     save_csv(player_history_df, 'player_history.csv')
     save_csv(player_future_fixtures_df, 'player_future_fixtures.csv')
+
+    # xG-based team strength + model fixture difficulty (see team_model.py)
+    team_ratings_df, fixture_model_df = build_team_model(player_history_df, players_df, fixtures_df, teams_df)
+    save_csv(team_ratings_df, 'team_ratings.csv')
+    save_csv(fixture_model_df, 'fixture_model.csv')
 
     print('FPL v2 data refresh complete')
 

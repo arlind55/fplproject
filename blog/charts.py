@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generate the chart image for each blog post from data/current.
-Usage (from repo root): python3 blog/charts.py
+Usage (from repo root): python3 blog/charts.py [GW]   (defaults to the latest finished GW)
 Writes docs/blog/img/<post-slug>.png at 1200x630 (doubles as the post's social card)."""
 from pathlib import Path
 import numpy as np, pandas as pd
@@ -61,8 +61,14 @@ agg = h.groupby("player_id").agg(games=("minutes", lambda s: (s > 0).sum()), min
 d = p[["id", "web_name", "team_short_name", "pos", "now_cost", "selected_by_percent"]].merge(agg, left_on="id", right_on="player_id")
 d["ppg"] = d.pts / d.games; d["vapm"] = (d.ppg - 2) / d.now_cost; d["xvapm"] = (d.xpts / d.games - 2) / d.now_cost; d["delta"] = d.pts - d.xpts
 
+import sys
+GW = int(sys.argv[1]) if len(sys.argv) > 1 else int(pd.read_csv(DATA / "events.csv").query("finished == True").id.max())
+MINS = 90 * max(1, GW // 2)          # minimum minutes scales with the season: 90 after GW2, 180 after GW4 …
+SLUG = f"gw{GW}"
+ORD = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten"}.get(GW, str(GW))
+
 # ── 1. Value report: VAPM top 8, actual vs expected ─────────────────────────────
-top = d[d.mins >= 90].sort_values("vapm", ascending=False).head(8).iloc[::-1]
+top = d[d.mins >= MINS].sort_values("vapm", ascending=False).head(8).iloc[::-1]
 fig = canvas(); ax = fig.add_axes([.20, .10, .74, .66]); frame(ax)
 y = np.arange(len(top))
 ax.barh(y, top.vapm, color=[POSC[x] for x in top.pos], height=.6, zorder=2)
@@ -74,8 +80,8 @@ for yi, (n, tm, pr, v, xv) in enumerate(zip(top.web_name, top.team_short_name, t
 ax.set_yticks([]); ax.set_xlim(0, top.vapm.max() * 1.18)
 ax.set_xlabel("VAPM = (points per game − 2) ÷ price", fontproperties=BODY, color=INK3, fontsize=10)
 leg = ax.legend(loc="lower right", frameon=False, prop=BODY, labelcolor=INK2, fontsize=10)
-header(fig, "Top VAPM after two gameweeks", "Bars: actual VAPM (90+ minutes). Tick: where VAPM would sit on expected points — the gap is finishing and clean-sheet luck.")
-save(fig, "gw3-value-report")
+header(fig, f"Top VAPM after {ORD} gameweeks", f"Bars: actual VAPM ({MINS}+ minutes). Tick: where VAPM would sit on expected points — the gap is finishing and clean-sheet luck.")
+save(fig, f"{SLUG}-value-report")
 
 # ── 2. Template check: points vs xPts for ≥25% owned ────────────────────────────
 tpl = d[d.selected_by_percent >= 25].sort_values("selected_by_percent", ascending=False)
@@ -89,10 +95,11 @@ for xi, (n, tm, own, dl) in enumerate(zip(tpl.web_name, tpl.team_short_name, tpl
     ax.text(xi, max(tpl.pts.iloc[xi], tpl.xpts.iloc[xi]) + .5, f"{dl:+.1f}", ha="center", color=OK if dl > 0 else ERR, fontproperties=MONO, fontsize=9.5)
 ax.set_xticks([]); ax.set_ylim(0, max(tpl.pts.max(), tpl.xpts.max()) * 1.15)
 ax.legend(loc="upper right", frameon=False, prop=BODY, labelcolor=INK2, fontsize=10)
-header(fig, "The template vs its expected points", "Every player owned by 25%+ of managers. Green/red: points minus xPts. Arsenal players have one match in this dataset.")
-save(fig, "gw3-template-check")
+header(fig, "The template vs its expected points", f"Every player owned by 25%+ of managers after GW{GW}. Green/red: points minus xPts.")
+save(fig, f"{SLUG}-template-check")
 
-# ── 3. Fixture swing: slope chart GW3–5 → GW6–10 ─────────────────────────────────
+# ── 3. Fixture swing: slope chart GW3–5 → GW6–10 (the GW6 pre-break piece) ──────
+if GW > 5: sys.exit(0)
 f = pd.read_csv(DATA / "fixtures.csv", usecols=["event", "team_h", "team_a", "team_h_difficulty", "team_a_difficulty"]).dropna(subset=["event"])
 rows = []
 for r in f.itertuples():

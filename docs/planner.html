@@ -77,7 +77,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .toolbar p{margin:2px 0 0;color:var(--ink-3);font-size:12px}
 .legend{display:flex;gap:6px;align-items:center;color:var(--ink-3);font-size:12px;letter-spacing:.04em;text-transform:uppercase}
 .legend span{display:inline-block;width:26px;height:18px;border-radius:3px;font:600 11px "IBM Plex Mono",monospace;text-align:center;line-height:18px;letter-spacing:0}
-.controls{display:grid;grid-template-columns:minmax(260px,1.3fr) repeat(3,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.controls{display:grid;grid-template-columns:minmax(220px,1.2fr) repeat(4,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.controls .seg button{padding:7px 6px;font-size:12.5px}
+.modenote{color:var(--ink-3);font-size:11px;margin-top:6px;line-height:1.35}
+#ratingCard[hidden]{display:none}
+@media (max-width:1100px){.controls{grid-template-columns:1fr 1fr 1fr}}
 @media (max-width:900px){.controls{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){.controls{grid-template-columns:1fr}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;box-shadow:var(--shadow)}
@@ -151,7 +155,7 @@ footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-co
 </header>
 
 <div class="toolbar">
-  <div><h2>Fixture run planner</h2><p>FPL's official difficulty ratings for every fixture · pick a window, filter by venue, rank teams by easiest run</p></div>
+  <div><h2>Fixture run planner</h2><p>FPL's official difficulty ratings — or an xG-based model of them — for every fixture · pick a window, filter by venue, rank teams by easiest run</p></div>
   <div class="legend">Difficulty
     <span style="background:var(--d1);color:var(--d1-ink)">1</span>
     <span style="background:var(--d2);color:var(--d2-ink)">2</span>
@@ -169,6 +173,16 @@ footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-co
       <input type="range" id="gwFrom" min="1" max="38" step="1" aria-label="First gameweek">
       <input type="range" id="gwTo" min="1" max="38" step="1" aria-label="Last gameweek">
     </div>
+  </div>
+  <div class="card" id="ratingCard" hidden>
+    <div class="label">Rating <a href="./metrics.html#model" style="color:var(--accent);text-transform:none;letter-spacing:0;font-weight:500">how it works</a></div>
+    <div class="seg" id="mode" role="group" aria-label="Difficulty source">
+      <button data-m="fpl" aria-pressed="true">FPL</button>
+      <button data-m="att" aria-pressed="false">xG attack</button>
+      <button data-m="def" aria-pressed="false">xG defence</button>
+      <button data-m="blend" aria-pressed="false">Blend</button>
+    </div>
+    <div class="modenote" id="modeNote"></div>
   </div>
   <div class="card">
     <div class="label">Venue</div>
@@ -204,7 +218,7 @@ footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-co
 </div>
 
 <footer>
-  <span>Avg = mean FPL difficulty of the team's fixtures in the selected range and venue (lower is easier). Easy = fixtures rated 2 or below. Ratings are FPL's official FDR and can change week to week.</span>
+  <span>Avg = mean difficulty (under the selected rating) of the team's fixtures in the selected range and venue; lower is easier. Easy = fixtures rated 2 or below. FPL ratings are the official FDR and can change week to week; xG ratings are recomputed from Opta xG every data refresh — <a href="./metrics.html#model">method</a>.</span>
   <span>Source: <a href="https://github.com/arlind55/fplproject" style="color:inherit">arlind55/fplproject</a> · data/current</span>
 </footer>
 </div>
@@ -228,7 +242,7 @@ function describeData(events,meta,progress){
   const cur=events.find(e=>truthy(e.is_current)),next=events.find(e=>truthy(e.is_next));
   let when="";if(meta?.updated_at){const d=new Date(meta.updated_at);when=d.toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
   let gw=`<b>GW${lastDone}</b> complete`;
-  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone){gw=`<b>GW${cur.id}</b> in progress${progress&&progress.gw==+cur.id?` (${progress.played}/${progress.total} played)`:""}`;}
+  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone){const done=progress&&progress.gw==+cur.id&&progress.played>=progress.total;gw=done?`<b>GW${cur.id}</b> played · awaiting FPL confirmation`:`<b>GW${cur.id}</b> in progress${progress&&progress.gw==+cur.id?` (${progress.played}/${progress.total} played)`:""}`;}
   return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · ${gw} · GW${next?next.id:"?"} next`;
 }
 async function fetchMeta(){try{const r=await fetch(`${BASE}/meta.json`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}
@@ -238,7 +252,9 @@ let TEAMS={};      // id -> [short, name]
 let BY_TEAM={};    // id -> [gw][] of {opp, venue, diff, score}
 let NEXT_GW=1, MAX_GW=38;
 
-const state={from:null,to:null,venue:"all",sort:"easy",scores:true,hideOut:false};
+const state={from:null,to:null,venue:"all",sort:"easy",scores:true,hideOut:false,mode:"fpl"};
+let MODEL=null;   // fixture id -> model row, when fixture_model.csv exists
+const MODE_NOTE={fpl:"FPL's official rating of the opponent, 1–5.",att:"How hard it is for this team's attackers to score: expected goals for, from xG-based attack/defence ratings by venue. Includes the team's own strength.",def:"How hard it is for this team to keep a clean sheet: expected goals against. Tooltip shows clean-sheet probability.",blend:"Average of the FPL rating and the xG model (attack and defence combined)."};
 try{const s=JSON.parse(localStorage.getItem("fdr-planner")||"null");if(s&&typeof s==="object")Object.assign(state,s);}catch(e){}
 function save(){try{localStorage.setItem("fdr-planner",JSON.stringify(state));}catch(e){}}
 
@@ -261,6 +277,9 @@ async function fetchCsv(file){
   return csvToObjects(await res.text());
 }
 const int=v=>{const n=parseInt(v,10);return Number.isFinite(n)?n:null;};
+const num=v=>{const n=parseFloat(v);return Number.isFinite(n)?n:null;};
+// difficulty of a fixture under the selected rating mode
+function diffOf(fx){if(state.mode==="fpl"||!fx.m)return fx.diff;const v=fx.m[state.mode];return v==null?fx.diff:v;}
 const truthy=v=>/^(true|1)$/i.test(String(v));
 
 async function load(){
@@ -270,6 +289,8 @@ async function load(){
   let fixtures,source="fixtures_lite.csv";
   try{fixtures=await fetchCsv("fixtures_lite.csv");}
   catch(e){source="fixtures.csv";fixtures=await fetchCsv("fixtures.csv");}
+  try{const rows=await fetchCsv("fixture_model.csv");MODEL={};rows.forEach(r=>{MODEL[r.id]=r;});$("ratingCard").hidden=false;}
+  catch(e){MODEL=null;state.mode="fpl";}
 
   TEAMS={};teams.forEach(t=>{TEAMS[t.id]=[t.short_name,t.name];});
   const ids=Object.keys(TEAMS);
@@ -286,8 +307,11 @@ async function load(){
     const hs=int(f.team_h_score),as=int(f.team_a_score);
     const played=truthy(f.finished)||truthy(f.finished_provisional)||(hs!==null&&as!==null&&truthy(f.started));
     prog[gw]=prog[gw]||{played:0,total:0};prog[gw].total++;if(played)prog[gw].played++;
-    BY_TEAM[h][gw].push({opp:a,venue:"H",diff:hd,score:played?`${hs}–${as}`:null});
-    BY_TEAM[a][gw].push({opp:h,venue:"A",diff:ad,score:played?`${as}–${hs}`:null});
+    const m=MODEL?MODEL[f.id]:null;
+    const mh=m?{att:int(m.att_diff_home),def:int(m.def_diff_home),blend:int(m.blend_diff_home),xgf:num(m.xg_home),xga:num(m.xg_away),cs:num(m.cs_prob_home)}:null;
+    const ma=m?{att:int(m.att_diff_away),def:int(m.def_diff_away),blend:int(m.blend_diff_away),xgf:num(m.xg_away),xga:num(m.xg_home),cs:num(m.cs_prob_away)}:null;
+    BY_TEAM[h][gw].push({opp:a,venue:"H",diff:hd,score:played?`${hs}–${as}`:null,m:mh});
+    BY_TEAM[a][gw].push({opp:h,venue:"A",diff:ad,score:played?`${as}–${hs}`:null,m:ma});
     n++;
   }
 
@@ -321,7 +345,7 @@ function seg(id,key,attr){
     });
   });
 }
-seg("venue","venue","v");seg("sort","sort","s");
+seg("venue","venue","v");seg("sort","sort","s");seg("mode","mode","m");
 $("showScores").checked=state.scores;$("hideOut").checked=state.hideOut;
 $("showScores").addEventListener("change",e=>{state.scores=e.target.checked;save();render();});
 $("hideOut").addEventListener("change",e=>{state.hideOut=e.target.checked;save();render();});
@@ -331,10 +355,12 @@ function inScope(fx,gw){return gw>=state.from&&gw<=state.to&&(state.venue==="all
 // ─── Render ───────────────────────────────────────────────────────────────────
 function render(){
   if(!Object.keys(TEAMS).length)return;
+  $("modeNote").textContent=MODE_NOTE[state.mode]||"";
+  document.querySelectorAll("#mode button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.m===state.mode)));
   const gws=[];for(let g=1;g<=MAX_GW;g++){if(!state.hideOut||(g>=state.from&&g<=state.to))gws.push(g);}
   const rows=Object.keys(TEAMS).map(id=>{
     let sum=0,n=0,easy=0;
-    for(let g=state.from;g<=state.to;g++)for(const fx of BY_TEAM[id][g])if(inScope(fx,g)&&fx.diff!==null){sum+=fx.diff;n++;if(fx.diff<=2)easy++;}
+    for(let g=state.from;g<=state.to;g++)for(const fx of BY_TEAM[id][g]){const d=diffOf(fx);if(inScope(fx,g)&&d!==null){sum+=d;n++;if(d<=2)easy++;}}
     return{id,avg:n?sum/n:null,n,easy};
   });
   const name=id=>TEAMS[id][1];
@@ -363,10 +389,14 @@ function render(){
       if(!list.length)out+=`<div class="chip blank">—</div>`;
       for(const fx of list){
         const on=inScope(fx,g);
-        const cls=on&&fx.diff!==null?`d${fx.diff}`:"off";
+        const d=diffOf(fx);
+        const cls=on&&d!==null?`d${d}`:"off";
         const showScore=state.scores&&fx.score;
         const [oShort,oName]=TEAMS[fx.opp];
-        out+=`<div class="chip ${cls}${list.length>1?" multi":""}" title="${nm} ${fx.venue==="H"?"vs":"at"} ${oName} · difficulty ${fx.diff??"?"}${fx.score?" · "+fx.score:""}">${oShort}<span class="ha">${fx.venue}</span>${showScore?`<span class="sc">${fx.score}</span>`:""}</div>`;
+        let tip=`${nm} ${fx.venue==="H"?"vs":"at"} ${oName} · FPL ${fx.diff??"?"}`;
+        if(fx.m){tip+=` · model: attack ${fx.m.att} / defence ${fx.m.def} · xG for ${fx.m.xgf?.toFixed(2)} · against ${fx.m.xga?.toFixed(2)} · CS ${Math.round((fx.m.cs||0)*100)}%`;}
+        if(fx.score)tip+=` · ${fx.score}`;
+        out+=`<div class="chip ${cls}${list.length>1?" multi":""}" title="${tip}">${oShort}<span class="ha">${fx.venue}</span>${showScore?`<span class="sc">${fx.score}</span>`:""}</div>`;
       }
       out+=`</div></td>`;
     }

@@ -278,7 +278,7 @@ function describeData(events,meta,progress){
   const cur=events.find(e=>truthy(e.is_current)),next=events.find(e=>truthy(e.is_next));
   let when="";if(meta?.updated_at){const d=new Date(meta.updated_at);when=d.toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
   let gw=`<b>GW${lastDone}</b> complete`;
-  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone){gw=`<b>GW${cur.id}</b> in progress${progress&&progress.gw==+cur.id?` (${progress.played}/${progress.total} played)`:""}`;}
+  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone){const done=progress&&progress.gw==+cur.id&&progress.played>=progress.total;gw=done?`<b>GW${cur.id}</b> played · awaiting FPL confirmation`:`<b>GW${cur.id}</b> in progress${progress&&progress.gw==+cur.id?` (${progress.played}/${progress.total} played)`:""}`;}
   return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · ${gw} · GW${next?next.id:"?"} next`;
 }
 async function fetchMeta(){try{const r=await fetch(`${BASE}/meta.json`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}

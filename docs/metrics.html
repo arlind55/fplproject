@@ -134,6 +134,7 @@ hr{border:0;border-top:1px solid var(--line);margin:36px 0}
   <a href="#delta">Over / under-performance (Δ)</a>
   <a href="#other">ICT, DefCon, form</a>
   <a href="#windows">Windows, per game, per 90</a>
+  <a href="#model">xG fixture model</a>
   <a href="#caveats">When not to trust the numbers</a>
 </nav>
 
@@ -216,6 +217,19 @@ hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 <h3 id="windows">Windows, per game and per 90</h3>
 <p>Every metric on the dashboard is computed over the gameweek window you select — the whole season, the last 3, 6 or 10 gameweeks, or a custom range — and can be restricted to home or away matches. This is worth using deliberately. Season totals reward availability; a six-week window catches a change in role or a new manager; the home/away split shows the players whose returns are heavily venue-dependent, which matters when you're deciding on a captain.</p>
 <p>The <em>basis</em> toggle changes how counting stats are expressed. <strong>Total</strong> is the raw sum over the window. <strong>Per game</strong> divides by appearances (matches with at least one minute) and is the right basis for VAPM and for comparing regular starters. <strong>Per 90</strong> divides by minutes and scales to a full match, which is the fair comparison between starters and substitutes but will produce absurd numbers for players with 20 minutes — always pair it with a minimum-minutes filter.</p>
+
+<hr>
+<h3 id="model">The xG fixture model <small>planner · rating toggle</small></h3>
+<p>FPL's fixture difficulty rating is a single number per opponent, and it's built from league position, form and results — so a team that wins 4–1 from two chances looks stronger than it is. The planner's <strong>xG attack</strong>, <strong>xG defence</strong> and <strong>Blend</strong> options replace it with a rating built only from chance quality.</p>
+<h4>Team strength</h4>
+<div class="formula">attack = (Σ xG for + K × avg) ÷ ((games + K) × avg) <span class="c">// 1.00 = league average</span><br>defence = (Σ xG against + K × avg) ÷ ((games + K) × avg) <span class="c">// lower is better</span></div>
+<p>Every team gets an attack and a defence rating, each computed separately for home and away matches. xG for is the sum of the team's players' expected goals in each match; xG against is the goalkeeper's expected goals conceded, which is the same thing from the other side. Actual goals never enter the ratings — they're kept in two separate columns, <em>finishing</em> (goals − xG) and <em>leak</em> (conceded − xGC), so you can see who has been clinical or fortunate without it distorting their strength.</p>
+<p>K is a prior worth six matches of league-average performance. Early in the season it stops one big result swinging a rating: after four games a team can move about 30% from average, no further. By mid-season the real data dominates and the prior barely matters.</p>
+<h4>From ratings to a fixture</h4>
+<div class="formula">home xG = avg × attack<sub>home</sub>(H) × defence<sub>away</sub>(A)<br>away xG = avg × attack<sub>away</sub>(A) × defence<sub>home</sub>(H)<br>P(clean sheet) = e<sup>−xG against</sup></div>
+<p>So each fixture gets an expected-goals figure for both sides, and from each team's point of view two difficulties. <strong>xG attack</strong> answers "how hard is it for this team's attackers to score?" — low expected goals for means a high rating. <strong>xG defence</strong> answers "how hard is it to keep a clean sheet?" — high expected goals against means a high rating. Both are mapped onto FPL's 1–5 scale by ranking every remaining fixture in the season: the easiest 10% are a 1, the next 20% a 2, the middle 40% a 3, then 20% and 10% for 4 and 5. <strong>Blend</strong> averages the FPL rating with the model's attack and defence combined.</p>
+<p>The important difference from FPL's rating: the model includes the team's <em>own</em> strength, not just the opponent's. A weak attack away at an average defence is a hard fixture for its forwards even if FPL calls the opponent a 3. That is deliberate — the planner ranks teams by how likely their players are to return, which is what you're choosing between — but it means the two scales answer slightly different questions, and the planner's tooltip shows both alongside the raw expected goals.</p>
+<p class="note">Limitations: FPL's xG includes penalties, which flatters teams awarded several. Ratings use only this season's matches, so promoted teams start from the same prior as everyone else. The model knows nothing about injuries, suspensions, managerial changes or European fatigue. Team ratings and the fixture model are recomputed every data refresh and published as <code>team_ratings.csv</code> and <code>fixture_model.csv</code> in the repo.</p>
 
 <hr>
 <h3 id="caveats">When not to trust the numbers</h3>
