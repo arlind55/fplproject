@@ -25,7 +25,13 @@ BANDS = (0.10, 0.30, 0.70, 0.90)   # cumulative quantile cut points for ratings 
 
 def team_matches(history_df: pd.DataFrame, players_df: pd.DataFrame, fixtures_df: pd.DataFrame) -> pd.DataFrame:
     """One row per team per played fixture with xG for/against and goals for/against."""
-    h = history_df.merge(players_df[['id', 'element_type']], left_on='player_id', right_on='id', suffixes=('', '_p'))
+    h = history_df.copy()
+    # The FPL API returns xG fields as strings ("0.52"); coerce everything we aggregate to numbers.
+    for c in ('expected_goals', 'expected_goals_conceded', 'minutes', 'team_h_score', 'team_a_score', 'round', 'player_id', 'fixture'):
+        if c in h.columns:
+            h[c] = pd.to_numeric(h[c], errors='coerce')
+    h['was_home'] = h['was_home'].astype(str).str.lower().isin(('true', '1'))
+    h = h.merge(players_df[['id', 'element_type']], left_on='player_id', right_on='id', suffixes=('', '_p'))
     fx = fixtures_df[['id', 'team_h', 'team_a']].rename(columns={'id': 'fixture'})
     h = h.merge(fx, on='fixture', how='inner')
     # Team from the fixture, not the player's current club (players who moved carry old matches)
@@ -88,6 +94,8 @@ def fixture_model(fixtures_df: pd.DataFrame, ratings: pd.DataFrame) -> pd.DataFr
     r = ratings.set_index('team_id')
     avg = float(ratings['league_avg_xg'].iloc[0]) if len(ratings) else 1.3
     f = fixtures_df[['id', 'event', 'kickoff_time', 'finished', 'team_h', 'team_a', 'team_h_difficulty', 'team_a_difficulty']].copy()
+    for c in ('team_h_difficulty', 'team_a_difficulty', 'event'):
+        f[c] = pd.to_numeric(f[c], errors='coerce')
     f = f[f['team_h'].isin(r.index) & f['team_a'].isin(r.index)]
     f['xg_home'] = avg * r.loc[f['team_h'], 'att_home'].values * r.loc[f['team_a'], 'def_away'].values
     f['xg_away'] = avg * r.loc[f['team_a'], 'att_away'].values * r.loc[f['team_h'], 'def_home'].values
