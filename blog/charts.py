@@ -63,7 +63,7 @@ d["ppg"] = d.pts / d.games; d["vapm"] = (d.ppg - 2) / d.now_cost; d["xvapm"] = (
 
 import sys
 GW = int(sys.argv[1]) if len(sys.argv) > 1 else int(pd.read_csv(DATA / "events.csv").query("finished == True").id.max())
-MINS = 90 * max(1, GW // 2)          # minimum minutes scales with the season: 90 after GW2, 180 after GW4 …
+MINS = 45 * GW                     # minimum minutes = half the available time (225 after GW5)
 SLUG = f"gw{GW}"
 ORD = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten"}.get(GW, str(GW))
 
