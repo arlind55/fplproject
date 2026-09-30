@@ -54,8 +54,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
 .brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
 .brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
-.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px}
-.tabs a{padding:7px 16px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{padding:7px 14px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
 .tabs a:hover{color:var(--ink)}
 .tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
 .right{display:flex;align-items:center;gap:10px}
@@ -111,6 +112,7 @@ hr{border:0;border-top:1px solid var(--line);margin:36px 0}
   <nav class="tabs" aria-label="Pages">
     <a href="./index.html">Dashboard</a>
     <a href="./planner.html">Fixture planner</a>
+    <a href="./projections.html">Projections</a>
     <a href="./metrics.html" aria-current="page">Metrics</a>
     <a href="./blog/">Value Blog</a>
   </nav>
@@ -135,6 +137,7 @@ hr{border:0;border-top:1px solid var(--line);margin:36px 0}
   <a href="#other">ICT, DefCon, form</a>
   <a href="#windows">Windows, per game, per 90</a>
   <a href="#model">xG fixture model</a>
+  <a href="#projections">Projections</a>
   <a href="#caveats">When not to trust the numbers</a>
 </nav>
 
@@ -229,14 +232,33 @@ hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 <div class="formula">home xG = avg × attack<sub>home</sub>(H) × defence<sub>away</sub>(A)<br>away xG = avg × attack<sub>away</sub>(A) × defence<sub>home</sub>(H)<br>P(clean sheet) = e<sup>−xG against</sup></div>
 <p>So each fixture gets an expected-goals figure for both sides, and from each team's point of view two difficulties. <strong>xG attack</strong> answers "how hard is it for this team's attackers to score?" — low expected goals for means a high rating. <strong>xG defence</strong> answers "how hard is it to keep a clean sheet?" — high expected goals against means a high rating. Both are mapped onto FPL's 1–5 scale by ranking every remaining fixture in the season: the easiest 10% are a 1, the next 20% a 2, the middle 40% a 3, then 20% and 10% for 4 and 5. <strong>Blend</strong> averages the FPL rating with the model's attack and defence combined.</p>
 <p>The important difference from FPL's rating: the model includes the team's <em>own</em> strength, not just the opponent's. A weak attack away at an average defence is a hard fixture for its forwards even if FPL calls the opponent a 3. That is deliberate — the planner ranks teams by how likely their players are to return, which is what you're choosing between — but it means the two scales answer slightly different questions, and the planner's tooltip shows both alongside the raw expected goals.</p>
-<p class="note">Limitations: FPL's xG includes penalties, which flatters teams awarded several. Ratings use only this season's matches, so promoted teams start from the same prior as everyone else. The model knows nothing about injuries, suspensions, managerial changes or European fatigue. Team ratings and the fixture model are recomputed every data refresh and published as <code>team_ratings.csv</code> and <code>fixture_model.csv</code> in the repo.</p>
+<p class="note">Limitations: FPL's xG includes penalties, which flatters teams awarded several. The prior is last season's final ratings, pulled 40% back toward average because squads change over the summer; promoted teams start from the average of the three relegated sides. The model knows nothing about injuries, suspensions, managerial changes or European fatigue. Team ratings and the fixture model are recomputed every data refresh and published as <code>team_ratings.csv</code> and <code>fixture_model.csv</code> in the repo.</p>
+
+<hr>
+<h3 id="projections">Projections <small>projections page · Proj 5 column</small></h3>
+<p>The <a href="./projections.html" style="color:var(--accent)">Projections page</a> estimates how many points each player will score in each of the next five gameweeks. It is deliberately simple: every part of FPL's scoring gets its own small model, each one is an average rather than a prediction, and they're added up.</p>
+<h4>Will he play?</h4>
+<p>From the player's last six team matches, weighted toward the most recent, the model estimates the chance he starts, the chance he comes off the bench, how long he usually lasts when he starts and how often that's past 60 minutes. That is multiplied by FPL's chance-of-playing flag; where the injury news gives a return date ("expected back 10 Oct") the player counts as available from the first deadline after it. Minutes turn out to matter more than anything else: in the backtest, tuning the minutes model moved accuracy more than every other setting combined.</p>
+<h4>How much does he do per 90?</h4>
+<div class="formula">rate = (this season + ½ × last season + K × price prior) ÷ (this-season 90s + ½ × last-season 90s + K)</div>
+<p>xG, xA, saves, bonus and yellow cards per 90 are all estimated this way. The price prior is a straight-line fit of each rate on price within a position, because FPL's prices are a decent guide to how involved a player will be. Early in the season the prior and last season carry most of the weight; by December it's almost all this season. DefCon uses the same idea, as the share of 60-minute matches where he reached the threshold (10 for defenders, 12 for midfielders and forwards).</p>
+<h4>How good is the fixture?</h4>
+<p>The <a href="#model">xG fixture model</a> gives both teams' expected goals for every match. A player's rates are scaled by his team's expected goals in that fixture relative to its average, so an attacker playing a weak defence at home is projected for more than his season rate.</p>
+<h4>Adding it up</h4>
+<div class="formula">goals = xG/90 × fixture multiplier × expected minutes ÷ 90 × goal points<br>assists = xA/90 × fixture multiplier × expected minutes ÷ 90 × 3<br>clean sheet = P(60+ mins) × e<sup>−xG against</sup> × CS points<br>+ appearance, −goals conceded, saves, DefCon, bonus, −cards</div>
+<p>Two calibrations from last season: FPL awards about 0.94 goals per xG (own goals and deflections don't count for the shooter) and 1.38 assists per xA, because FPL counts rebounds, won penalties and deflected passes as assists and Opta's xA doesn't. Goals conceded and saves use the exact average of a Poisson count, so a defence expected to concede 2.1 goals costs its keeper 0.80 points on average, not the naive 2.1 ÷ 2 = 1.05.</p>
+<h4>Captaincy and the model squad</h4>
+<p>The captain ranking simulates each candidate's next gameweek 20,000 times (does he start, goals, assists, clean sheet, saves) to show a 90th-percentile score, the chance of a 10-point haul and the chance of a blank. The model squad is the best legal £100m squad for the five gameweeks, found with an integer programme: starting XI at full value (later weeks discounted 10% a week), bench at 15%, captain doubled for the next gameweek. <code>python -m fplvalue.optimise --team-id &lt;id&gt;</code> in the repo runs the same thing for your own team and suggests transfers, charging 4 points per hit.</p>
+<h4>How accurate is it?</h4>
+<p>Every week the pipeline reruns a walk-forward backtest: rewind to before each deadline, project that gameweek using only what was known then, compare with what happened. It covers all of last season and this season so far, against three baselines including FPL's own <em>ep_next</em>. The current numbers are at the bottom of the <a href="./projections.html#backtest" style="color:var(--accent)">Projections page</a>. Expect an average miss of around two points per player per week even when the model is working well: one goal or clean sheet either way is most of that, and nothing can predict it.</p>
+<p class="note">Not modelled: penalty order changes, rotation around European games, managerial changes, and set-piece duties beyond what shows up in xG. The whole model is open source in the <a href="https://github.com/arlind55/fplproject/tree/main/fplvalue">fplvalue</a> package, with a notebook to explore it.</p>
 
 <hr>
 <h3 id="caveats">When not to trust the numbers</h3>
 <p><strong>Small samples.</strong> Everything on this page is a rate, and rates from two or three games are mostly noise. Set a minimum-minutes filter of at least 180 before ranking anything, and treat any early-season list as a set of names to watch rather than a set of transfers to make.</p>
 <p><strong>Expected stats are about the chance, not the player.</strong> A deliberately elite finisher will outscore his xG year after year; xG models don't know who is shooting. Persistent positive Δ over a whole season is usually skill, not luck. Persistent positive Δ over three weeks usually isn't.</p>
 <p><strong>Penalties.</strong> A penalty is worth about 0.78 xG, so penalty takers carry structurally higher xG and xPts. That's correct — they really will score more — but it means comparing a taker's xGI to a non-taker's tells you as much about set-piece duties as about open play.</p>
-<p><strong>Fixtures aren't in the model.</strong> xPts is a measure of what a player's performances were worth, not a forecast of next week. For that, combine it with the <a href="./planner.html" style="color:var(--accent)">fixture planner</a>: a player with strong underlying numbers and a soft run of fixtures is the combination you're looking for.</p>
+<p><strong>Fixtures aren't in xPts.</strong> xPts is a measure of what a player's performances were worth, not a forecast of next week; the <a href="#projections" style="color:var(--accent)">projections</a> are the forecast. For that, combine it with the <a href="./planner.html" style="color:var(--accent)">fixture planner</a>: a player with strong underlying numbers and a soft run of fixtures is the combination you're looking for.</p>
 <p><strong>Price changes.</strong> VAPM and PPM use the current price, not what you paid or what he cost at the time of the points. A player who has risen £0.5m looks slightly worse value than he was for the people who bought him early — which is the right way round if you're deciding whether to buy now.</p>
 
 <p class="note" style="margin-top:36px">Source data: the official Fantasy Premier League API, refreshed weekly by the <a href="https://github.com/arlind55/fplproject" style="color:inherit">fplproject</a> pipeline. Expected stats are Opta's, as published by FPL. xPts and Δ are FPL Value's own calculations as described above.</p>

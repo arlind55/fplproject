@@ -1,12 +1,15 @@
 from pathlib import Path
 from datetime import datetime, timezone
+import sys
 import time
+import traceback
 import requests
 import pandas as pd
 from utils import ensure_dir, write_json, today_str
-from team_model import build as build_team_model
 
 BASE_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(BASE_DIR))
+from fplvalue.team_model import build as build_team_model  # noqa: E402
 CURRENT_DIR = BASE_DIR / 'data' / 'current'
 HISTORY_DIR = BASE_DIR / 'data' / 'history' / today_str()
 PLAYER_SUMMARIES_DIR = CURRENT_DIR / 'player_summaries'
@@ -213,10 +216,26 @@ def main() -> None:
     save_csv(player_history_df, 'player_history.csv')
     save_csv(player_future_fixtures_df, 'player_future_fixtures.csv')
 
-    # xG-based team strength + model fixture difficulty (see team_model.py)
-    team_ratings_df, fixture_model_df = build_team_model(player_history_df, players_df, fixtures_df, teams_df)
+    # xG-based team strength + model fixture difficulty (see fplvalue/team_model.py).
+    # Last season's final ratings are the prior, so early-season numbers aren't all pulled to average.
+    team_prior = None
+    try:
+        from fplvalue.load import load, last_season
+        from fplvalue.project import team_prior_from
+        team_prior = team_prior_from(last_season(load(CURRENT_DIR)), teams_df)
+    except Exception:
+        traceback.print_exc()
+    team_ratings_df, fixture_model_df = build_team_model(player_history_df, players_df, fixtures_df, teams_df, prior=team_prior)
     save_csv(team_ratings_df, 'team_ratings.csv')
     save_csv(fixture_model_df, 'fixture_model.csv')
+
+    # Expected-points projections, captain ranking and model squad (see fplvalue/). Never blocks the refresh.
+    try:
+        from fplvalue.publish import write as write_projections
+        write_projections([CURRENT_DIR, HISTORY_DIR])
+        print('projections written')
+    except Exception:
+        traceback.print_exc()
 
     print('FPL v2 data refresh complete')
 

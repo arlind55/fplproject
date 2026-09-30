@@ -1,0 +1,16 @@
+id,web_name,team_short_name,pos,price,next_opp,next_gw,next_n,is_starter,is_captain
+1,Raya,ARS,GKP,6.1,LEE (H),3.88,19.43,True,False
+4,Gabriel,ARS,DEF,8.0,LEE (H),5.59,27.7,True,False
+388,Guéhi,MCI,DEF,6.0,LIV (A),4.2,21.96,True,False
+229,Tarkowski,EVE,DEF,6.1,HUL (A),4.86,21.93,True,False
+445,Thiaw,NEW,DEF,5.0,COV (A),4.31,20.11,True,False
+426,B.Fernandes,MUN,MID,11.9,TOT (H),7.23,32.47,True,True
+12,Saka,ARS,MID,9.5,LEE (H),5.83,28.25,True,False
+427,Mbeumo,MUN,MID,7.9,TOT (H),5.86,26.28,True,False
+399,Cherki,MCI,MID,7.8,LIV (A),4.27,22.95,True,False
+68,Tavernier,BOU,MID,6.1,CHE (A),4.34,22.56,True,False
+346,Calvert-Lewin,LEE,FWD,6.0,ARS (A),3.31,20.0,True,False
+250,Leno,FUL,GKP,4.5,IPS (A),3.12,15.33,False,False
+173,Thomas,COV,DEF,4.0,NEW (H),3.55,17.79,False,False
+249,Barry,EVE,FWD,5.6,HUL (A),3.97,18.59,False,False
+316,Emersonn,IPS,FWD,5.5,FUL (H),3.24,16.69,False,False

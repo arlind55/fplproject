@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FPL projections — expected points, captain picks and model squad</title>
+<meta name="description" content="Free FPL expected points projections for every player over the next five gameweeks, built from xG, xA, minutes, clean-sheet odds and the fixture model. Captain ranking with haul odds, a £100m model squad, and a published backtest against FPL's own ep_next.">
+<link rel="canonical" href="https://fplvalue.co/projections.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FPL Value">
+<meta property="og:title" content="FPL projections: expected points, captains and a model squad">
+<meta property="og:description" content="Expected points for every FPL player over the next five gameweeks, a captain ranking with haul odds, and the best £100m squad. Backtested against FPL\'s own projections.">
+<meta property="og:url" content="https://fplvalue.co/projections.html">
+<meta property="og:image" content="https://fplvalue.co/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FPL projections: expected points, captains and a model squad">
+<meta name="twitter:description" content="Expected points for every FPL player over the next five gameweeks, a captain ranking with haul odds, and the best £100m squad. Backtested against FPL\'s own projections.">
+<meta name="twitter:image" content="https://fplvalue.co/og-image.png">
+<meta name="theme-color" content="#131521" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* ── Shared shell (keep in sync with planner.html) ─────────────────────────── */
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface-2:#e9ebf2; --line:#d5d8e3; --line-strong:#b9bdcc;
+  --ink:#171a26; --ink-2:#4a4f63; --ink-3:#7a8096; --accent:#2f3fa8; --accent-ink:#ffffff;
+  --d1:#1f7a4d; --d2:#3fa66e; --d3:#c9ccd6; --d4:#d95f6a; --d5:#8f1f33;
+  --d1-ink:#ffffff; --d2-ink:#0f2a1c; --d3-ink:#2b2f3d; --d4-ink:#ffffff; --d5-ink:#ffffff;
+  --muted-cell:#f0f1f5; --ok:#1f7a4d; --warn:#b8741a; --err:#a8323f;
+  --gkp:#b8860b; --def:#2f6fb5; --mid:#2f8f5b; --fwd:#d0663a;
+  --shadow:0 1px 2px rgba(23,26,38,.06),0 6px 20px rgba(23,26,38,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+    --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+    --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+    --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+    --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+    --gkp:#e0b23a; --def:#6fa3e6; --mid:#5fc48f; --fwd:#f08a5c;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+  --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+  --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+  --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+  --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+  --gkp:#e0b23a; --def:#6fa3e6; --mid:#5fc48f; --fwd:#f08a5c;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{padding:7px 14px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+.right{display:flex;align-items:center;gap:10px}
+.status{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:12px;white-space:nowrap}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block;flex:none}
+.status.ok i{background:var(--ok)} .status.warn i{background:var(--warn)} .status.err i{background:var(--err)}
+.status b{font:600 12px "IBM Plex Mono",monospace;color:var(--ink)}
+.theme{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink-2);display:grid;place-items:center}
+.theme:hover{color:var(--ink)}
+.theme svg{width:16px;height:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;gap:8px}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{flex:1;background:var(--surface);color:var(--ink-2);border:0;border-right:1px solid var(--line);padding:7px 10px;font:500 13px "IBM Plex Sans",sans-serif;cursor:pointer;white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible,.tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{color:inherit}
+@media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+
+/* ── Projections ────────────────────────────────────────────────────────────── */
+.intro{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:16px}
+.intro h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:26px;margin:0 0 6px;line-height:1.1}
+.intro p{margin:0;color:var(--ink-2);max-width:70ch}
+.intro a{color:var(--accent)}
+.proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.proof div{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.proof b{display:block;font:700 26px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:0;color:var(--ink);margin-top:2px;text-transform:none}
+.proof b span{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3);margin-left:6px}
+.proof .cap{grid-column:1/-1;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:16px}
+@media (max-width:980px){.grid2,.intro{grid-template-columns:1fr}}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.head h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:22px;margin:0}
+.head p{margin:2px 0 0;color:var(--ink-3);font-size:12px}
+/* captain list */
+.cap-row{display:grid;grid-template-columns:22px minmax(0,1.2fr) minmax(0,2fr) 54px 54px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.cap-row:last-child{border-bottom:0}
+.cap-row.hdr{font:600 10px "IBM Plex Mono",monospace;letter-spacing:.05em;color:var(--ink-3);text-transform:uppercase;padding-top:0}
+.cap-row .rk{font:600 12px "IBM Plex Mono",monospace;color:var(--ink-3)}
+.cap-row .who b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cap-row .who small{color:var(--ink-3);font-size:12px;white-space:nowrap}
+.cap-row .n{font:500 12.5px "IBM Plex Mono",monospace;text-align:right}
+.bar{position:relative;height:22px;border-radius:4px;background:var(--surface-2)}
+.bar .mean{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--accent)}
+.bar .ceil{position:absolute;top:9px;height:4px;background:var(--accent);opacity:.35;border-radius:2px}
+.bar span{position:absolute;left:8px;top:0;line-height:22px;font:600 12px "IBM Plex Mono",monospace;color:var(--accent-ink)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;color:var(--ink-3);font-size:12px}
+.legend i{display:inline-block;width:14px;height:8px;border-radius:2px;background:var(--accent);margin-right:6px;vertical-align:middle}
+.legend i.c{height:4px;opacity:.35}
+/* pitch */
+.pitch{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:14px 8px;display:grid;gap:12px}
+.line{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.pl{width:98px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 6px 5px;text-align:center;position:relative;box-shadow:var(--shadow)}
+.pl b{display:block;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl small{display:block;color:var(--ink-3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl .xp{font:600 12px "IBM Plex Mono",monospace;color:var(--accent);margin-top:2px}
+.pl .c{position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--surface);font:700 11px "IBM Plex Mono",monospace;display:grid;place-items:center}
+.pl::before{content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:3px;border-radius:6px 6px 0 0;background:var(--line)}
+.pl.GKP::before{background:var(--gkp)} .pl.DEF::before{background:var(--def)} .pl.MID::before{background:var(--mid)} .pl.FWD::before{background:var(--fwd)}
+.bench{border-top:1px dashed var(--line-strong);padding-top:12px}
+.bench .pl{opacity:.75}
+.sqmeta{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--ink-3)}
+.sqmeta b{font:600 13px "IBM Plex Mono",monospace;color:var(--ink)}
+@media (max-width:520px){.pl{width:74px}.pl small{font-size:10px}.cap-row{grid-template-columns:18px minmax(0,1.3fr) minmax(0,1.4fr) 44px}.cap-row .blank{display:none}}
+/* table */
+.filters{display:grid;grid-template-columns:minmax(160px,1.3fr) auto auto minmax(100px,.6fr) auto auto;gap:10px;margin-bottom:12px;align-items:end}
+@media (max-width:1100px){.filters{grid-template-columns:1fr 1fr}}
+.field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+.field input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font:inherit;color:var(--ink)}
+.field input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);cursor:pointer;padding:8px 0;white-space:nowrap}
+.check input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font:500 13px "IBM Plex Sans",sans-serif;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.btn:hover{color:var(--ink);border-color:var(--line-strong)}
+.count{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3)}
+.tablewrap{border:1px solid var(--line);border-radius:8px;overflow:auto;max-height:720px;background:var(--surface)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:0 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px}
+thead th{position:sticky;top:0;z-index:2;background:var(--surface-2);color:var(--ink-3);font:600 11px "IBM Plex Mono",monospace;letter-spacing:.04em;text-align:left;padding:9px 10px;border-bottom:1px solid var(--line-strong);cursor:pointer;user-select:none}
+thead th:hover{color:var(--ink)}
+thead th.sorted{color:var(--accent)}
+thead th.sorted::after{content:" ▾"} thead th.sorted.asc::after{content:" ▴"}
+th.num,td.num{text-align:right;font-family:"IBM Plex Mono",monospace}
+td.num{font-size:12.5px}
+th.grp{border-left:1px solid var(--line-strong)} td.grp{border-left:1px solid var(--line)}
+tbody tr.row{height:40px;cursor:pointer}
+tbody tr.row:hover td{background:var(--muted-cell)}
+tbody tr.row.open td{background:var(--surface-2)}
+td.name{font-weight:600}
+td.heat{padding:0 3px}
+td.heat span{display:block;min-width:44px;padding:5px 6px;border-radius:4px;text-align:center;font:600 12px "IBM Plex Mono",monospace}
+td.total{font-weight:600;color:var(--accent)}
+.pos{font:600 10px "IBM Plex Mono",monospace;padding:2px 6px;border-radius:3px;color:#fff;letter-spacing:.04em}
+.pos.GKP{background:var(--gkp)} .pos.DEF{background:var(--def)} .pos.MID{background:var(--mid)} .pos.FWD{background:var(--fwd)}
+.avail{font:500 11px "IBM Plex Mono",monospace;padding:2px 6px;border-radius:3px}
+.avail.a0{background:var(--d5);color:var(--d5-ink)} .avail.a1{background:var(--d4);color:var(--d4-ink)} .avail.a2{background:var(--warn);color:#1b1407}
+tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;border-bottom:1px solid var(--line-strong)}
+.brk{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px 18px;font-size:11px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+.brk b{display:block;font:600 14px "IBM Plex Mono",monospace;color:var(--ink);letter-spacing:0;text-transform:none;margin-top:2px}
+.brk b.neg{color:var(--err)}
+.brk .inputs{grid-column:1/-1;text-transform:none;letter-spacing:0;font-size:12px;color:var(--ink-2);margin-top:4px}
+.empty{padding:32px;text-align:center;color:var(--ink-3)}
+.empty.err{color:var(--err)}
+.bt .tablewrap{max-height:none}
+.bt table{min-width:560px}
+.bt td,.bt th{height:34px}
+.bt thead th{cursor:default}
+.bt tr.best td{color:var(--accent);font-weight:600}
+.note{color:var(--ink-3);font-size:12px;margin:10px 0 0}
+.note a{color:inherit}
+@media (prefers-reduced-motion:no-preference){.tabs a,.btn,.seg button{transition:background-color .15s,color .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand"><div><h1>FPL Value</h1><small>Premier League 2026/27</small></div></div>
+  <nav class="tabs" aria-label="Pages">
+    <a href="./index.html">Dashboard</a>
+    <a href="./planner.html">Fixture planner</a>
+    <a href="./projections.html" aria-current="page">Projections</a>
+    <a href="./metrics.html">Metrics</a>
+    <a href="./blog/">Value Blog</a>
+  </nav>
+  <div class="right">
+    <span class="status" id="status"><i></i><span>Loading data…</span></span>
+    <button class="theme" id="themeBtn" type="button" aria-label="Toggle light / dark"></button>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="card">
+    <h2 id="introTitle">Expected points, next five gameweeks</h2>
+    <p>Every player's projected points, built from their xG and xA rates, how often they start, their team's fixtures in the <a href="./planner.html">xG fixture model</a>, clean-sheet odds, DefCon and bonus history, and FPL's injury flags. Updated with the data every Tuesday. <a href="./metrics.html#projections">How it works →</a></p>
+  </div>
+  <div class="card">
+    <div class="label">Backtest <span id="proofSpan">regular starters</span></div>
+    <div class="proof" id="proof"><div class="cap">Loading…</div></div>
+  </div>
+</section>
+
+<section class="grid2">
+  <div class="card">
+    <div class="head"><div><h3>Captain ranking</h3><p id="capSub">Projected points next gameweek, with upside</p></div></div>
+    <div id="capList"><div class="empty">Loading…</div></div>
+    <div class="legend"><span><i></i>Projected points</span><span><i class="c"></i>Up to the 90th percentile (a good day)</span><span>Haul = P(10+ pts) · Blank = P(≤2)</span></div>
+  </div>
+  <div class="card">
+    <div class="head"><div><h3>Model squad</h3><p id="sqSub">Best £100m squad for the next five gameweeks</p></div></div>
+    <div id="squad"><div class="empty">Loading…</div></div>
+  </div>
+</section>
+
+<section class="card" id="table">
+  <div class="head">
+    <div><h3>All projections</h3><p>Click a column to sort · click a row for the next-gameweek breakdown</p></div>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="filters">
+    <div class="field"><label for="search">Search</label><input id="search" type="text" placeholder="Saka, Palmer, Haaland"></div>
+    <div class="field"><label>Position</label><div class="seg" id="posSeg" role="group"><button data-p="" aria-pressed="true">All</button><button data-p="GKP" aria-pressed="false">GKP</button><button data-p="DEF" aria-pressed="false">DEF</button><button data-p="MID" aria-pressed="false">MID</button><button data-p="FWD" aria-pressed="false">FWD</button></div></div>
+    <div class="field"><label>Rank by</label><div class="seg" id="rankSeg" role="group"><button data-r="next_n" aria-pressed="true">Next 5</button><button data-r="next_gw" aria-pressed="false">Next GW</button><button data-r="per_m" aria-pressed="false">Per £m</button></div></div>
+    <div class="field"><label for="maxPrice">Max price</label><input id="maxPrice" type="number" step="0.1" min="0" placeholder="8.0"></div>
+    <div class="field"><label>&nbsp;</label><label class="check"><input type="checkbox" id="hideOut" checked> Hide unlikely starters</label></div>
+    <div class="field"><label>&nbsp;</label><button class="btn" id="export" type="button">Export CSV</button></div>
+  </div>
+  <div class="tablewrap">
+    <table><thead><tr id="thead"></tr></thead><tbody id="tbody"><tr><td class="empty" colspan="14">Loading projections…</td></tr></tbody></table>
+  </div>
+</section>
+
+<section class="card bt" id="backtest" style="margin-top:16px">
+  <div class="head"><div><h3>How accurate is it?</h3><p>Walk-forward backtest: rewind to before each deadline, project that gameweek, compare with what happened. Lower error and higher rank correlation are better.</p></div></div>
+  <div id="btBody"><div class="empty">Loading…</div></div>
+  <p class="note">Regular starters = started at least two of their last four matches. Points/match = season points ÷ team matches; form = average of the last four; FPL = the game's own <code>ep_next</code>, available for weeks where a snapshot was saved before the deadline. Top-20 = the average actual score of each week's 20 highest-projected players.</p>
+</section>
+
+<footer>
+  <span>Projections are averages, not predictions: a 6-point projection means a typical outcome over many repeats of that fixture. <a href="./metrics.html#projections">Method →</a></span>
+  <span>Source: <a href="https://github.com/arlind55/fplproject">arlind55/fplproject</a> · data/current/projections.csv</span>
+</footer>
+</div>
+
+<script>
+// ── Shared: theme + data status (keep in sync with index.html) ────────────────
+const REPO={owner:"arlind55",repo:"fplproject",branch:"main"};
+const BASE=`https://raw.githubusercontent.com/${REPO.owner}/${REPO.repo}/${REPO.branch}/data/current`;
+const $=id=>document.getElementById(id);
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function currentTheme(){const t=document.documentElement.getAttribute("data-theme");if(t)return t;return matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme");$("themeBtn").innerHTML=currentTheme()==="dark"?SUN:MOON;}
+try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
+$("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);});
+function setStatus(cls,html){const el=$("status");el.className="status "+cls;el.lastElementChild.innerHTML=html;}
+function describeData(events,meta){
+  const truthy=v=>/^(true|1)$/i.test(String(v));
+  const fin=events.filter(e=>truthy(e.finished)).map(e=>+e.id);const lastDone=fin.length?Math.max(...fin):0;
+  const cur=events.find(e=>truthy(e.is_current)),next=events.find(e=>truthy(e.is_next));
+  let when="";if(meta?.updated_at){const d=new Date(meta.updated_at);when=d.toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
+  let gw=`<b>GW${lastDone}</b> complete`;
+  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone)gw=`<b>GW${cur.id}</b> in progress`;
+  return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · ${gw} · GW${next?next.id:"?"} next`;
+}
+async function fetchJson(file){try{const r=await fetch(`${BASE}/${file}`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}
+function csvToObjects(text){
+  const rows=[];let row=[],cell="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+    if(c==='"'){if(q&&n==='"'){cell+='"';i++;}else q=!q;}
+    else if(c===","&&!q){row.push(cell);cell="";}
+    else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&n==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";}
+    else cell+=c;}
+  if(cell.length||row.length){row.push(cell);rows.push(row);}
+  const [h,...b]=rows.filter(r=>r.some(v=>v!==""));
+  return b.map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]??"").trim()])));
+}
+async function fetchCsv(file){const res=await fetch(`${BASE}/${file}`,{cache:"no-cache"});if(!res.ok)throw new Error(`${file}: HTTP ${res.status}`);return csvToObjects(await res.text());}
+const num=v=>{const n=parseFloat(v);return Number.isFinite(n)?n:null;};
+const fmt=(v,d=1)=>v==null||!Number.isFinite(v)?"—":v.toFixed(d);
+const pct=v=>v==null?"—":`${Math.round(v*100)}%`;
+const price=v=>v==null?"—":`£${v.toFixed(1)}m`;
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const truthy=v=>/^(true|1)$/i.test(String(v));
+
+// ── State ────────────────────────────────────────────────────────────────────
+const S={rows:[],gws:[],opps:{},pos:"",rank:"next_n",sort:null,open:null,filtered:[]};
+try{const s=JSON.parse(localStorage.getItem("fpl-proj")||"null");if(s){S.pos=s.pos??"";S.rank=s.rank||"next_n";}}catch(e){}
+function save(){try{localStorage.setItem("fpl-proj",JSON.stringify({pos:S.pos,rank:S.rank}));}catch(e){}}
+const COMP=[["app","Appearance"],["goals","Goals"],["assists","Assists"],["cs","Clean sheet"],["conceded","Conceded"],["saves","Saves"],["defcon","DefCon"],["bonus","Bonus"],["cards","Cards"]];
+
+function shape(r){
+  const o={id:r.id,name:r.web_name,team:r.team_short_name,pos:r.pos,price:num(r.price),own:num(r.selected_by_percent),status:r.status,opp:r.next_opp,
+    avail:num(r.avail_next),pstart:num(r.p_start),xmins:num(r.next_xmins),xg90:num(r.xg90),xa90:num(r.xa90),next_gw:num(r.next_gw),next_n:num(r.next_n),gw:{},c:{}};
+  for(const k in r){if(k.startsWith("gw_"))o.gw[+k.slice(3)]=num(r[k]);if(k.startsWith("next_")&&COMP.some(c=>"next_"+c[0]===k))o.c[k.slice(5)]=num(r[k]);}
+  o.per_m=o.price?o.next_n/o.price:null;
+  return o;
+}
+
+// ── Captain ranking ──────────────────────────────────────────────────────────
+function renderCaptains(caps,gw){
+  const top=caps.map(c=>({name:c.web_name,team:c.team_short_name,opp:c.next_opp,mean:num(c.next_gw),p90:num(c.p90),haul:num(c.haul_prob),blank:num(c.blank_prob),avail:num(c.avail_next)}))
+    .filter(c=>c.mean!=null).sort((a,b)=>b.mean-a.mean).slice(0,10);
+  if(!top.length){$("capList").innerHTML='<div class="empty">No captain data yet.</div>';return;}
+  const max=Math.max(...top.map(c=>c.p90||c.mean))*1.04;
+  $("capSub").textContent=`GW${gw} · projected points, with upside`;
+  $("capList").innerHTML=`<div class="cap-row hdr"><span>#</span><span>Player</span><span>Projection → 90th pct</span><span class="n">Haul</span><span class="n blank">Blank</span></div>`+
+    top.map((c,i)=>`<div class="cap-row"><span class="rk">${i+1}</span>
+      <span class="who"><b>${esc(c.name)}</b><small>${esc(c.team)} · ${esc(c.opp)}${c.avail!=null&&c.avail<1?` · ${pct(c.avail)} fit`:""}</small></span>
+      <div class="bar" title="Projection ${fmt(c.mean,2)} · 90th percentile ${fmt(c.p90,1)}"><div class="ceil" style="left:${c.mean/max*100}%;width:${Math.max(0,(c.p90-c.mean)/max*100)}%"></div><div class="mean" style="width:${c.mean/max*100}%"></div><span>${fmt(c.mean,1)}</span></div>
+      <span class="n">${pct(c.haul)}</span><span class="n blank">${pct(c.blank)}</span></div>`).join("");
+}
+
+// ── Model squad ──────────────────────────────────────────────────────────────
+function renderSquad(sq,meta){
+  if(!sq.length){$("squad").innerHTML='<div class="empty">No squad yet.</div>';return;}
+  const P=sq.map(r=>({name:r.web_name,team:r.team_short_name,pos:r.pos,price:num(r.price),opp:r.next_opp,gw:num(r.next_gw),n5:num(r.next_n),xi:truthy(r.is_starter),cap:truthy(r.is_captain)}));
+  const card=p=>`<div class="pl ${p.pos}" title="${esc(p.name)} · ${esc(p.team)} · ${price(p.price)} · next 5: ${fmt(p.n5)}">${p.cap?'<span class="c">C</span>':""}<b>${esc(p.name)}</b><small>${esc(p.team)} · ${price(p.price)}</small><div class="xp">${fmt(p.n5)}</div></div>`;
+  const xi=P.filter(p=>p.xi),bench=P.filter(p=>!p.xi).sort((a,b)=>(a.pos==="GKP"?-1:0)-(b.pos==="GKP"?-1:0)||b.n5-a.n5);
+  const lines=["GKP","DEF","MID","FWD"].map(pos=>`<div class="line">${xi.filter(p=>p.pos===pos).map(card).join("")}</div>`).join("");
+  const cost=P.reduce((s,p)=>s+(p.price||0),0),xi5=xi.reduce((s,p)=>s+(p.n5||0),0),cap=P.find(p=>p.cap);
+  const xiNext=xi.reduce((s,p)=>s+(p.gw||0),0)+(cap?.gw||0);
+  const gws=meta?.gws||[];
+  $("sqSub").textContent=`Best £100m squad for GW${gws[0]??"?"}–${gws[gws.length-1]??"?"} · number = projected points over the five`;
+  $("squad").innerHTML=`<div class="pitch">${lines}<div class="line bench">${bench.map(card).join("")}</div></div>
+    <div class="sqmeta"><span>Cost <b>${price(cost)}</b></span><span>XI next 5 <b>${fmt(xi5,1)}</b></span><span>XI next GW incl. captain <b>${fmt(xiNext,1)}</b></span><span>Captain <b>${esc(cap?.name||"—")}</b></span></div>
+    <p class="note">Your own transfers: <code>python -m fplvalue.optimise --team-id &lt;your id&gt; --ft 1</code> in the repo.</p>`;
+}
+
+// ── Table ────────────────────────────────────────────────────────────────────
+function heat(v){if(v==null)return"";if(v>=6)return"background:var(--d1);color:var(--d1-ink)";if(v>=4.5)return"background:var(--d2);color:var(--d2-ink)";if(v>=3)return"background:var(--d3);color:var(--d3-ink)";return"color:var(--ink-3)";}
+function cols(){
+  const base=[
+    {key:"name",label:"Player",cls:"name",str:true,render:p=>esc(p.name)},
+    {key:"team",label:"Team",str:true,render:p=>esc(p.team)},
+    {key:"pos",label:"Pos",str:true,render:p=>`<span class="pos ${p.pos}">${p.pos}</span>`},
+    {key:"price",label:"Price",num:true,render:p=>price(p.price)},
+    {key:"own",label:"Own %",num:true,render:p=>fmt(p.own)},
+    {key:"avail",label:"Fit",num:true,title:"Chance of being available next GW",render:p=>p.avail==null||p.avail>=.99?"":`<span class="avail ${p.avail<.3?"a0":p.avail<.7?"a1":"a2"}">${pct(p.avail)}</span>`},
+    {key:"xmins",label:"xMins",num:true,grp:true,title:"Expected minutes next GW",render:p=>fmt(p.xmins,0)},
+  ];
+  const g=S.gws.map((gw,i)=>({key:"gw"+gw,label:`GW${gw}`,num:true,cls:"heat",grp:i===0,title:`Projected points GW${gw}`,val:p=>p.gw[gw],
+    render:p=>{const v=p.gw[gw],o=S.opps[p.team]?.[gw];return `<span style="${heat(v)}" title="${esc(o||"no fixture")}">${o?fmt(v,1):"—"}</span>`;}}));
+  return base.concat(g,[
+    {key:"next_n",label:`Next ${S.gws.length}`,num:true,grp:true,cls:"total",render:p=>fmt(p.next_n,1)},
+    {key:"per_m",label:"Per £m",num:true,title:"Projected points over the window ÷ price",render:p=>fmt(p.per_m,2)},
+  ]);
+}
+function val(p,c){return c.val?c.val(p):p[c.key];}
+function render(){
+  const C=cols(),q=$("search").value.trim().toLowerCase(),maxP=num($("maxPrice").value),hide=$("hideOut").checked;
+  const sort=S.sort||{key:S.rank,dir:"desc"};
+  const sc=C.find(c=>c.key===sort.key)||C.find(c=>c.key==="next_n");
+  let rows=S.rows.filter(p=>(!S.pos||p.pos===S.pos)&&(!q||[p.name,p.team].some(v=>String(v||"").toLowerCase().includes(q)))&&(maxP==null||(p.price||0)<=maxP)&&(!hide||(p.pstart??0)>=.35||(p.next_n??0)>=8));
+  rows.sort((a,b)=>{const av=val(a,sc),bv=val(b,sc);if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return -1;const r=sc.str?String(av).localeCompare(String(bv)):av-bv;return sort.dir==="asc"?r:-r;});
+  S.filtered=rows;
+  $("thead").innerHTML=C.map(c=>`<th class="${c.num?"num":""} ${c.grp?"grp":""} ${sc.key===c.key?"sorted "+sort.dir:""}" data-key="${c.key}" ${c.title?`title="${esc(c.title)}"`:""}>${c.label}</th>`).join("");
+  $("count").textContent=`${rows.length} players`;
+  if(!rows.length){$("tbody").innerHTML=`<tr><td colspan="${C.length}" class="empty">No players match.</td></tr>`;return;}
+  $("tbody").innerHTML=rows.slice(0,200).map(p=>`<tr class="row ${S.open===p.id?"open":""}" data-id="${p.id}">${C.map(c=>`<td class="${c.num?"num":""} ${c.grp?"grp":""} ${c.cls||""}">${c.render(p)}</td>`).join("")}</tr>${S.open===p.id?detail(p,C.length):""}`).join("")
+    +(rows.length>200?`<tr><td colspan="${C.length}" class="empty">Showing 200 of ${rows.length}. Narrow the filters to see more.</td></tr>`:"");
+}
+function detail(p,span){
+  const gw=S.gws[0];
+  return `<tr class="detail"><td colspan="${span}"><div class="label">GW${gw} breakdown · ${esc(p.opp)} · ${fmt(p.next_gw,2)} projected</div><div class="brk">
+    ${COMP.map(([k,l])=>{const v=p.c[k];return v!=null&&Math.abs(v)>=.005?`<div>${l}<b class="${v<0?"neg":""}">${v>0?"+":""}${fmt(v,2)}</b></div>`:"";}).join("")}
+    <div class="inputs">Inputs: starts ${pct(p.pstart)} of the time · ${fmt(p.xmins,0)} expected minutes · xG/90 ${fmt(p.xg90,2)} · xA/90 ${fmt(p.xa90,2)}${p.avail!=null&&p.avail<.99?` · ${pct(p.avail)} chance of being available`:""}</div></div></td></tr>`;
+}
+$("thead").addEventListener("click",e=>{const th=e.target.closest("th[data-key]");if(!th)return;const k=th.dataset.key,cur=S.sort||{key:S.rank,dir:"desc"};
+  const str=["name","team","pos"].includes(k);S.sort=cur.key===k?{key:k,dir:cur.dir==="desc"?"asc":"desc"}:{key:k,dir:str?"asc":"desc"};render();});
+$("tbody").addEventListener("click",e=>{const tr=e.target.closest("tr.row");if(!tr)return;S.open=S.open===tr.dataset.id?null:tr.dataset.id;render();});
+function seg(id,key,attr){document.querySelectorAll(`#${id} button`).forEach(b=>{b.setAttribute("aria-pressed",String(b.dataset[attr]===S[key]));
+  b.addEventListener("click",()=>{S[key]=b.dataset[attr];if(key==="rank")S.sort=null;document.querySelectorAll(`#${id} button`).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));save();render();});});}
+seg("posSeg","pos","p");seg("rankSeg","rank","r");
+["search","maxPrice","hideOut"].forEach(id=>$(id).addEventListener("input",render));
+$("export").addEventListener("click",()=>{const head=["name","team","pos","price","own","avail","xmins",...S.gws.map(g=>"gw"+g),"next_n","next_gw"];
+  const lines=[head.join(",")].concat(S.filtered.map(p=>[p.name,p.team,p.pos,p.price,p.own,p.avail,p.xmins,...S.gws.map(g=>p.gw[g]),p.next_n,p.next_gw].map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")));
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8;"}));a.download=`fpl-projections-gw${S.gws[0]}.csv`;a.click();URL.revokeObjectURL(a.href);});
+
+// ── Backtest ─────────────────────────────────────────────────────────────────
+const MODEL_LABEL={model:"This model",ep_next:"FPL ep_next",form:"Form (last 4)",ppm:"Points / match"};
+function renderBacktest(bt){
+  if(!bt){$("btBody").innerHTML='<div class="empty">Backtest not available yet.</div>';$("proof").innerHTML='<div class="cap">Backtest runs with the weekly data refresh.</div>';return;}
+  const blocks=[];
+  for(const key of ["this_season","last_season"]){const s=bt[key];if(!s?.regulars)continue;
+    const R=s.regulars,order=(key==="this_season"?["model","ep_next","form"]:["model","form","ppm"]).filter(k=>R[k]);
+    const bestMae=Math.min(...order.map(k=>R[k].mae));
+    blocks.push(`<div class="label">${esc(s.label)} · ${R.model.weeks} gameweeks${key==="this_season"?" so far":""}</div><div class="tablewrap"><table>
+      <thead><tr><th>Projection</th><th class="num">Weeks</th><th class="num">Avg error (MAE)</th><th class="num">RMSE</th><th class="num">Rank correlation</th><th class="num">Top-20 avg pts</th></tr></thead><tbody>
+      ${order.map(k=>{const m=R[k];return `<tr class="${m.mae===bestMae?"best":""}"><td>${MODEL_LABEL[k]||k}</td><td class="num">${m.weeks}</td><td class="num">${fmt(m.mae,2)}</td><td class="num">${fmt(m.rmse,2)}</td><td class="num">${fmt(m.spearman,2)}</td><td class="num">${fmt(m.top20_actual,2)}</td></tr>`;}).join("")}
+      </tbody></table></div>`);
+    if(key==="last_season"&&s.vs_fpl?.model&&s.vs_fpl?.ep_next){const a=s.vs_fpl.model,b=s.vs_fpl.ep_next;
+      blocks.push(`<p class="note">Head-to-head with FPL's ep_next on the ${a.weeks} ${esc(s.label)} weeks where both exist: average error ${fmt(a.mae,2)} vs ${fmt(b.mae,2)}, rank correlation ${fmt(a.spearman,2)} vs ${fmt(b.spearman,2)}, top-20 ${fmt(a.top20_actual,2)} vs ${fmt(b.top20_actual,2)} points.</p>`);}
+  }
+  $("btBody").innerHTML=blocks.join("")||'<div class="empty">Backtest not available yet.</div>';
+  const s=bt.this_season?.regulars?.ep_next?bt.this_season:bt.last_season?.vs_fpl?{label:bt.last_season.label,regulars:bt.last_season.vs_fpl}:null;
+  if(s){const m=s.regulars.model,f=s.regulars.ep_next;$("proofSpan").textContent=`${s.label} · regular starters`;
+    $("proof").innerHTML=`<div>Avg error<b>${fmt(m.mae,2)}<span>FPL ${fmt(f.mae,2)}</span></b></div><div>Rank corr.<b>${fmt(m.spearman,2)}<span>FPL ${fmt(f.spearman,2)}</span></b></div><div>Top-20 pts<b>${fmt(m.top20_actual,2)}<span>FPL ${fmt(f.top20_actual,2)}</span></b></div>
+      <div class="cap">Compared with FPL's own expected points over the same ${m.weeks} gameweeks. <a href="#backtest" style="color:var(--accent)">Full backtest ↓</a></div>`;}
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(async()=>{
+  try{
+    const [proj,caps,squad,fx,teams,events,meta,pmeta]=await Promise.all([fetchCsv("projections.csv"),fetchCsv("captains.csv").catch(()=>[]),fetchCsv("model_squad.csv").catch(()=>[]),
+      fetchCsv("fixtures_lite.csv").catch(()=>[]),fetchCsv("teams.csv"),fetchCsv("events.csv"),fetchJson("meta.json"),fetchJson("projection_meta.json")]);
+    const tshort={};teams.forEach(t=>tshort[t.id]=t.short_name);
+    S.rows=proj.map(shape).filter(p=>p.name);
+    S.gws=pmeta?.gws||Object.keys(S.rows[0]?.gw||{}).map(Number).sort((a,b)=>a-b);
+    for(const f of fx){const e=+f.event;if(!S.gws.includes(e))continue;const h=tshort[f.team_h],a=tshort[f.team_a];
+      for(const [t,o,v] of [[h,a,"H"],[a,h,"A"]]){S.opps[t]=S.opps[t]||{};S.opps[t][e]=(S.opps[t][e]?S.opps[t][e]+" + ":"")+`${o} (${v})`;}}
+    $("introTitle").textContent=`Expected points, GW${S.gws[0]}–${S.gws[S.gws.length-1]}`;
+    renderCaptains(caps,S.gws[0]);renderSquad(squad,pmeta);renderBacktest(pmeta?.backtest);render();
+    setStatus("ok",describeData(events,meta));
+  }catch(err){
+    setStatus("err","Could not load projections");
+    $("tbody").innerHTML=`<tr><td colspan="14" class="empty err">Couldn't load projections from ${BASE}. ${esc(err.message)}. They're written by the weekly "Update Premier League Data v2" run.</td></tr>`;
+    ["capList","squad","btBody"].forEach(id=>$(id).innerHTML='<div class="empty">Not available yet.</div>');
+  }
+})();
+</script>
+</body>
+</html>

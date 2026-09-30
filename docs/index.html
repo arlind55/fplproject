@@ -62,8 +62,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .brand{display:flex;align-items:center;gap:14px}
 .brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
 .brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
-.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px}
-.tabs a{padding:7px 16px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{padding:7px 14px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
 .tabs a:hover{color:var(--ink)}
 .tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
 .right{display:flex;align-items:center;gap:10px}
@@ -168,6 +169,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
   <nav class="tabs" aria-label="Pages">
     <a href="./index.html" aria-current="page">Dashboard</a>
     <a href="./planner.html">Fixture planner</a>
+    <a href="./projections.html">Projections</a>
     <a href="./metrics.html">Metrics</a>
     <a href="./blog/">Value Blog</a>
   </nav>
@@ -392,6 +394,7 @@ const COLS=[
   {key:"delta",label:"Δ",num:true,basis:true,src:"delta",title:"Points minus expected points",render:p=>p.delta==null?"—":`<span class="${p.delta>0.5?"up":p.delta<-0.5?"down":""}">${signed(per(p,p.delta))}</span>`},
   {key:"ppm",label:"PPM",num:true,grp:true,title:"Points per million: points in window ÷ price",render:p=>fmt(p.ppm,2)},
   {key:"vapm",label:"VAPM",num:true,title:"(points per game − 2) ÷ price",render:p=>fmt(vapm(p),2)},
+  {key:"proj5",label:"Proj 5",num:true,title:"Projected points over the next five gameweeks — see the Projections page",render:p=>p.proj5==null?"—":`<a href="./projections.html" style="color:var(--accent);text-decoration:none" onclick="event.stopPropagation()">${fmt(p.proj5)}</a>`},
   {key:"xg",label:"xG",num:true,basis:true,grp:true,render:p=>fmt(per(p,p.xg),2)},
   {key:"xa",label:"xA",num:true,basis:true,render:p=>fmt(per(p,p.xa),2)},
   {key:"xgi",label:"xGI",num:true,basis:true,render:p=>fmt(per(p,p.xgi),2)},
@@ -437,6 +440,7 @@ function detailRow(p){
       <div>xGC / 90<b>${fmt(p90(p,p.xgc),2)}</b></div>
       <div>Clean sheets<b>${p.cs}</b></div>
       <div>Bonus<b>${p.bonus}</b></div>
+      <div>Projected next GW<b>${p.projNext==null?"—":fmt(p.projNext)} <span class="muted">next 5: ${p.proj5==null?"—":fmt(p.proj5)}</span></b></div>
       <div>Transfers this GW<b><span class="delta up">+${p.tin.toLocaleString()}</span> <span class="delta down">−${p.tout.toLocaleString()}</span></b></div>
     </div></div></td></tr>`;
 }
@@ -487,7 +491,7 @@ function onThemeChange(){if(state.rows.length)buildCharts();}
 function fillSelect(id,values){const el=$(id),cur=el.value;el.innerHTML='<option value="">All</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");el.value=values.includes(cur)?cur:"";}
 function bindFilters(){
   ["search","position","team","maxPrice","minMins","hideUnavail"].forEach(id=>$(id).addEventListener("input",renderPlayers));
-  $("exportPlayers").addEventListener("click",()=>{const keys=["name","team","pos","price","games","mins","ppg","pts","xpts","delta","ppm","vapm","goals","assists","xg","xa","xgi","xgc","ict","defcon","bonus","own","tin","tout","status","news"];
+  $("exportPlayers").addEventListener("click",()=>{const keys=["name","team","pos","price","games","mins","ppg","pts","xpts","delta","ppm","vapm","proj5","projNext","goals","assists","xg","xa","xgi","xgc","ict","defcon","bonus","own","tin","tout","status","news"];
     const lines=[`# window ${windowLabel()} venue ${state.venue}`,keys.join(",")].concat(state.filtered.map(p=>keys.map(k=>`"${String(typeof p[k]==="number"?+p[k].toFixed(3):(p[k]??"")).replace(/"/g,'""')}"`).join(",")));
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8;"}));a.download=`fpl-players-${windowLabel().replace("–","-")}.csv`;a.click();URL.revokeObjectURL(a.href);});
 }
@@ -495,9 +499,10 @@ function bindFilters(){
 // ── Init ─────────────────────────────────────────────────────────────────────
 (async()=>{
   try{
-    const [players,history,teams,teamDifficulty,events,meta]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("team_fixture_difficulty.csv"),fetchCsv("events.csv"),fetchMeta()]);
+    const [players,history,teams,teamDifficulty,events,meta,proj]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("team_fixture_difficulty.csv"),fetchCsv("events.csv"),fetchMeta(),fetchCsv("projections.csv").catch(()=>[])]);
     teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
-    state.players=players.map(shapePlayer).filter(p=>p.name);
+    const PJ={};proj.forEach(r=>{PJ[r.id]={proj5:num(r.next_n),projNext:num(r.next_gw)};});
+    state.players=players.map(shapePlayer).filter(p=>p.name).map(p=>Object.assign(p,PJ[p.id]||{proj5:null,projNext:null}));
     const gws=new Set();history.forEach(h=>{const r=shapeHist(h);if(!r.gw)return;gws.add(r.gw);(state.hist[h.player_id]=state.hist[h.player_id]||[]).push(r);});
     state.gws=gws.size?[...gws].sort((a,b)=>a-b):[1];
     state.teamDifficulty=teamDifficulty;state.events=events;

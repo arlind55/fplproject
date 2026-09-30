@@ -17,7 +17,7 @@ def nice(d): return datetime.date.fromisoformat(d).strftime("%-d %b %Y")
 
 def tabs(active):
     cur = ' aria-current="page"'
-    items = [("Dashboard", "../index.html"), ("Fixture planner", "../planner.html"), ("Metrics", "../metrics.html"), ("Value Blog", "./index.html")]
+    items = [("Dashboard", "../index.html"), ("Fixture planner", "../planner.html"), ("Projections", "../projections.html"), ("Metrics", "../metrics.html"), ("Value Blog", "./index.html")]
     return "".join(f'<a href="{h}"{cur if n == active else ""}>{n}</a>' for n, h in items)
 
 def slugify(text):
@@ -112,7 +112,7 @@ def page(meta, body, posts, active="Value Blog"):
 {body}
 <footer>
   <span>FPL Value · independent and unaffiliated with the Premier League or Fantasy Premier League. Data: official FPL API via <a href="https://github.com/arlind55/fplproject">fplproject</a>.</span>
-  <span><a href="../index.html">Dashboard</a> · <a href="../planner.html">Fixture planner</a> · <a href="../metrics.html">Metrics</a></span>
+  <span><a href="../index.html">Dashboard</a> · <a href="../planner.html">Fixture planner</a> · <a href="../projections.html">Projections</a> · <a href="../metrics.html">Metrics</a></span>
 </footer>
 </div>
 <script>
