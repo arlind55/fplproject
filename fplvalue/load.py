@@ -44,8 +44,16 @@ class Snapshot:
 
     @property
     def last_finished_gw(self) -> int:
-        fin = self.events[_bool(self.events['finished'])]
-        return int(fin['id'].max()) if len(fin) else 0
+        """Latest gameweek that has been played. FPL only flips events.finished once bonus is confirmed,
+        which can be after the Tuesday refresh, so a gameweek whose fixtures have all finished counts too.
+        (Postponed matches get event=null, so they never hold a gameweek open.)"""
+        done = set(self.events.loc[_bool(self.events['finished']), 'id'].astype(int))
+        f = self.fixtures.dropna(subset=['event'])
+        played = f['finished']
+        if 'finished_provisional' in f.columns:
+            played = played | _bool(f['finished_provisional'])
+        done |= {int(gw) for gw, ok in played.groupby(f['event']).all().items() if ok}
+        return max(done, default=0)
 
     def deadline(self, gw: int) -> pd.Timestamp:
         row = self.events[self.events['id'] == gw]

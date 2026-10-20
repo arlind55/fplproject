@@ -5,6 +5,7 @@ or by hand:  python -m fplvalue.publish
     data/current/captains.csv         top 40 by next-GW projection, with simulated ceiling / haul odds
     data/current/model_squad.csv      best £100m squad for the next five gameweeks
     data/current/projection_meta.json gameweeks, parameters, squad totals, backtest summary
+    data/current/accuracy.json        live track record of past published projections (see accuracy.py)
 """
 from __future__ import annotations
 
@@ -16,7 +17,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from . import backtest
+from . import accuracy, backtest
 from .load import DATA, last_season, load
 from .optimise import optimise
 from .project import COMPONENTS, Params, project, state_from_snapshot
@@ -55,12 +56,18 @@ def write(out_dirs: list[Path] | None = None, with_backtest: bool = True, prm: P
             meta['backtest'] = backtest.summary_json(backtest.run(prm, verbose=False))
         except Exception as e:      # never let the backtest block the data refresh
             meta['backtest_error'] = str(e)
+    try:
+        acc = accuracy.to_json(accuracy.run(snap))
+    except Exception as e:          # the track record is a nice-to-have, never block the refresh
+        acc = {'error': str(e)}
+    acc['generated_at'] = meta['generated_at']
     for d in out_dirs:
         d.mkdir(parents=True, exist_ok=True)
         P.to_csv(d / 'projections.csv', index=False)
         cap.to_csv(d / 'captains.csv', index=False)
         squad.to_csv(d / 'model_squad.csv', index=False)
         (d / 'projection_meta.json').write_text(json.dumps(meta, indent=2))
+        (d / 'accuracy.json').write_text(json.dumps(acc, indent=2))
     return meta
 
 

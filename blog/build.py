@@ -17,7 +17,7 @@ def nice(d): return datetime.date.fromisoformat(d).strftime("%-d %b %Y")
 
 def tabs(active):
     cur = ' aria-current="page"'
-    items = [("Dashboard", "../index.html"), ("Fixture planner", "../planner.html"), ("Projections", "../projections.html"), ("Metrics", "../metrics.html"), ("Value Blog", "./index.html")]
+    items = [("Dashboard", "../index.html"), ("Fixture planner", "../planner.html"), ("Projections", "../projections.html"), ("Track record", "../accuracy.html"), ("Metrics", "../metrics.html"), ("Value Blog", "./index.html")]
     return "".join(f'<a href="{h}"{cur if n == active else ""}>{n}</a>' for n, h in items)
 
 def slugify(text):
