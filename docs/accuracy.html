@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FPL projection track record — live accuracy, week by week</title>
+<meta name="description" content="How accurate are FPL Value's expected points? Every week's published projections, frozen before the deadline and scored against what happened, side by side with FPL's own ep_next.">
+<link rel="canonical" href="https://fplvalue.co/accuracy.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FPL Value">
+<meta property="og:title" content="FPL Value track record: are the projections any good?">
+<meta property="og:description" content="Every published projection, frozen before the deadline and scored against what happened. Compared with FPL's own expected points.">
+<meta property="og:url" content="https://fplvalue.co/accuracy.html">
+<meta property="og:image" content="https://fplvalue.co/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FPL Value track record: are the projections any good?">
+<meta name="twitter:description" content="Every published projection, frozen before the deadline and scored against what happened. Compared with FPL's own expected points.">
+<meta name="twitter:image" content="https://fplvalue.co/og-image.png">
+<meta name="theme-color" content="#131521" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* ── Shared shell (keep in sync with planner.html) ─────────────────────────── */
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface-2:#e9ebf2; --line:#d5d8e3; --line-strong:#b9bdcc;
+  --ink:#171a26; --ink-2:#4a4f63; --ink-3:#7a8096; --accent:#2f3fa8; --accent-ink:#ffffff;
+  --d1:#1f7a4d; --d2:#3fa66e; --d3:#c9ccd6; --d4:#d95f6a; --d5:#8f1f33;
+  --d1-ink:#ffffff; --d2-ink:#0f2a1c; --d3-ink:#2b2f3d; --d4-ink:#ffffff; --d5-ink:#ffffff;
+  --muted-cell:#f0f1f5; --ok:#1f7a4d; --warn:#b8741a; --err:#a8323f;
+  --gkp:#b8860b; --def:#2f6fb5; --mid:#2f8f5b; --fwd:#d0663a;
+  --shadow:0 1px 2px rgba(23,26,38,.06),0 6px 20px rgba(23,26,38,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+    --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+    --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+    --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+    --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+    --gkp:#e0b23a; --def:#6fa3e6; --mid:#5fc48f; --fwd:#f08a5c;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+  --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+  --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+  --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+  --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+  --gkp:#e0b23a; --def:#6fa3e6; --mid:#5fc48f; --fwd:#f08a5c;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{padding:7px 14px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+.right{display:flex;align-items:center;gap:10px}
+.status{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:12px;white-space:nowrap}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block;flex:none}
+.status.ok i{background:var(--ok)} .status.warn i{background:var(--warn)} .status.err i{background:var(--err)}
+.status b{font:600 12px "IBM Plex Mono",monospace;color:var(--ink)}
+.theme{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink-2);display:grid;place-items:center}
+.theme:hover{color:var(--ink)}
+.theme svg{width:16px;height:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;gap:8px}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{flex:1;background:var(--surface);color:var(--ink-2);border:0;border-right:1px solid var(--line);padding:7px 10px;font:500 13px "IBM Plex Sans",sans-serif;cursor:pointer;white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible,.tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{color:inherit}
+@media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+
+
+/* ── Track record ───────────────────────────────────────────────────────────── */
+.intro{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:16px}
+.intro h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:26px;margin:0 0 6px;line-height:1.1}
+.intro p{margin:0 0 8px;color:var(--ink-2);max-width:70ch}
+.intro p:last-child{margin-bottom:0}
+.intro a{color:var(--accent)}
+.proof{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 10px}
+.proof div{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.proof b{display:block;font:700 26px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:0;color:var(--ink);margin-top:2px;text-transform:none}
+.proof b span{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3);margin-left:6px}
+.proof .cap{grid-column:1/-1;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px}
+@media (max-width:980px){.intro{grid-template-columns:1fr}}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.head h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:22px;margin:0}
+.head p{margin:2px 0 0;color:var(--ink-3);font-size:12px}
+.tablewrap{border:1px solid var(--line);border-radius:8px;overflow:auto;background:var(--surface)}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:720px;font-variant-numeric:tabular-nums}
+th,td{padding:0 10px;height:40px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px}
+tbody tr:last-child td{border-bottom:0}
+thead th{background:var(--surface-2);color:var(--ink-3);font:600 11px "IBM Plex Mono",monospace;letter-spacing:.04em;text-align:left;border-bottom:1px solid var(--line-strong)}
+th.num,td.num{text-align:right;font-family:"IBM Plex Mono",monospace}
+td.num{font-size:12.5px}
+td.gw{font:600 13px "IBM Plex Mono",monospace}
+td.win{color:var(--accent);font-weight:600}
+.err-bars{display:grid;gap:3px;min-width:140px}
+.err-bars i{display:block;height:6px;border-radius:3px;background:var(--accent)}
+.err-bars i.f{background:var(--line-strong)}
+td small{color:var(--ink-3)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;color:var(--ink-3);font-size:12px}
+.legend i{display:inline-block;width:14px;height:6px;border-radius:3px;background:var(--accent);margin-right:6px;vertical-align:middle}
+.legend i.f{background:var(--line-strong)}
+.empty{padding:32px;text-align:center;color:var(--ink-3)}
+.empty.err{color:var(--err)}
+.note{color:var(--ink-3);font-size:12px;margin:10px 0 0;max-width:110ch}
+.note a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand"><div><h1>FPL Value</h1><small>Premier League 2026/27</small></div></div>
+  <nav class="tabs" aria-label="Pages">
+    <a href="./index.html">Dashboard</a>
+    <a href="./planner.html">Fixture planner</a>
+    <a href="./projections.html">Projections</a>
+    <a href="./accuracy.html" aria-current="page">Track record</a>
+    <a href="./metrics.html">Metrics</a>
+    <a href="./blog/">Value Blog</a>
+  </nav>
+  <div class="right">
+    <span class="status" id="status"><i></i><span>Loading data…</span></span>
+    <button class="theme" id="themeBtn" type="button" aria-label="Toggle light / dark"></button>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="card">
+    <h2>Are the projections any good?</h2>
+    <p>Every Tuesday the <a href="./projections.html">projections</a> are saved into the public data history before the next deadline. Once a gameweek is played, this page scores what was published against what actually happened. Nothing is re-run or re-tuned afterwards. The forecasts are the ones you could see at the time.</p>
+    <p>The comparison is FPL's own expected points (<code>ep_next</code>) from the same snapshot. Lower average error is better.</p>
+  </div>
+  <div class="card">
+    <div class="label">This season so far <span id="proofSpan"></span></div>
+    <div class="proof" id="proof"><div class="cap">Loading…</div></div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="head"><div><h3>Week by week</h3><p>The forecast for each gameweek is the latest one published before its deadline</p></div></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>GW</th><th>Published</th><th class="num">Players</th><th class="num">Avg error</th><th class="num">FPL error</th><th>Error</th><th class="num">Rank corr.</th><th class="num">Top-20 avg</th><th>Model's captain</th><th>FPL's captain</th></tr></thead>
+      <tbody id="tbody"><tr><td colspan="10" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+  <div class="legend"><span><i></i>FPL Value</span><span><i class="f"></i>FPL ep_next</span></div>
+  <p class="note">Scored players are everyone projected at least 1 point or who scored anything that week, which leaves out the long tail of squad players who were never going to feature. Avg error is the mean absolute difference between projected and actual points. Rank corr. is how well the order matched (Spearman, 1 is perfect). Top-20 avg is the average actual score of the 20 highest-projected players. Captain is the single highest projection. A few weeks is a small sample, so read the totals as early signal. For a full-season test see the <a href="./projections.html#backtest">walk-forward backtest</a>.</p>
+</section>
+
+<footer>
+  <span>Projections are averages, not predictions: a 6-point projection means a typical outcome over many repeats of that fixture. <a href="./metrics.html#projections">Method →</a></span>
+  <span>Source: <a href="https://github.com/arlind55/fplproject/tree/main/data/history">arlind55/fplproject · data/history</a> · data/current/accuracy.json</span>
+</footer>
+</div>
+
+<script>
+// ── Shared: theme + data status (keep in sync with index.html) ────────────────
+const REPO={owner:"arlind55",repo:"fplproject",branch:"main"};
+const BASE=`https://raw.githubusercontent.com/${REPO.owner}/${REPO.repo}/${REPO.branch}/data/current`;
+const $=id=>document.getElementById(id);
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function currentTheme(){const t=document.documentElement.getAttribute("data-theme");if(t)return t;return matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme");$("themeBtn").innerHTML=currentTheme()==="dark"?SUN:MOON;}
+try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
+$("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);});
+function setStatus(cls,html){const el=$("status");el.className="status "+cls;el.lastElementChild.innerHTML=html;}
+function describeData(events,meta){
+  const truthy=v=>/^(true|1)$/i.test(String(v));
+  const fin=events.filter(e=>truthy(e.finished)).map(e=>+e.id);const lastDone=fin.length?Math.max(...fin):0;
+  const cur=events.find(e=>truthy(e.is_current)),next=events.find(e=>truthy(e.is_next));
+  let when="";if(meta?.updated_at){const d=new Date(meta.updated_at);when=d.toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
+  let gw=`<b>GW${lastDone}</b> complete`;
+  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone)gw=`<b>GW${cur.id}</b> in progress`;
+  return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · ${gw} · GW${next?next.id:"?"} next`;
+}
+async function fetchJson(file){try{const r=await fetch(`${BASE}/${file}`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}
+function csvToObjects(text){
+  const rows=[];let row=[],cell="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+    if(c==='"'){if(q&&n==='"'){cell+='"';i++;}else q=!q;}
+    else if(c===","&&!q){row.push(cell);cell="";}
+    else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&n==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";}
+    else cell+=c;}
+  if(cell.length||row.length){row.push(cell);rows.push(row);}
+  const [h,...b]=rows.filter(r=>r.some(v=>v!==""));
+  return b.map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]??"").trim()])));
+}
+async function fetchCsv(file){const res=await fetch(`${BASE}/${file}`,{cache:"no-cache"});if(!res.ok)throw new Error(`${file}: HTTP ${res.status}`);return csvToObjects(await res.text());}
+const num=v=>{const n=parseFloat(v);return Number.isFinite(n)?n:null;};
+const fmt=(v,d=1)=>v==null||!Number.isFinite(v)?"—":v.toFixed(d);
+const pct=v=>v==null?"—":`${Math.round(v*100)}%`;
+const price=v=>v==null?"—":`£${v.toFixed(1)}m`;
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const truthy=v=>/^(true|1)$/i.test(String(v));
+
+
+// ── Track record ─────────────────────────────────────────────────────────────
+const day=s=>{const d=new Date(s+"T12:00:00Z");return isNaN(d)?esc(s):d.toLocaleDateString([],{day:"numeric",month:"short"});};
+const capCell=c=>c?`${esc(c.name)} <small>${esc(c.team)} · ${fmt(c.projected)} → </small><b>${c.actual}</b>`:"—";
+
+function renderProof(s){
+  if(!s||!s.weeks){$("proof").innerHTML='<div class="cap">The first scored gameweek appears here once it has been played.</div>';return;}
+  $("proofSpan").textContent=`${s.weeks} gameweek${s.weeks===1?"":"s"}`;
+  const h2h=s.head_to_head_weeks;
+  $("proof").innerHTML=`<div>Avg error<b>${fmt(h2h?s.model_mae_same_weeks:s.model_mae,2)}${h2h?`<span>FPL ${fmt(s.fpl_mae,2)}</span>`:""}</b></div>
+    <div>Beat FPL<b>${h2h?`${s.model_wins} of ${h2h}`:"—"}<span>weeks</span></b></div>
+    <div>Captain points<b>${s.captain_points}<span>${fmt(s.captain_points/s.weeks)} a week</span></b></div>
+    <div>Weeks tracked<b>${s.weeks}</b></div>`;
+}
+
+function renderWeeks(weeks){
+  if(!weeks?.length){$("tbody").innerHTML='<tr><td colspan="10" class="empty">No gameweek has been scored yet.</td></tr>';return;}
+  const max=Math.max(...weeks.flatMap(w=>[w.model?.mae||0,w.fpl?.mae||0]));
+  $("tbody").innerHTML=weeks.slice().reverse().map(w=>{const m=w.model,f=w.fpl||{};const won=f.mae!=null&&m.mae<f.mae;
+    return `<tr><td class="gw">GW${w.gw}</td><td>${day(w.snapshot)}</td><td class="num">${w.n}</td>
+      <td class="num${won?" win":""}">${fmt(m.mae,2)}</td><td class="num">${fmt(f.mae,2)}</td>
+      <td><div class="err-bars"><i style="width:${(m.mae/max*100).toFixed(1)}%"></i>${f.mae!=null?`<i class="f" style="width:${(f.mae/max*100).toFixed(1)}%"></i>`:""}</div></td>
+      <td class="num">${fmt(m.spearman,2)}</td><td class="num">${fmt(m.top20_actual,2)}</td>
+      <td>${capCell(m.captain)}</td><td>${capCell(f.captain)}</td></tr>`;}).join("");
+}
+
+(async()=>{
+  const [acc,events,meta]=await Promise.all([fetchJson("accuracy.json"),fetchCsv("events.csv").catch(()=>null),fetchJson("meta.json")]);
+  if(events)setStatus("ok",describeData(events,meta));else setStatus("err","Could not load data");
+  if(!acc||acc.error){
+    setStatus(events?"warn":"err",events?describeData(events,meta):"Could not load data");
+    $("tbody").innerHTML=`<tr><td colspan="10" class="empty err">The track record isn't available yet. It's written by the weekly "Update Premier League Data v2" run.</td></tr>`;
+    $("proof").innerHTML='<div class="cap">Not available yet.</div>';return;}
+  renderProof(acc.summary);renderWeeks(acc.weeks);
+})();
+</script>
+</body>
+</html>

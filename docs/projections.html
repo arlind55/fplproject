@@ -187,6 +187,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
     <a href="./index.html">Dashboard</a>
     <a href="./planner.html">Fixture planner</a>
     <a href="./projections.html" aria-current="page">Projections</a>
+    <a href="./accuracy.html">Track record</a>
     <a href="./metrics.html">Metrics</a>
     <a href="./blog/">Value Blog</a>
   </nav>
@@ -403,7 +404,7 @@ function renderBacktest(bt){
   const s=bt.this_season?.regulars?.ep_next?bt.this_season:bt.last_season?.vs_fpl?{label:bt.last_season.label,regulars:bt.last_season.vs_fpl}:null;
   if(s){const m=s.regulars.model,f=s.regulars.ep_next;$("proofSpan").textContent=`${s.label} · regular starters`;
     $("proof").innerHTML=`<div>Avg error<b>${fmt(m.mae,2)}<span>FPL ${fmt(f.mae,2)}</span></b></div><div>Rank corr.<b>${fmt(m.spearman,2)}<span>FPL ${fmt(f.spearman,2)}</span></b></div><div>Top-20 pts<b>${fmt(m.top20_actual,2)}<span>FPL ${fmt(f.top20_actual,2)}</span></b></div>
-      <div class="cap">Compared with FPL's own expected points over the same ${m.weeks} gameweeks. <a href="#backtest" style="color:var(--accent)">Full backtest ↓</a></div>`;}
+      <div class="cap">Compared with FPL's own expected points over the same ${m.weeks} gameweeks. <a href="#backtest" style="color:var(--accent)">Full backtest ↓</a> · <a href="./accuracy.html" style="color:var(--accent)">Live track record →</a></div>`;}
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
