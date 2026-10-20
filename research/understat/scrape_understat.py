@@ -26,6 +26,7 @@ Standard library only. Usage:
 
 import argparse
 import csv
+import gzip
 import datetime as dt
 import http.cookiejar
 import json
@@ -64,7 +65,11 @@ class Client:
                 req = urllib.request.Request(url, headers=headers)
                 with self.opener.open(req, timeout=30) as res:
                     self.last = time.monotonic()
-                    return res.read()
+                    body = res.read()
+                    # Understat gzips responses even when not asked to.
+                    if body[:2] == b"\x1f\x8b":
+                        body = gzip.decompress(body)
+                    return body
             except urllib.error.HTTPError as err:
                 if err.code not in (429, 500, 502, 503, 504) or attempt == 3:
                     raise
