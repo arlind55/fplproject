@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-21T21:24:26Z",
+  "generated_at": "2026-10-21T21:36:57Z",
   "gws": [
     8,
     9,
@@ -34,6 +34,18 @@
     "xi_next_gw": 58.8,
     "extra_transfers": 0
   },
+  "long_gws": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ],
   "backtest": {
     "last_season": {
       "label": "2025/26",
