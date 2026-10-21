@@ -123,15 +123,16 @@ pool = caps.head(15)
 most_owned = pool.loc[pool.selected_by_percent.idxmax()]
 if most_owned.id not in set(cap.id): cap = pd.concat([cap.head(7), most_owned.to_frame().T])
 cap_rows = []
-top_mean = float(cap.sim_mean.max())
+top_mean = float(cap.next_gw.max())
+pens_of = proj.set_index("id")["next_pens"] if "next_pens" in proj else pd.Series(dtype=float)
 for r in cap.itertuples():
-    w_mean = r.sim_mean / cap.p90.max() * 100; w_p90 = r.p90 / cap.p90.max() * 100
+    w_mean = r.next_gw / cap.p90.max() * 100; w_p90 = r.p90 / cap.p90.max() * 100
     flag = f' <span class="flag" title="{esc(str(by_name.loc[r.web_name].news) if r.web_name in by_name.index else "")}">{pct(r.avail_next)} fit</span>' if r.avail_next < 1 else ""
-    cap_rows.append(f"""<tr{' class="hl"' if r.sim_mean == top_mean else ''}><td>{pos(r.pos)} <strong>{esc(r.web_name)}</strong>{flag}<span class="sub">{r.team_short_name} · {esc(r.next_opp)}</span></td>
+    cap_rows.append(f"""<tr{' class="hl"' if r.next_gw == top_mean else ''}><td>{pos(r.pos)} <strong>{esc(r.web_name)}</strong>{flag}<span class="sub">{r.team_short_name} · {esc(r.next_opp)}</span></td>
 <td class="bar"><span class="range" style="width:{w_p90:.1f}%"></span><span class="mean" style="width:{w_mean:.1f}%"></span></td>
-<td class="n"><strong>{r.sim_mean:.1f}</strong></td><td class="n">{r.p90:.0f}</td><td class="n">{pct(r.haul_prob)}</td><td class="n">{own(r.selected_by_percent)}</td></tr>""")
-captaincy = f"""<h3>Captaincy <small>10,000 simulated GW{GW}s</small></h3>
-<div class="tw"><table class="t cap"><thead><tr><th>Player</th><th class="bar"><span class="key"><i class="mean"></i>expected <i class="range"></i>1-in-10 ceiling</span></th><th class="n">xPts</th><th class="n">Ceiling</th><th class="n">10+ pts</th><th class="n">Owned</th></tr></thead><tbody>
+<td class="n"><strong>{r.next_gw:.1f}</strong></td><td class="n">{(f"{pens_of.get(r.id, 0):.1f}" if pens_of.get(r.id, 0) >= .05 else "–")}</td><td class="n">{r.p90:.0f}</td><td class="n">{pct(r.haul_prob)}</td><td class="n">{own(r.selected_by_percent)}</td></tr>""")
+captaincy = f"""<h3>Captaincy <small>20,000 simulated GW{GW}s</small></h3>
+<div class="tw"><table class="t cap"><thead><tr><th>Player</th><th class="bar"><span class="key"><i class="mean"></i>expected <i class="range"></i>1-in-10 ceiling</span></th><th class="n">xPts</th><th class="n" title="Expected points from penalties, included in xPts">Pens</th><th class="n">Ceiling</th><th class="n">10+ pts</th><th class="n">Owned</th></tr></thead><tbody>
 {''.join(cap_rows)}
 </tbody></table></div>
 {prose('captain')}"""
@@ -263,7 +264,7 @@ body = f"""<!--META {json.dumps(post_meta, ensure_ascii=False)} -->
 {luck}
 {record}
 <div class="callout"><b>Before the deadline.</b> {notes['verdict']}</div>
-<p class="note">Method: projections are the site's own model (xG, xA, clean-sheet and minutes rates, shrunk toward last season and price; details on the <a href="../metrics.html">metrics page</a>), run on data pulled {pd.Timestamp(pm['generated_at']).tz_convert(UK):%a %-d %b %H:%M}. Captaincy uses 10,000 simulations of GW{GW}; the ceiling is the 90th percentile. Fixture difficulty is the model's 1–5 blend of xG ratings and FPL's own. Luck check uses <a href="https://understat.com">Understat</a> expected points. Check team news before the deadline: the model only knows what FPL's availability flags said at the time.</p>
+<p class="note">Method: projections are the site's own model (non-penalty xG plus a separate penalty term, xA, clean-sheet and minutes rates, shrunk toward last season and price; details on the <a href="../metrics.html">metrics page</a>), generated {pd.Timestamp(pm['generated_at']).tz_convert(UK):%a %-d %b %H:%M}. Captaincy uses 20,000 simulations of GW{GW}; the ceiling is the 90th percentile. Fixture difficulty is the model's 1–5 blend of xG ratings and FPL's own. Luck check uses <a href="https://understat.com">Understat</a> expected points. Check team news before the deadline: the model only knows what FPL's availability flags said at the time.</p>
 <div class="next"></div>
 </article>
 </div>
@@ -291,17 +292,17 @@ ax.spines["bottom"].set_color(LINE); ax.tick_params(colors=INK3, labelsize=10, l
 ax.grid(axis="x", color=LINE, linewidth=.6); ax.set_axisbelow(True)
 y = np.arange(len(c))
 ax.barh(y, c.p90, height=.62, color=LINE, zorder=1, label="1-in-10 ceiling")
-ax.barh(y, c.sim_mean, height=.62, color=[POSC[p] for p in c.pos], zorder=2, label="Expected points")
+ax.barh(y, c.next_gw, height=.62, color=[POSC[p] for p in c.pos], zorder=2, label="Expected points")
 for yi, r in c.iterrows():
     ax.text(-.02, yi + .1, r.web_name, ha="right", va="center", color=INK, fontproperties=BODY, fontsize=13, transform=ax.get_yaxis_transform())
     ax.text(-.02, yi - .28, f"{r.team_short_name} v {r.next_opp} · {own(r.selected_by_percent)} owned", ha="right", va="center", color=INK3, fontproperties=MONO, fontsize=8.5, transform=ax.get_yaxis_transform())
-    ax.text(r.sim_mean - .15, yi, f"{r.sim_mean:.1f}", ha="right", va="center", color=BG, fontproperties=MONO, fontsize=11)
+    ax.text(r.next_gw - .15, yi, f"{r.next_gw:.1f}", ha="right", va="center", color=BG, fontproperties=MONO, fontsize=11)
     ax.text(r.p90 + .2, yi, f"{pct(r.haul_prob)} chance of 10+" + ("  ·  " + pct(r.avail_next) + " fit" if r.avail_next < 1 else ""), va="center", color=INK2, fontproperties=MONO, fontsize=9.5)
 ax.set_yticks([]); ax.set_xlim(0, c.p90.max() * 1.42)
 for lab in ax.get_xticklabels(): lab.set_fontproperties(MONO)
 ax.set_xlabel(f"GW{GW} points (simulated)", fontproperties=BODY, color=INK3, fontsize=10)
 fig.text(.045, .93, f"GW{GW} captaincy: who the model backs", fontproperties=DISP, fontsize=26, color=INK, va="top")
-fig.text(.045, .855, "Coloured bar: expected points. Grey: the 1-in-10 ceiling. From 10,000 simulated gameweeks.", fontproperties=BODY, fontsize=12, color=INK2, va="top")
+fig.text(.045, .855, "Coloured bar: expected points. Grey: the 1-in-10 ceiling. From 20,000 simulated gameweeks.", fontproperties=BODY, fontsize=12, color=INK2, va="top")
 fig.text(.955, .04, "fplvalue.co", fontproperties=DISP, fontsize=14, color=ACCENT, ha="right")
 IMG.mkdir(parents=True, exist_ok=True)
 fig.savefig(IMG / f"{SLUG}.png", facecolor=BG, dpi=100); plt.close(fig)
