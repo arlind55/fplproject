@@ -399,7 +399,7 @@ const signed=(v,d=1)=>(v>0?"+":"")+fmt(v,d);
 //      team endpoints. Set the URL here once it's deployed; it's the reliable route.
 //   2. Public CORS proxies, as a fallback. They're free and sometimes slow or down.
 // If every route fails the page offers to start from the model squad, which you can then edit with Swap.
-const FPL_PROXY="";   // e.g. "https://fpl-proxy.<account>.workers.dev"
+const FPL_PROXY="https://workerfpl-proxyjs.arlind-krasniqi-09.workers.dev";   // worker/fpl-proxy.js, deployed on Cloudflare
 const FPL="https://fantasy.premierleague.com";
 const ROUTES=[
   ...(FPL_PROXY?[{name:"fplvalue proxy",url:p=>FPL_PROXY.replace(/\/$/,"")+p}]:[]),
