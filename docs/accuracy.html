@@ -84,6 +84,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 footer a{color:inherit}
 @media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+/* Tabs sit right after the brand on every page so they don't shift with the status text; on phones the status wraps instead of widening the page */
+.topbar>.tabs{margin-right:auto}
+@media (max-width:700px){.topbar>.tabs{margin-right:0}.right{gap:8px}.status{white-space:normal;min-width:0;flex:1 1 auto}}
 
 
 /* ── Track record ───────────────────────────────────────────────────────────── */
@@ -171,6 +174,7 @@ td small{color:var(--ink-3)}
 </footer>
 </div>
 
+<script src="./shell.js"></script>
 <script>
 // ── Shared: theme + data status (keep in sync with index.html) ────────────────
 const REPO={owner:"arlind55",repo:"fplproject",branch:"main"};
@@ -183,15 +187,6 @@ function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t
 try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
 $("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);});
 function setStatus(cls,html){const el=$("status");el.className="status "+cls;el.lastElementChild.innerHTML=html;}
-function describeData(events,meta){
-  const truthy=v=>/^(true|1)$/i.test(String(v));
-  const fin=events.filter(e=>truthy(e.finished)).map(e=>+e.id);const lastDone=fin.length?Math.max(...fin):0;
-  const cur=events.find(e=>truthy(e.is_current)),next=events.find(e=>truthy(e.is_next));
-  let when="";if(meta?.updated_at){const d=new Date(meta.updated_at);when=d.toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
-  let gw=`<b>GW${lastDone}</b> complete`;
-  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone)gw=`<b>GW${cur.id}</b> in progress`;
-  return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · ${gw} · GW${next?next.id:"?"} next`;
-}
 async function fetchJson(file){try{const r=await fetch(`${BASE}/${file}`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}
 function csvToObjects(text){
   const rows=[];let row=[],cell="",q=false;
@@ -239,10 +234,10 @@ function renderWeeks(weeks){
 }
 
 (async()=>{
-  const [acc,events,meta]=await Promise.all([fetchJson("accuracy.json"),fetchCsv("events.csv").catch(()=>null),fetchJson("meta.json")]);
-  if(events)setStatus("ok",describeData(events,meta));else setStatus("err","Could not load data");
+  const [acc,events,meta,fx]=await Promise.all([fetchJson("accuracy.json"),fetchCsv("events.csv").catch(()=>null),fetchJson("meta.json"),fetchCsv("fixtures_lite.csv").catch(()=>null)]);
+  if(events)setStatus("ok",describeData(events,meta,fx));else setStatus("err","Could not load data");
   if(!acc||acc.error){
-    setStatus(events?"warn":"err",events?describeData(events,meta):"Could not load data");
+    setStatus(events?"warn":"err",events?describeData(events,meta,fx):"Could not load data");
     $("tbody").innerHTML=`<tr><td colspan="10" class="empty err">The track record isn't available yet. It's written by the weekly "Update Premier League Data v2" run.</td></tr>`;
     $("proof").innerHTML='<div class="cap">Not available yet.</div>';return;}
   renderProof(acc.summary);renderWeeks(acc.weeks);

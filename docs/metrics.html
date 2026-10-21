@@ -69,9 +69,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .theme svg{width:16px;height:16px}
 .tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
 @media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+/* Tabs sit right after the brand on every page so they don't shift with the status text; on phones the status wraps instead of widening the page */
+.topbar>.tabs{margin-right:auto}
+@media (max-width:700px){.topbar>.tabs{margin-right:0}.right{gap:8px}.status{white-space:normal;min-width:0;flex:1 1 auto}}
 /* ── Article ─────────────────────────────────────────────────────────────────── */
 .article{display:grid;grid-template-columns:220px minmax(0,1fr);gap:32px;align-items:start}
-@media (max-width:900px){.article{grid-template-columns:1fr}.toc{position:static}}
+@media (max-width:900px){.article{grid-template-columns:minmax(0,1fr)}.toc{position:static}}
 .toc{position:sticky;top:20px;font-size:13px}
 .toc .label{margin-bottom:10px}
 .toc a{display:block;padding:5px 0;color:var(--ink-2);text-decoration:none;border-left:2px solid var(--line);padding-left:12px}

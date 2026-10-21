@@ -46,3 +46,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .theme svg{width:16px;height:16px}
 .tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
 @media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+/* Tabs sit right after the brand on every page so they don't shift with the status text; on phones the status wraps instead of widening the page */
+.topbar>.tabs{margin-right:auto}
+@media (max-width:700px){.topbar>.tabs{margin-right:0}.right{gap:8px}.status{white-space:normal;min-width:0;flex:1 1 auto}}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{color:inherit}
