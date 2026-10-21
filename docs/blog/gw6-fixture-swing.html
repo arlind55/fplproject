@@ -79,6 +79,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 footer a{color:inherit}
 
+/* Position colours (same values as the dashboard; shell.css doesn't carry them) */
+:root{--gkp:#b8860b;--def:#2f6fb5;--mid:#2f8f5b;--fwd:#d0663a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--gkp:#e0b23a;--def:#6fa3e6;--mid:#5fc48f;--fwd:#f08a5c}}
+:root[data-theme="dark"]{--gkp:#e0b23a;--def:#6fa3e6;--mid:#5fc48f;--fwd:#f08a5c}
 /* ── Article ─────────────────────────────────────────────────────────────────── */
 .article{display:grid;grid-template-columns:minmax(0,1fr);justify-content:center}
 .article>*{min-width:0;width:100%}
@@ -149,6 +153,82 @@ figure.hero img{display:block;width:100%;height:auto}
 .post{display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:center}
 .post img{width:100%;height:auto;border-radius:6px;border:1px solid var(--line);background:#131521}
 @media (max-width:640px){.post{grid-template-columns:1fr}}
+/* ── Deadline brief (gameweek preview, built by preview.py) ──────────────────── */
+.prose.brief-post{max-width:880px}
+.brief-post .dim,.brief-post .sub{color:var(--ink-3)}
+.brief-post .sub{display:block;font:500 11px "IBM Plex Mono",monospace;margin-top:2px}
+.brief{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0 8px}
+.call{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+.call .lbl{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.call .who{font:700 24px/1.05 "Barlow Condensed","Arial Narrow",sans-serif}
+.call .who small{display:block;font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3);margin-top:4px}
+.call .nums{display:flex;gap:16px}
+.call .nums span{font:500 10.5px "IBM Plex Mono",monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em}
+.call .nums b{display:block;font:600 20px "IBM Plex Mono",monospace;color:var(--ink);letter-spacing:0}
+.prose .call p{font-size:13.5px;line-height:1.5;color:var(--ink-2);margin:0}
+/* captaincy table with inline range bars */
+table.cap td.bar,table.cap th.bar{width:34%;min-width:120px;position:relative}
+table.cap td.bar span{position:absolute;left:10px;top:50%;height:10px;transform:translateY(-50%);border-radius:2px;max-width:calc(100% - 20px)}
+table.cap .range{background:var(--surface-2);border:1px solid var(--line)}
+table.cap .mean{background:var(--accent)}
+table.cap .key{font:500 10px "IBM Plex Mono",monospace;text-transform:none;letter-spacing:0;display:inline-flex;gap:6px;align-items:center}
+table.cap .key i{display:inline-block;width:12px;height:8px;border-radius:2px}
+table.cap .key i.range{margin-left:6px}
+.flag{font:600 10px "IBM Plex Mono",monospace;color:var(--warn);border:1px solid currentColor;border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:1px}
+/* fixtures grid */
+.matches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0 16px}
+.match{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-variant-numeric:tabular-nums}
+.match .ko{font:500 10.5px "IBM Plex Mono",monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.match .side{display:flex;justify-content:space-between;align-items:baseline}
+.match .side b{font:700 18px "Barlow Condensed","Arial Narrow",sans-serif}
+.match .side span{font:600 13px "IBM Plex Mono",monospace}
+.match .split{height:5px;border-radius:3px;background:var(--line-strong);margin:5px 0;overflow:hidden}
+.match .split i{display:block;height:100%;background:var(--accent)}
+.match .cs{display:flex;justify-content:space-between;font:500 10.5px "IBM Plex Mono",monospace;color:var(--ink-3);margin-top:6px}
+/* pitch */
+.pitch{background:linear-gradient(var(--surface-2) 1px,transparent 1px) 0 0/100% 25%,var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 8px;display:grid;gap:12px;margin:12px 0 8px;position:relative}
+.pitch .line{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;position:relative}
+.chip{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:96px;text-align:center;display:grid;gap:1px;box-shadow:var(--shadow)}
+.chip b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
+.chip span{font:500 10px "IBM Plex Mono",monospace;color:var(--ink-3)}
+.chip em{font:600 13px "IBM Plex Mono",monospace;font-style:normal;color:var(--accent)}
+.chip .c{position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:700 10px/18px "IBM Plex Mono",monospace;font-style:normal}
+.benchrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px;opacity:.85}
+.benchrow .lbl{font:600 10.5px "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-right:4px}
+/* transfer targets */
+table.t tr.grp td{background:var(--surface-2);padding:5px 10px}
+table.tgt .tag{font-size:9.5px;padding:1px 5px;margin-left:4px;text-transform:uppercase;letter-spacing:.04em;vertical-align:1px}
+.fixrow.mini{display:inline-flex;gap:3px;margin:0;flex-wrap:nowrap}
+.fixrow.mini .fix{min-width:40px;height:30px;font-size:10.5px}
+.fixrow.mini .fix small{font-size:8.5px}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.pair .tw{margin:12px 0 4px}
+/* fitness flags */
+.flags{list-style:none;padding:0;margin:12px 0 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.flags li{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:6px;padding:8px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 8px;font-size:13px}
+.flags li.out{border-left-color:var(--err)}
+.flags .dim{grid-column:1;font:500 11px "IBM Plex Mono",monospace}
+.flags .st{grid-row:1/3;grid-column:2;align-self:center;font:600 13px "IBM Plex Mono",monospace;color:var(--warn)}
+.flags li.out .st{color:var(--err)}
+.flags small{grid-column:1/3;color:var(--ink-3);font-size:12px}
+/* luck check: diverging bars */
+.luck{display:grid;gap:3px;margin:12px 0 16px;font-size:13px}
+.lk{display:grid;grid-template-columns:140px 1fr 48px 130px;gap:10px;align-items:center}
+.lk .tm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lk .axis{position:relative;height:12px;background:linear-gradient(var(--line-strong),var(--line-strong)) 50% 0/1px 100% no-repeat}
+.lk .axis i{position:absolute;top:1px;bottom:1px;border-radius:2px}
+.lk .axis i.pos{left:50%;background:var(--ok)}
+.lk .axis i.neg{right:50%;background:var(--err)}
+.lk .v{font:600 12.5px "IBM Plex Mono",monospace;text-align:right}
+.lk .dim{font:500 11px "IBM Plex Mono",monospace}
+@media (max-width:640px){.lk{grid-template-columns:96px 1fr 44px}.lk .dim{display:none}.lk .tm{font-size:12px}}
+/* track record tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:12px 0}
+.tiles div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.tiles span{display:block;font:500 10.5px "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3)}
+.tiles b{display:block;font:700 30px/1.1 "Barlow Condensed","Arial Narrow",sans-serif;margin:4px 0 2px}
+.tiles small{color:var(--ink-3);font-size:11.5px}
+.brief-post .callout{border-left:3px solid var(--accent)}
 
 </style>
 </head>
@@ -163,7 +243,7 @@ figure.hero img{display:block;width:100%;height:auto}
   </div>
 </header>
 
-<div class="article with-side"><nav class="side" aria-label="Posts"><div class="label">Value Blog</div><details><summary><time datetime="2026-09-22">22 Sep 2026</time><span class="n">2</span></summary><a class="p" href="./gw5-template-check.html"><span class="tag">Template check</span>Template check: GW5</a><a class="p" href="./gw5-value-report.html"><span class="tag">Value report</span>Value report: GW5</a></details><details><summary><time datetime="2026-09-15">15 Sep 2026</time><span class="n">2</span></summary><a class="p" href="./gw4-template-check.html"><span class="tag">Template check</span>Template check: GW4</a><a class="p" href="./gw4-value-report.html"><span class="tag">Value report</span>Value report: GW4</a></details><details open><summary><time datetime="2026-09-02">2 Sep 2026</time><span class="n">3</span></summary><a class="p" href="./gw3-template-check.html"><span class="tag">Template check</span>Template check: who&#x27;s earning their ownership?</a><a class="p" href="./gw3-value-report.html"><span class="tag">Value report</span>Value report: GW3</a><a class="p cur" href="./gw6-fixture-swing.html" aria-current="page"><span class="tag">Fixtures</span>Fixture swing: whose run turns after the break</a><div class="secs"><a href="#five-teams-whose-fixtures-ease-from-gw6">Five teams whose fixtures ease from GW6</a><a href="#the-longest-easy-runs-in-the-calendar">The longest easy runs in the calendar</a><a href="#three-teams-to-move-off-before-the-break">Three teams to move off before the break</a></div></details><a class="all" href="./index.html">All posts →</a></nav>
+<div class="article with-side"><nav class="side" aria-label="Posts"><div class="label">Value Blog</div><details><summary><time datetime="2026-10-21">21 Oct 2026</time><span class="n">1</span></summary><a class="p" href="./gw8-preview.html"><span class="tag">Deadline brief</span>Deadline brief: GW8</a></details><details><summary><time datetime="2026-09-22">22 Sep 2026</time><span class="n">2</span></summary><a class="p" href="./gw5-template-check.html"><span class="tag">Template check</span>Template check: GW5</a><a class="p" href="./gw5-value-report.html"><span class="tag">Value report</span>Value report: GW5</a></details><details><summary><time datetime="2026-09-15">15 Sep 2026</time><span class="n">2</span></summary><a class="p" href="./gw4-template-check.html"><span class="tag">Template check</span>Template check: GW4</a><a class="p" href="./gw4-value-report.html"><span class="tag">Value report</span>Value report: GW4</a></details><details open><summary><time datetime="2026-09-02">2 Sep 2026</time><span class="n">3</span></summary><a class="p" href="./gw3-template-check.html"><span class="tag">Template check</span>Template check: who&#x27;s earning their ownership?</a><a class="p" href="./gw3-value-report.html"><span class="tag">Value report</span>Value report: GW3</a><a class="p cur" href="./gw6-fixture-swing.html" aria-current="page"><span class="tag">Fixtures</span>Fixture swing: whose run turns after the break</a><div class="secs"><a href="#five-teams-whose-fixtures-ease-from-gw6">Five teams whose fixtures ease from GW6</a><a href="#the-longest-easy-runs-in-the-calendar">The longest easy runs in the calendar</a><a href="#three-teams-to-move-off-before-the-break">Three teams to move off before the break</a></div></details><a class="all" href="./index.html">All posts →</a></nav>
 <article class="prose">
 <div class="kicker"><span>Fixture swing</span><time datetime="2026-09-02">2 September 2026 · planning for GW6</time></div>
 <h2>Whose run turns easy after the October break</h2>
