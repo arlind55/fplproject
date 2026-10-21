@@ -229,6 +229,13 @@ def main() -> None:
     save_csv(team_ratings_df, 'team_ratings.csv')
     save_csv(fixture_model_df, 'fixture_model.csv')
 
+    # Penalties taken this season, matched from Understat to FPL players (the model's penalty term needs them).
+    try:
+        from penalties import refresh as refresh_penalties
+        refresh_penalties(fetch=True)
+    except Exception:
+        traceback.print_exc()
+
     # Expected-points projections, captain ranking and model squad (see fplvalue/). Never blocks the refresh.
     try:
         from fplvalue.publish import write as write_projections

@@ -35,7 +35,7 @@ def simulate(x: pd.DataFrame, ids, prm: Params | None = None, n: int = 20000, se
     gkdef = np.isin(pos, ['GKP', 'DEF'])[None, :]
     gk = (pos == 'GKP')[None, :]
 
-    goals = rng.poisson(col('xg90') * prm.goal_cal * col('mult_att') * mins / 90)
+    goals = rng.poisson((col('xg90') * prm.goal_cal * col('mult_att') + col('pen90')) * mins / 90)
     assists = rng.poisson(col('xa90') * prm.assist_cal * col('mult_att') * mins / 90)
     conc = rng.poisson(col('xga') * prm.cs_cal * mins / 90)
     saves = rng.poisson(col('saves90') * col('mult_def') * mins / 90)
