@@ -72,6 +72,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .theme svg{width:16px;height:16px}
 .tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
 @media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+/* Tabs sit right after the brand on every page so they don't shift with the status text; on phones the status wraps instead of widening the page */
+.topbar>.tabs{margin-right:auto}
+@media (max-width:700px){.topbar>.tabs{margin-right:0}.right{gap:8px}.status{white-space:normal;min-width:0;flex:1 1 auto}}
 /* ── Planner ─────────────────────────────────────────────────────────────────── */
 .toolbar{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .toolbar h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:22px;margin:0}
@@ -226,6 +229,7 @@ footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-co
 </footer>
 </div>
 
+<script src="./shell.js"></script>
 <script>
 // ── Shared: theme + data status (keep in sync with index.html) ────────────────
 const REPO={owner:"arlind55",repo:"fplproject",branch:"main"};
@@ -238,16 +242,6 @@ function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t
 try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
 $("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);});
 function setStatus(cls,html){const el=$("status");el.className="status "+cls;el.lastElementChild.innerHTML=html;}
-// events: events.csv rows; meta: meta.json or null; progress: {gw, played, total} for an in-progress GW, or null
-function describeData(events,meta,progress){
-  const truthy=v=>/^(true|1)$/i.test(String(v));
-  const fin=events.filter(e=>truthy(e.finished)).map(e=>+e.id);const lastDone=fin.length?Math.max(...fin):0;
-  const cur=events.find(e=>truthy(e.is_current)),next=events.find(e=>truthy(e.is_next));
-  let when="";if(meta?.updated_at){const d=new Date(meta.updated_at);when=d.toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
-  let gw=`<b>GW${lastDone}</b> complete`;
-  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone){const done=progress&&progress.gw==+cur.id&&progress.played>=progress.total;gw=done?`<b>GW${cur.id}</b> played · awaiting FPL confirmation`:`<b>GW${cur.id}</b> in progress${progress&&progress.gw==+cur.id?` (${progress.played}/${progress.total} played)`:""}`;}
-  return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · ${gw} · GW${next?next.id:"?"} next`;
-}
 async function fetchMeta(){try{const r=await fetch(`${BASE}/meta.json`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}
 
 // ── Planner ──────────────────────────────────────────────────────────────────
@@ -302,14 +296,13 @@ async function load(){
   NEXT_GW=int(next?.id)||1;
 
   BY_TEAM={};ids.forEach(id=>{BY_TEAM[id]=Array.from({length:MAX_GW+1},()=>[]);});
-  let n=0;const prog={};
+  let n=0;
   for(const f of fixtures){
     const gw=int(f.event),h=f.team_h,a=f.team_a;
     if(!gw||!BY_TEAM[h]||!BY_TEAM[a])continue;       // unscheduled / postponed fixtures have no GW yet
     const hd=int(f.team_h_difficulty),ad=int(f.team_a_difficulty);
     const hs=int(f.team_h_score),as=int(f.team_a_score);
     const played=truthy(f.finished)||truthy(f.finished_provisional)||(hs!==null&&as!==null&&truthy(f.started));
-    prog[gw]=prog[gw]||{played:0,total:0};prog[gw].total++;if(played)prog[gw].played++;
     const m=MODEL?MODEL[f.id]:null;
     const mh=m?{att:int(m.att_diff_home),def:int(m.def_diff_home),blend:int(m.blend_diff_home),xgf:num(m.xg_home),xga:num(m.xg_away),cs:num(m.cs_prob_home)}:null;
     const ma=m?{att:int(m.att_diff_away),def:int(m.def_diff_away),blend:int(m.blend_diff_away),xgf:num(m.xg_away),xga:num(m.xg_home),cs:num(m.cs_prob_away)}:null;
@@ -318,9 +311,7 @@ async function load(){
     n++;
   }
 
-  const cur=events.find(e=>truthy(e.is_current));
-  const progress=cur&&prog[+cur.id]?{gw:+cur.id,...prog[+cur.id]}:null;
-  setStatus("ok",describeData(events,meta,progress)+(source==="fixtures.csv"?` · ${n} fixtures (full file)`:""));
+  setStatus("ok",describeData(events,meta,fixtures)+(source==="fixtures.csv"?` · ${n} fixtures (full file)`:""));
   return true;
 }
 

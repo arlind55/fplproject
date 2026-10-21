@@ -85,6 +85,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 footer a{color:inherit}
 @media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+/* Tabs sit right after the brand on every page so they don't shift with the status text; on phones the status wraps instead of widening the page */
+.topbar>.tabs{margin-right:auto}
+@media (max-width:700px){.topbar>.tabs{margin-right:0}.right{gap:8px}.status{white-space:normal;min-width:0;flex:1 1 auto}}
 
 /* ── Dashboard ──────────────────────────────────────────────────────────────── */
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
@@ -115,7 +118,23 @@ footer a{color:inherit}
 .count{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3)}
 .filters{display:grid;grid-template-columns:minmax(180px,1.4fr) repeat(4,minmax(110px,.8fr)) auto auto;gap:10px;margin-bottom:12px;align-items:end}
 @media (max-width:1100px){.filters{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:640px){.filters{grid-template-columns:1fr 1fr}.kpis,.charts{grid-template-columns:1fr}}
+@media (max-width:640px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis,.charts{grid-template-columns:1fr}}
+@media (max-width:1100px){.filters .picker{grid-column:1/-1}}
+/* Player picker: type to filter, pick several to compare just those players */
+.picker{position:relative}
+.pick{display:flex;flex-wrap:wrap;gap:4px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:3px 4px;min-height:35px}
+.pick:focus-within{outline:2px solid var(--accent);outline-offset:-1px}
+.field .pick input,.field .pick input:focus{border:0;outline:0;padding:4px 6px;flex:1;min-width:140px;width:auto;background:transparent}
+.filters.comparing>.field:not(.picker):not(:last-child){opacity:.45}
+.chip{display:inline-flex;align-items:center;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:2px 2px 2px 8px;font-size:12px;font-weight:500;color:var(--ink);white-space:nowrap}
+.chip button{border:0;background:none;color:var(--ink-3);cursor:pointer;font-size:15px;line-height:1;padding:0 4px}
+.chip button:hover{color:var(--err)}
+.chip.clear{background:none;border-color:transparent;color:var(--accent);cursor:pointer;padding:2px 6px;font:inherit;font-size:12px}
+.pick-list{position:absolute;z-index:5;left:0;right:0;top:100%;margin:4px 0 0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;box-shadow:var(--shadow);max-height:320px;overflow:auto;min-width:260px}
+.pick-list li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;cursor:pointer;font-size:13px}
+.pick-list li.on,.pick-list li:hover{background:var(--muted-cell)}
+.pick-list li .t{color:var(--ink-3);font:500 12px "IBM Plex Mono",monospace;margin-left:auto}
+.pick-list li.none{color:var(--ink-3);cursor:default}
 .field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:6px}
 .field input,.field select{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font:inherit;color:var(--ink)}
 .field input:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:-1px}
@@ -239,15 +258,18 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
 
 <section class="card" id="players">
   <div class="screener-head">
-    <div><h3>Player screener</h3><p>Click a column to sort · click a row for next fixtures and detail · all metrics follow the window, venue and basis above</p></div>
+    <div><h3>Player screener</h3><p>Click a column to sort · click a row for next fixtures and detail · pick players in the search box to compare just them · all metrics follow the window, venue and basis above</p></div>
     <span class="count" id="playerCountStatus">0 players</span>
   </div>
   <div class="filters">
-    <div class="field"><label for="search">Search</label><input id="search" type="text" placeholder="Saka, Palmer, Haaland"></div>
+    <div class="field picker"><label for="search">Players</label>
+      <div class="pick"><span id="chips" style="display:contents"></span><input id="search" type="text" placeholder="Search, or pick several to compare" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="pickList"></div>
+      <ul class="pick-list" id="pickList" role="listbox" hidden></ul>
+    </div>
     <div class="field"><label for="position">Position</label><select id="position"><option value="">All</option></select></div>
     <div class="field"><label for="team">Team</label><select id="team"><option value="">All</option></select></div>
     <div class="field"><label for="maxPrice">Max price</label><input id="maxPrice" type="number" step="0.1" min="0" placeholder="8.0"></div>
-    <div class="field"><label for="minMins">Min minutes</label><input id="minMins" type="number" step="10" min="0" value="0"></div>
+    <div class="field"><label for="minMins">Min minutes</label><input id="minMins" type="number" step="10" min="0" value="90"></div>
     <div class="field"><label>&nbsp;</label><label class="check"><input type="checkbox" id="hideUnavail"> Hide unavailable</label></div>
     <div class="field"><label>&nbsp;</label><button class="btn" id="exportPlayers" type="button">Export CSV</button></div>
   </div>
@@ -262,6 +284,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
 </footer>
 </div>
 
+<script src="./shell.js"></script>
 <script>
 // ── Shared: theme + data status (keep in sync with planner.html) ──────────────
 const REPO={owner:"arlind55",repo:"fplproject",branch:"main"};
@@ -274,24 +297,15 @@ function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t
 try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
 $("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);if(typeof onThemeChange==="function")onThemeChange();});
 function setStatus(cls,html){const el=$("status");el.className="status "+cls;el.lastElementChild.innerHTML=html;}
-// events: events.csv rows; meta: meta.json or null; progress: {gw, played, total} for an in-progress GW, or null
-function describeData(events,meta,progress){
-  const truthy=v=>/^(true|1)$/i.test(String(v));
-  const fin=events.filter(e=>truthy(e.finished)).map(e=>+e.id);const lastDone=fin.length?Math.max(...fin):0;
-  const cur=events.find(e=>truthy(e.is_current)),next=events.find(e=>truthy(e.is_next));
-  let when="";if(meta?.updated_at){const d=new Date(meta.updated_at);when=d.toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
-  let gw=`<b>GW${lastDone}</b> complete`;
-  if(cur&&!truthy(cur.finished)&&+cur.id>lastDone){const done=progress&&progress.gw==+cur.id&&progress.played>=progress.total;gw=done?`<b>GW${cur.id}</b> played · awaiting FPL confirmation`:`<b>GW${cur.id}</b> in progress${progress&&progress.gw==+cur.id?` (${progress.played}/${progress.total} played)`:""}`;}
-  return `Data updated ${when?`<b>${when}</b>`:"<b>—</b>"} · ${gw} · GW${next?next.id:"?"} next`;
-}
 async function fetchMeta(){try{const r=await fetch(`${BASE}/meta.json`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 const charts={};
 const state={players:[],hist:{},teams:{},teamDifficulty:[],events:[],future:null,filtered:[],rows:[],
-  gws:[1],from:1,to:1,preset:"season",venue:"all",basis:"total",valueMode:"xgi",sort:{key:"ppg",dir:"desc"},open:null};
+  gws:[1],from:1,to:1,preset:"season",venue:"all",basis:"total",valueMode:"xgi",sort:{key:"ppg",dir:"desc"},open:null,picked:[]};
 try{const s=JSON.parse(localStorage.getItem("fpl-dash")||"null");if(s&&typeof s==="object")Object.assign(state,s);}catch(e){}
-function save(){try{localStorage.setItem("fpl-dash",JSON.stringify({preset:state.preset,from:state.from,to:state.to,venue:state.venue,basis:state.basis,valueMode:state.valueMode,sort:state.sort}));}catch(e){}}
+if(!Array.isArray(state.picked))state.picked=[];
+function save(){try{localStorage.setItem("fpl-dash",JSON.stringify({preset:state.preset,from:state.from,to:state.to,venue:state.venue,basis:state.basis,valueMode:state.valueMode,sort:state.sort,picked:state.picked}));}catch(e){}}
 
 function csvToObjects(text){
   const rows=[];let row=[],cell="",q=false;
@@ -416,16 +430,54 @@ $("playersHead").addEventListener("click",e=>{const th=e.target.closest("th[data
 
 function renderPlayers(){
   const q=$("search").value.trim().toLowerCase(),position=$("position").value,team=$("team").value,maxPrice=num($("maxPrice").value),minMins=num($("minMins").value)||0,hide=$("hideUnavail").checked;
-  const rows=state.rows.filter(p=>(!q||[p.name,p.teamName,p.team].some(v=>String(v||"").toLowerCase().includes(q)))&&(!position||p.pos===position)&&(!team||p.team===team)&&(maxPrice==null||(p.price||0)<=maxPrice)&&p.mins>=minMins&&(!hide||p.status==="a"||p.status==="d"));
+  // Picked players override the other filters: the table becomes a side-by-side of just those players
+  const picked=new Set(state.picked);
+  const rows=picked.size?state.rows.filter(p=>picked.has(p.id))
+    :state.rows.filter(p=>(!q||[p.name,p.teamName,p.team].some(v=>String(v||"").toLowerCase().includes(q)))&&(!position||p.pos===position)&&(!team||p.team===team)&&(maxPrice==null||(p.price||0)<=maxPrice)&&p.mins>=minMins&&(!hide||p.status==="a"||p.status==="d"));
   const {key,dir}=state.sort,str=STR.includes(key);
   rows.sort((a,b)=>{const av=sortValue(a,key),bv=sortValue(b,key);const an=av==null||(typeof av==="number"&&!Number.isFinite(av)),bn=bv==null||(typeof bv==="number"&&!Number.isFinite(bv));if(an&&bn)return 0;if(an)return 1;if(bn)return -1;const r=str?String(av).localeCompare(String(bv)):av-bv;return dir==="asc"?r:-r;});
-  state.filtered=rows;renderHead();$("playerCountStatus").textContent=`${rows.length} players · ${windowLabel()}${state.venue!=="all"?(state.venue==="H"?" · home":" · away"):""}`;
+  state.filtered=rows;renderHead();renderChips();$("playerCountStatus").textContent=`${picked.size?`Comparing ${rows.length} · other filters paused`:`${rows.length} players`} · ${windowLabel()}${state.venue!=="all"?(state.venue==="H"?" · home":" · away"):""}`;
   const tb=$("playersTable");
   if(!rows.length){tb.innerHTML=`<tr><td colspan="${COLS.length}" class="empty">No players match the current filters.</td></tr>`;return;}
   tb.innerHTML=rows.slice(0,150).map(p=>`<tr class="row ${state.open===p.id?"open":""}" data-id="${p.id}">${COLS.map(c=>`<td class="${c.num?"num":""} ${c.grp?"grp":""} ${c.cls||""}">${c.render(p)}</td>`).join("")}</tr>${state.open===p.id?detailRow(p):""}`).join("")
     +(rows.length>150?`<tr><td colspan="${COLS.length}" class="empty">Showing 150 of ${rows.length} — narrow the filters to see more.</td></tr>`:"");
 }
 $("playersTable").addEventListener("click",async e=>{const tr=e.target.closest("tr.row");if(!tr)return;const id=tr.dataset.id;state.open=state.open===id?null:id;if(state.open&&!state.future)await loadFuture();renderPlayers();});
+// ── Player picker ────────────────────────────────────────────────────────────
+const pick={matches:[],on:0};
+function renderChips(){
+  const byId=Object.fromEntries(state.rows.map(p=>[p.id,p]));
+  $("chips").innerHTML=state.picked.filter(id=>byId[id]).map(id=>`<span class="chip">${esc(byId[id].name)}<button type="button" data-unpick="${esc(id)}" aria-label="Remove ${esc(byId[id].name)}">×</button></span>`).join("")
+    +(state.picked.length>1?`<button type="button" class="chip clear" data-unpick="*">Clear</button>`:"");
+  $("search").placeholder=state.picked.length?"Add another player":"Search, or pick several to compare";
+  document.querySelector(".filters").classList.toggle("comparing",state.picked.length>0);
+}
+function renderPickList(){
+  const q=$("search").value.trim().toLowerCase(),list=$("pickList");
+  if(!q){list.hidden=true;$("search").setAttribute("aria-expanded","false");return;}
+  const picked=new Set(state.picked);
+  // Names that start with the query first ("sak" → Saka before Isak), then word starts, then anything else
+  const rank=p=>{const n=String(p.name||"").toLowerCase();return n.startsWith(q)?0:n.split(/[\s.\-']/).some(w=>w.startsWith(q))?1:2;};
+  pick.matches=state.rows.filter(p=>!picked.has(p.id)&&[p.name,p.teamName,p.team].some(v=>String(v||"").toLowerCase().includes(q)))
+    .sort((a,b)=>rank(a)-rank(b)||(b.seasonPts||0)-(a.seasonPts||0)).slice(0,8);
+  pick.on=Math.min(pick.on,Math.max(pick.matches.length-1,0));
+  list.innerHTML=pick.matches.length?pick.matches.map((p,i)=>`<li role="option" id="pick${i}" data-pick="${esc(p.id)}" class="${i===pick.on?"on":""}" aria-selected="${i===pick.on}"><span class="pos ${p.pos}">${p.pos}</span>${esc(p.name)}<span class="t">${esc(p.team)} · ${price(p.price)}</span></li>`).join(""):`<li class="none">No players match “${esc(q)}”</li>`;
+  list.hidden=false;$("search").setAttribute("aria-expanded","true");
+}
+function addPick(id){if(!id||state.picked.includes(id))return;state.picked.push(id);$("search").value="";pick.on=0;save();renderPickList();renderPlayers();}
+function removePick(id){state.picked=id==="*"?[]:state.picked.filter(x=>x!==id);save();renderPlayers();$("search").focus();}
+$("search").addEventListener("input",()=>{pick.on=0;renderPickList();});
+$("search").addEventListener("keydown",e=>{
+  const open=!$("pickList").hidden&&pick.matches.length;
+  if(e.key==="ArrowDown"&&open){e.preventDefault();pick.on=(pick.on+1)%pick.matches.length;renderPickList();}
+  else if(e.key==="ArrowUp"&&open){e.preventDefault();pick.on=(pick.on-1+pick.matches.length)%pick.matches.length;renderPickList();}
+  else if(e.key==="Enter"&&open){e.preventDefault();addPick(pick.matches[pick.on].id);}
+  else if(e.key==="Escape"){$("pickList").hidden=true;$("search").setAttribute("aria-expanded","false");}
+  else if(e.key==="Backspace"&&!$("search").value&&state.picked.length){removePick(state.picked[state.picked.length-1]);}
+});
+$("search").addEventListener("blur",()=>{$("pickList").hidden=true;$("search").setAttribute("aria-expanded","false");});
+$("pickList").addEventListener("mousedown",e=>{e.preventDefault();const li=e.target.closest("li[data-pick]");if(li)addPick(li.dataset.pick);});
+$("chips").addEventListener("click",e=>{const b=e.target.closest("[data-unpick]");if(b)removePick(b.dataset.unpick);});
 async function loadFuture(){try{const rows=await fetchCsv("player_future_fixtures.csv");const map={};rows.forEach(f=>{(map[f.player_id]=map[f.player_id]||[]).push(f);});Object.values(map).forEach(l=>l.sort((a,b)=>(num(a.event)||99)-(num(b.event)||99)));state.future=map;}catch(e){state.future={};}}
 function detailRow(p){
   const fixtures=(state.future?.[p.id]||[]).slice(0,5);
@@ -500,7 +552,7 @@ function bindFilters(){
 // ── Init ─────────────────────────────────────────────────────────────────────
 (async()=>{
   try{
-    const [players,history,teams,teamDifficulty,events,meta,proj]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("team_fixture_difficulty.csv"),fetchCsv("events.csv"),fetchMeta(),fetchCsv("projections.csv").catch(()=>[])]);
+    const [players,history,teams,teamDifficulty,events,meta,proj,fx]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("team_fixture_difficulty.csv"),fetchCsv("events.csv"),fetchMeta(),fetchCsv("projections.csv").catch(()=>[]),fetchCsv("fixtures_lite.csv").catch(()=>null)]);
     teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
     const PJ={};proj.forEach(r=>{PJ[r.id]={proj5:num(r.next_n),projNext:num(r.next_gw)};});
     state.players=players.map(shapePlayer).filter(p=>p.name).map(p=>Object.assign(p,PJ[p.id]||{proj5:null,projNext:null}));
@@ -509,11 +561,7 @@ function bindFilters(){
     state.teamDifficulty=teamDifficulty;state.events=events;
     fillSelect("position",["GKP","DEF","MID","FWD"]);fillSelect("team",[...new Set(state.players.map(p=>p.team))].filter(Boolean).sort());
     bindFilters();applyPreset();refresh();
-    // Progress of an in-progress GW: fixtures in the current GW with minutes recorded vs fixtures scheduled
-    let progress=null;
-    const cur=events.find(e=>truthy(e.is_current));
-    if(cur&&!truthy(cur.finished)){const all=new Set(),played=new Set();history.forEach(h=>{if(+h.round===+cur.id){all.add(h.fixture);if(n0(h.minutes)>0)played.add(h.fixture);}});progress={gw:+cur.id,played:played.size,total:all.size||10};}
-    setStatus("ok",describeData(events,meta,progress));
+    setStatus("ok",describeData(events,meta,fx));
   }catch(err){
     setStatus("err","Could not load repo data");
     $("playersTable").innerHTML=`<tr><td colspan="18" class="empty err">Couldn't load data from ${BASE}. ${esc(err.message)}. Check the latest "Update Premier League Data v2" run in Actions.</td></tr>`;

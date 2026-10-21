@@ -1,5 +1,6 @@
 /* ── Article ─────────────────────────────────────────────────────────────────── */
 .article{display:grid;grid-template-columns:minmax(0,1fr);justify-content:center}
+.article>*{min-width:0;width:100%}
 .prose{max-width:72ch;margin:0 auto}
 .prose .kicker{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:8px 0 10px;display:flex;gap:12px;align-items:center}
 .prose .kicker time{color:var(--ink-3)}
@@ -42,7 +43,7 @@ hr{border:0;border-top:1px solid var(--line);margin:32px 0}
 .next{display:flex;justify-content:space-between;gap:12px;margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:13px}
 /* ── Sidebar + hero ──────────────────────────────────────────────────────────── */
 .article.with-side{grid-template-columns:240px minmax(0,1fr);gap:32px;align-items:start}
-@media (max-width:900px){.article.with-side{grid-template-columns:1fr}.side{position:static}}
+@media (max-width:900px){.article.with-side{grid-template-columns:minmax(0,1fr)}.side{position:static}}
 .side{position:sticky;top:20px;font-size:13px}
 .side .label{margin-bottom:10px}
 .side details{border-left:2px solid var(--line);margin-bottom:6px}

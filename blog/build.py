@@ -112,7 +112,7 @@ def page(meta, body, posts, active="Value Blog"):
 {body}
 <footer>
   <span>FPL Value · independent and unaffiliated with the Premier League or Fantasy Premier League. Data: official FPL API via <a href="https://github.com/arlind55/fplproject">fplproject</a>.</span>
-  <span><a href="../index.html">Dashboard</a> · <a href="../planner.html">Fixture planner</a> · <a href="../projections.html">Projections</a> · <a href="../metrics.html">Metrics</a></span>
+  <span><a href="../index.html">Dashboard</a> · <a href="../planner.html">Fixture planner</a> · <a href="../projections.html">Projections</a> · <a href="../accuracy.html">Track record</a> · <a href="../metrics.html">Metrics</a></span>
 </footer>
 </div>
 <script>
