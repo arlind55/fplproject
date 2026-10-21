@@ -6,7 +6,8 @@ For every player and every fixture in the projection window:
 
     minutes      p_start, p_sub, minutes-when-started, share of starts reaching 60'   (recency-weighted, shrunk)
     appearance   P(plays) + P(60+)
-    goals        xG/90  × fixture attack multiplier × E[minutes]/90 × goal points
+    goals        npxG/90 × fixture attack multiplier × E[minutes]/90 × goal points      (open play: penalties removed)
+    pens         team penalties/match × fixture attack multiplier × P(first available taker) × 0.80 × goal points
     assists      xA/90  × fixture attack multiplier × E[minutes]/90 × 3
     clean sheet  P(60+) × e^(−fixture xG against) × CS points
     conceded     −E[floor(goals conceded while on pitch / 2)]                          (GK, DEF)
@@ -34,12 +35,12 @@ import numpy as np
 import pandas as pd
 
 from . import team_model
-from .load import Snapshot
+from .load import DATA, Snapshot
 
 GOAL = {'GKP': 10, 'DEF': 6, 'MID': 5, 'FWD': 4}
 CS_PTS = {'GKP': 4, 'DEF': 4, 'MID': 1, 'FWD': 0}
 DEFCON_T = {'GKP': 999, 'DEF': 10, 'MID': 12, 'FWD': 12}
-COMPONENTS = ['app', 'goals', 'assists', 'cs', 'conceded', 'saves', 'defcon', 'bonus', 'cards']
+COMPONENTS = ['app', 'goals', 'pens', 'assists', 'cs', 'conceded', 'saves', 'defcon', 'bonus', 'cards']
 
 
 @dataclass
@@ -55,7 +56,9 @@ class Params:
     lam: float = 0.5              # weight of a last-season 90 relative to a this-season 90
     decay: float = 0.7            # recency weight per match for the minutes model
     n_recent: int = 6             # matches looked at for the minutes model
-    goal_cal: float = 0.94        # FPL goals per Opta xG (2025/26)
+    goal_cal: float = 0.93        # FPL non-penalty goals per Opta npxG (2025/26)
+    pen_conv: float = 0.80        # penalties scored per penalty taken (Understat, 1,175 PL penalties since 2014/15)
+    k_pens: float = 20.0          # team penalty-rate prior weight, in matches
     assist_cal: float = 1.38      # FPL assists per Opta xA (FPL counts rebounds, pens won, deflections)
     cs_cal: float = 1.0           # multiplier on xG against inside e^(−xGA)
     horizon: int = 5
@@ -140,7 +143,7 @@ def _players_frame(snap: Snapshot) -> pd.DataFrame:
     t = snap.teams.set_index('id')['short_name']
     p['team_short_name'] = p['team'].map(t)
     keep = ['id', 'code', 'web_name', 'team', 'team_short_name', 'pos', 'price', 'status', 'chance', 'news',
-            'selected_by_percent', 'ep_next']
+            'selected_by_percent', 'ep_next', 'penalties_order']
     return p[[c for c in keep if c in p.columns]]
 
 
@@ -174,10 +177,12 @@ def state_as_of(snap: Snapshot, gw: int, avail: Snapshot | None = None, last: Sn
     p['price'] = p['id'].map(last_row['value']) / 10
     p['team_short_name'] = p['team'].map(snap.teams.set_index('id')['short_name'])
     p['status'], p['chance'], p['news'], p['ep_next'] = 'a', np.nan, '', np.nan
+    p['penalties_order'] = p['id'].map(snap.players.set_index('id')['penalties_order']) if 'penalties_order' in snap.players else np.nan
     if avail is not None:
         a = avail.players.set_index('id')
         for c_src, c_dst in (('status', 'status'), ('chance_of_playing_next_round', 'chance'), ('news', 'news'),
-                             ('ep_next', 'ep_next'), ('selected_by_percent', 'selected_by_percent')):
+                             ('ep_next', 'ep_next'), ('selected_by_percent', 'selected_by_percent'),
+                             ('penalties_order', 'penalties_order')):
             if c_src in a.columns:
                 p[c_dst] = p['id'].map(a[c_src]).where(p['id'].isin(a.index), p[c_dst])
         p['status'] = p['status'].fillna('a')
@@ -188,6 +193,52 @@ def state_as_of(snap: Snapshot, gw: int, avail: Snapshot | None = None, last: Sn
 
 
 # ── component models ────────────────────────────────────────────────────────────────────────────
+# ── penalties ───────────────────────────────────────────────────────────────────────────────────
+_PENS: pd.DataFrame | None = None
+
+
+def penalties() -> pd.DataFrame:
+    """Every penalty taken, matched to FPL fixture + player (data/penalties.csv, from scripts/penalties.py)."""
+    global _PENS
+    if _PENS is None:
+        f = DATA / 'penalties.csv'
+        _PENS = pd.read_csv(f) if f.exists() else pd.DataFrame(columns=['season', 'fixture', 'element', 'team_code', 'xg'])
+    return _PENS
+
+
+def season_label(events: pd.DataFrame) -> str:
+    y = pd.to_datetime(events['deadline_time'], utc=True).min().year
+    return f"{y}/{str(y + 1)[2:]}"
+
+
+def strip_pens(h: pd.DataFrame, season: str) -> pd.DataFrame:
+    """History with each penalty's xG taken out of expected_goals (so it becomes npxG) and a pens column."""
+    pz = penalties()
+    pz = pz[pz['season'] == season].groupby(['fixture', 'element']).agg(pens=('xg', 'size'), pen_xg=('xg', 'sum'))
+    h = h.join(pz, on=['fixture', 'player_id'])
+    h[['pens', 'pen_xg']] = h[['pens', 'pen_xg']].fillna(0)
+    h['expected_goals'] = (h['expected_goals'] - h['pen_xg']).clip(lower=0)
+    return h
+
+
+def team_pen_rate(state: 'State', prm: 'Params') -> pd.Series:
+    """Penalties per match by team (index: team id), this season + λ·last season, shrunk to the league rate."""
+    pz = penalties(); season = season_label(state.events)
+    y = int(season[:4]); last = f"{y - 1}/{str(y)[2:]}"
+    code = state.teams.set_index('id')['code']
+    played = state.history.groupby('team')['fixture'].nunique().reindex(code.index).fillna(0)
+    cur = pz[(pz['season'] == season) & pz['fixture'].isin(set(state.history['fixture']))]
+    cur_n = cur.groupby('team_code').size().reindex(code.values).fillna(0).to_numpy()
+    prev = pz[pz['season'] == last]
+    prev_n = prev.groupby('team_code').size()
+    in_last = code.isin(prev_n.index) if len(prev) else code.map(lambda c: False)
+    avg = len(prev) / (20 * 38) if len(prev) else 0.12
+    lam = prm.lam
+    rate = (cur_n + lam * code.map(prev_n).fillna(0).to_numpy() + prm.k_pens * avg) / (
+        played.to_numpy() + lam * 38 * in_last.to_numpy() + prm.k_pens)
+    return pd.Series(rate, index=code.index)
+
+
 def _totals(h: pd.DataFrame, pos_of: pd.Series) -> pd.DataFrame:
     """Per-player season totals the rate models need. pos_of: player_id -> pos."""
     if not len(h):
@@ -204,10 +255,12 @@ def _totals(h: pd.DataFrame, pos_of: pd.Series) -> pd.DataFrame:
 def rates(state: State, prm: Params) -> pd.DataFrame:
     """Shrunk per-90 rates (and DefCon hit rate per 60+ match) for every player in state.players."""
     P = state.players.set_index('id')
-    cur = _totals(state.history, P['pos']).reindex(P.index).fillna(0)
+    season = season_label(state.events)
+    cur = _totals(strip_pens(state.history, season), P['pos']).reindex(P.index).fillna(0)
     tab = cur.join(P[['pos', 'price']])
     if state.prior_history is not None:
-        lh = state.prior_history
+        y = int(season[:4])
+        lh = strip_pens(state.prior_history, f"{y - 1}/{str(y)[2:]}")
         ls = _totals(lh, lh.drop_duplicates('player_id').set_index('player_id')['pos'])
         ls = ls.join(lh.drop_duplicates('player_id').set_index('player_id')['code'])
         ls = ls.groupby('code').sum(numeric_only=True)
@@ -386,6 +439,15 @@ def project(state: State, prm: Params | None = None, gws: list[int] | None = Non
     x['xmins'] = emin
     x['app'] = (ps + pb) + p60
     x['goals'] = x['xg90'] * prm.goal_cal * x['mult_att'] * emin / 90 * pos.map(GOAL)
+    # penalties: the team's rate × attack multiplier, taken by the first listed taker who is on the pitch.
+    # on = share of the match a player is expected to be on (incl. availability); pen90 is per 90 on the pitch.
+    x['on'] = (emin / 90 * x['avail']).clip(0, 1)
+    x['pen_order'] = x['id'].map(P['penalties_order']) if 'penalties_order' in P else np.nan
+    x['team_pens'] = x['team'].map(team_pen_rate(state, prm)).fillna(0.12)
+    tk = x[x['pen_order'].notna()].sort_values(['fixture', 'team', 'pen_order'])
+    ahead_off = tk.groupby(['fixture', 'team'])['on'].transform(lambda o: (1 - o).cumprod().shift(fill_value=1.0))
+    x['pen90'] = (ahead_off.reindex(x.index).fillna(0) * x['team_pens'] * x['mult_att'] * prm.pen_conv)
+    x['pens'] = x['pen90'] * emin / 90 * pos.map(GOAL)
     x['assists'] = x['xa90'] * prm.assist_cal * x['mult_att'] * emin / 90 * 3
     x['cs'] = p60 * cs_p * pos.map(CS_PTS)
     x['conceded'] = np.where(gk_def, -(ps * floor_mean(x['xga'] * ms / 90, 2) + pb * floor_mean(x['xga'] * mb / 90, 2)), 0.0)
@@ -411,6 +473,8 @@ def project(state: State, prm: Params | None = None, gws: list[int] | None = Non
     out['next_opp'] = fx
     out['avail_next'] = A[gws[0]]
     out = out.join(M).join(R).join(wide).join(nxt)
+    out['pen90'] = x[x['event'] == gws[0]].groupby('id')['pen90'].max().reindex(P.index).fillna(0)
+    out['pens_taken'] = strip_pens(state.history, season_label(state.events)).groupby('player_id')['pens'].sum().reindex(P.index).fillna(0)
     out['next_gw'] = out[f'gw_{gws[0]}']
     out['next_n'] = out[[f'gw_{g}' for g in gws]].sum(1)
     out['next_n_discounted'] = sum(out[f'gw_{g}'] * 0.9 ** j for j, g in enumerate(gws))

@@ -26,7 +26,7 @@ from .simulate import captain_table
 warnings.simplefilter('ignore', category=FutureWarning)
 
 PROJ_COLS = ['id', 'web_name', 'team_short_name', 'pos', 'price', 'selected_by_percent', 'status', 'next_opp',
-             'avail_next', 'p_start', 'next_xmins', 'xg90', 'xa90', 'next_gw', 'next_n']
+             'avail_next', 'p_start', 'next_xmins', 'xg90', 'xa90', 'penalties_order', 'pens_taken', 'pen90', 'next_gw', 'next_n']
 
 
 def write(out_dirs: list[Path] | None = None, with_backtest: bool = True, prm: Params | None = None) -> dict:
