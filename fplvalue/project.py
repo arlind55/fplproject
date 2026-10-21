@@ -116,24 +116,17 @@ class State:
     first_gw: int
     prior_history: pd.DataFrame | None = None     # last season, with 'code' and 'pos'
     prior_players: pd.DataFrame | None = None     # last season end: code, pos, price
-    team_prior: pd.DataFrame | None = None        # index team_id: att, def
+    team_prev: pd.DataFrame | None = None         # last season's team matches, clubs as codes
 
 
-def team_prior_from(last: Snapshot, current_teams: pd.DataFrame) -> pd.DataFrame | None:
-    """Last season's final xG ratings as this season's team prior. Promoted teams get the average of the relegated ones."""
+def last_season_matches(last: Snapshot | None) -> pd.DataFrame | None:
+    """Last season's team matches with clubs as FPL codes (ids change between seasons), carried into
+    this season's team ratings with a recency weight."""
     if last is None or not len(last.history):
         return None
     tm = team_model.team_matches(last.history, last.players[['id', 'element_type']], last.fixtures)
-    r = team_model.team_ratings(tm, last.teams, k=0).set_index('team_id')
-    r = r.join(last.teams.set_index('id')['code'])
-    by_code = r.set_index('code')[['att', 'def']]
-    cur = current_teams.set_index('id')
-    gone = [c for c in by_code.index if c not in set(cur['code'])]
-    fill = by_code.loc[gone].mean() if gone else pd.Series({'att': 0.9, 'def': 1.1})
-    prior = cur['code'].map(lambda c: by_code.loc[c] if c in by_code.index else fill)
-    prior = pd.DataFrame(list(prior.values), index=cur.index)
-    # partial pooling toward 1.0: a season of xG is informative but squads change over the summer
-    return 1 + 0.6 * (prior - 1)
+    code = last.teams.set_index('id')['code']
+    return tm.assign(team=tm['team'].map(code), opp=tm['opp'].map(code))
 
 
 def _players_frame(snap: Snapshot) -> pd.DataFrame:
@@ -160,7 +153,7 @@ def state_from_snapshot(snap: Snapshot, last: Snapshot | None = None) -> State:
     first = snap.last_finished_gw + 1
     lh, lp = _prior_tables(last)
     return State(_players_frame(snap), snap.history[snap.history['round'] < first].copy(), snap.fixtures,
-                 snap.teams, snap.events, first, lh, lp, team_prior_from(last, snap.teams))
+                 snap.teams, snap.events, first, lh, lp, last_season_matches(last))
 
 
 def state_as_of(snap: Snapshot, gw: int, avail: Snapshot | None = None, last: Snapshot | None = None) -> State:
@@ -189,7 +182,7 @@ def state_as_of(snap: Snapshot, gw: int, avail: Snapshot | None = None, last: Sn
         p['news'] = p['news'].fillna('')
     lh, lp = _prior_tables(last)
     return State(p.reset_index(drop=True), h, f, snap.teams, snap.events, gw, lh, lp,
-                 team_prior_from(last, snap.teams) if last is not None else None)
+                 last_season_matches(last))
 
 
 # ── component models ────────────────────────────────────────────────────────────────────────────
@@ -393,11 +386,11 @@ def team_fixtures(state: State, gws: list[int]) -> tuple[pd.DataFrame, float]:
     pl = state.players[['id', 'pos']].copy()
     pl['element_type'] = pl['pos'].map({'GKP': 1, 'DEF': 2, 'MID': 3, 'FWD': 4})
     if len(state.history):
-        ratings, model = team_model.build(state.history, pl, state.fixtures, state.teams, prior=state.team_prior)
-    else:   # first gameweek of a season: prior only
-        tm = pd.DataFrame(columns=['fixture', 'team', 'round', 'was_home', 'xg', 'xga', 'gf', 'ga'])
-        ratings = team_model.team_ratings(tm.astype({'was_home': bool, 'xg': float, 'xga': float}), state.teams, prior=state.team_prior)
-        ratings['league_avg_xg'] = 1.35
+        ratings, model = team_model.build(state.history, pl, state.fixtures, state.teams, prev=state.team_prev)
+    else:   # first gameweek of a season: last season's matches only
+        tm = pd.DataFrame(columns=['fixture', 'team', 'opp', 'round', 'was_home', 'xg', 'xga', 'gf', 'ga'])
+        tm = tm.astype({'was_home': bool, 'round': int, 'xg': float, 'xga': float, 'gf': float, 'ga': float})
+        ratings = team_model.team_ratings(tm, state.teams, prev=state.team_prev)
         model = team_model.fixture_model(state.fixtures, ratings)
     avg = float(ratings['league_avg_xg'].iloc[0])
     r = ratings.set_index('team_id')

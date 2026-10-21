@@ -3,14 +3,22 @@
 Built from player_history (per-player xG / xGC per match). For every team-match we take
   xG for      = sum of that team's players' expected_goals
   xG against  = the goalkeeper's expected_goals_conceded (== opposition xG)
-Ratings are multiplicative and shrunk toward the league average with a prior worth
-PRIOR_GAMES matches, so early-season numbers stay sane:
-  attack  = (sum xG for  + K*avg) / ((n + K) * avg)      1.00 = league average
-  defence = (sum xG against + K*avg) / ((n + K) * avg)   lower is better
-Home and away versions use only matches at that venue (with the same prior).
 
-Expected goals in a fixture:  home team xG = avg * att_home(H) * def_away(A)
-                              away team xG = avg * att_away(A) * def_home(H)
+Ratings are a multiplicative attack/defence model fitted to xG, adjusted for opponents:
+  expected xG for team T against O = avg × attack(T) × defence(O) × home edge
+Each match is judged against what that opponent usually allows (or creates), so a team that has
+just played the top three isn't marked down for it. Matches are weighted by recency, halving every
+HALF_LIFE matches and carrying on across seasons (last season's matches come in through `prev`), and
+the ratings are shrunk toward average with a prior worth PRIOR_GAMES matches. Promoted teams, with
+no last-season matches, are shrunk toward the average of the sides they replaced.
+  attack 1.00 = league average; defence lower is better.
+
+The Understat backtest in research/understat/fixture_backtest.py chose this set-up: against
+season-to-date raw ratings split by venue (the previous version) it cut the error in predicted
+team xG by about 5%, and short form windows (last 6 or 10 matches) were clearly worse than both.
+
+Expected goals in a fixture:  home team xG = avg × att(H) × def(A) × home_edge
+                              away team xG = avg × att(A) × def(H) × (2 − home_edge)
 Model difficulty (1 easiest … 5 hardest), from the perspective of each team:
   attack difficulty  – how hard it is to score: low expected xG for  -> high difficulty
   defence difficulty – how hard to keep a clean sheet: high expected xG against -> high difficulty
@@ -19,7 +27,9 @@ Bands follow FPL's shape: 10% / 20% / 40% / 20% / 10% across all remaining fixtu
 import numpy as np
 import pandas as pd
 
-PRIOR_GAMES = 6
+HALF_LIFE = 15       # matches; a match this many games back counts half
+PRIOR_GAMES = 2
+PRIOR_GAMES_NO_HISTORY = 6   # when there is no last season to carry over (early backtest weeks)
 BANDS = (0.10, 0.30, 0.70, 0.90)   # cumulative quantile cut points for ratings 1..5
 
 
@@ -41,6 +51,8 @@ def team_matches(history_df: pd.DataFrame, players_df: pd.DataFrame, fixtures_df
     tm = (h.groupby(['fixture', 'team', 'round', 'was_home'])
             .agg(xg=('expected_goals', 'sum'), hs=('team_h_score', 'first'), as_=('team_a_score', 'first'))
             .reset_index().join(gk, on=['fixture', 'team']))
+    other = fx.set_index('fixture')
+    tm['opp'] = np.where(tm['was_home'], tm['fixture'].map(other['team_a']), tm['fixture'].map(other['team_h']))
     tm['gf'] = np.where(tm['was_home'], tm['hs'], tm['as_'])
     tm['ga'] = np.where(tm['was_home'], tm['as_'], tm['hs'])
     tm = tm[tm['gf'].notna() & tm['xga'].notna()].drop(columns=['hs', 'as_'])
@@ -48,41 +60,73 @@ def team_matches(history_df: pd.DataFrame, players_df: pd.DataFrame, fixtures_df
     return tm
 
 
-def _rate(g: pd.DataFrame, avg: float, k: int, prior=None) -> pd.Series:
-    n = len(g)
-    pa, pd_ = (1.0, 1.0)
-    if prior is not None and g.name in prior.index:
-        pa, pd_ = float(prior.at[g.name, 'att']), float(prior.at[g.name, 'def'])
-    return pd.Series({
-        'att': (g['xg'].sum() + k * avg * pa) / ((n + k) * avg),
-        'def': (g['xga'].sum() + k * avg * pd_) / ((n + k) * avg),
-        'n': n,
-    })
+def _fit(rows: pd.DataFrame, current: list, half_life: float, k: float, iters: int = 15):
+    """Opponent-adjusted attack/defence from team-match rows keyed by club code.
+    rows: team, opp, order (later = more recent), was_home, xg, xga. Returns (att, def, avg, home_edge) dicts."""
+    rows = rows.sort_values('order')
+    ago = rows.groupby('team').cumcount(ascending=False).values
+    w = 0.5 ** (ago / half_life)
+    avg = float(rows['xg'].tail(380).mean())
+    home_edge = float(rows.loc[rows['was_home'], 'xg'].mean() / rows['xg'].mean())
+    clubs = sorted(set(rows['team']) | set(rows['opp']) | set(current))
+    ix = {c: i for i, c in enumerate(clubs)}
+    t = rows['team'].map(ix).values
+    o = rows['opp'].map(ix).values
+    hf = np.where(rows['was_home'].values, home_edge, 2 - home_edge)
+    xg, xga = rows['xg'].values, rows['xga'].values
+    n = len(clubs)
+    # promoted clubs (no matches before this season) are shrunk toward the clubs they replaced
+    new = np.array([c in set(current) and c not in set(rows.loc[rows['season'] == 'prev', 'team']) for c in clubs])
+    gone = np.array([c not in set(current) for c in clubs])
+    has_prev = (rows['season'] == 'prev').any()
+    att, dfn = np.ones(n), np.ones(n)
+    for _ in range(iters):
+        pa = np.where(new & has_prev & gone.any(), att[gone].mean() if gone.any() else 1.0, 1.0)
+        pd_ = np.where(new & has_prev & gone.any(), dfn[gone].mean() if gone.any() else 1.0, 1.0)
+        att = ((np.bincount(t, w * xg, n) + k * avg * pa) /
+               (np.bincount(t, w * dfn[o] * hf * avg, n) + k * avg))
+        dfn = ((np.bincount(t, w * xga, n) + k * avg * pd_) /
+               (np.bincount(t, w * att[o] * (2 - hf) * avg, n) + k * avg))
+    cur = np.array([ix[c] for c in current])
+    # express ratings relative to this season's clubs, so 1.00 is the average Premier League side
+    ma, md = att[cur].mean(), dfn[cur].mean()
+    return ({c: att[ix[c]] / ma for c in current}, {c: dfn[ix[c]] / md for c in current}, avg * ma * md, home_edge)
 
 
-def team_ratings(tm: pd.DataFrame, teams_df: pd.DataFrame, k: int = PRIOR_GAMES, prior: pd.DataFrame = None) -> pd.DataFrame:
-    """prior: optional DataFrame indexed by team_id with 'att'/'def' columns (e.g. last season's ratings).
-    Without it every team is shrunk toward league average (1.00)."""
-    avg = float(tm['xg'].mean()) if len(tm) else 1.3
-    base = tm.groupby('team')[['xg', 'xga']].apply(lambda g: _rate(g, avg, k, prior))
-    home = tm[tm['was_home']].groupby('team')[['xg', 'xga']].apply(lambda g: _rate(g, avg, k, prior))[['att', 'def']].add_suffix('_home')
-    away = tm[~tm['was_home']].groupby('team')[['xg', 'xga']].apply(lambda g: _rate(g, avg, k, prior))[['att', 'def']].add_suffix('_away')
+def team_ratings(tm: pd.DataFrame, teams_df: pd.DataFrame, prev: pd.DataFrame = None,
+                 half_life: float = HALF_LIFE, k: float = None) -> pd.DataFrame:
+    """tm: this season's team_matches(). prev: last season's team_matches() with `team` and `opp` already
+    mapped to club codes (see fplvalue.project.last_season_matches), or None."""
+    code = teams_df.set_index('id')['code']
+    cur = tm.assign(team=tm['team'].map(code), opp=tm['opp'].map(code), order=1000 + tm['round'], season='cur')
+    parts = [cur]
+    if prev is not None and len(prev):
+        parts.insert(0, prev.assign(order=prev['round'], season='prev'))
+    rows = pd.concat(parts, ignore_index=True)[['team', 'opp', 'order', 'season', 'was_home', 'xg', 'xga']]
+    rows = rows.dropna(subset=['team', 'opp', 'xg', 'xga'])
+    rows['was_home'] = rows['was_home'].astype(bool)
+    if k is None:
+        k = PRIOR_GAMES if prev is not None and len(prev) else PRIOR_GAMES_NO_HISTORY
+    out = teams_df[['id', 'name', 'short_name', 'code']].rename(columns={'id': 'team_id'}).set_index('team_id')
+    if len(rows):
+        att, dfn, avg, he = _fit(rows, list(out['code']), half_life, k)
+        out['att'] = out['code'].map(att)
+        out['def'] = out['code'].map(dfn)
+    else:
+        out['att'], out['def'], avg, he = 1.0, 1.0, 1.35, 1.1
     tot = tm.groupby('team')[['xg', 'xga', 'gf', 'ga']].sum()
-    out = teams_df[['id', 'name', 'short_name']].rename(columns={'id': 'team_id'}).set_index('team_id')
-    out = out.join(base).join(home).join(away).join(tot)
-    for side in ('att', 'def'):
-        fill = prior[side].reindex(out.index).fillna(1.0) if prior is not None else pd.Series(1.0, index=out.index)
-        for c in (side, side + '_home', side + '_away'):
-            out[c] = out[c].fillna(fill)
-    out['n'] = out['n'].fillna(0).astype(int)
+    out = out.join(tm.groupby('team').size().rename('games')).join(tot)
+    out['games'] = out['games'].fillna(0).astype(int)
     for c in ('xg', 'xga', 'gf', 'ga'):
         out[c] = out[c].fillna(0)
     out['finishing'] = out['gf'] - out['xg']        # goals scored above chance quality (+ = clinical / lucky)
     out['leak'] = out['ga'] - out['xga']            # goals conceded above chance quality (+ = leaky / unlucky)
     out['league_avg_xg'] = avg
+    out['home_edge'] = he
+    out['half_life'] = half_life
     out['prior_games'] = k
-    return (out.reset_index()
-               .rename(columns={'n': 'games', 'xg': 'xg_for', 'xga': 'xg_against', 'gf': 'goals_for', 'ga': 'goals_against'})
+    return (out.drop(columns='code').reset_index()
+               .rename(columns={'xg': 'xg_for', 'xga': 'xg_against', 'gf': 'goals_for', 'ga': 'goals_against'})
                .round(3))
 
 
@@ -104,8 +148,9 @@ def fixture_model(fixtures_df: pd.DataFrame, ratings: pd.DataFrame) -> pd.DataFr
     for c in ('team_h_difficulty', 'team_a_difficulty', 'event'):
         f[c] = pd.to_numeric(f[c], errors='coerce')
     f = f[f['team_h'].isin(r.index) & f['team_a'].isin(r.index)]
-    f['xg_home'] = avg * r.loc[f['team_h'], 'att_home'].values * r.loc[f['team_a'], 'def_away'].values
-    f['xg_away'] = avg * r.loc[f['team_a'], 'att_away'].values * r.loc[f['team_h'], 'def_home'].values
+    he = float(ratings['home_edge'].iloc[0]) if len(ratings) else 1.1
+    f['xg_home'] = avg * r.loc[f['team_h'], 'att'].values * r.loc[f['team_a'], 'def'].values * he
+    f['xg_away'] = avg * r.loc[f['team_a'], 'att'].values * r.loc[f['team_h'], 'def'].values * (2 - he)
     f['cs_prob_home'] = np.exp(-f['xg_away'])       # P(home team clean sheet)
     f['cs_prob_away'] = np.exp(-f['xg_home'])
     # Bands computed across unplayed fixtures only (both sides pooled), so the scale reflects the remaining calendar
@@ -126,8 +171,8 @@ def fixture_model(fixtures_df: pd.DataFrame, ratings: pd.DataFrame) -> pd.DataFr
     return f.sort_values(['event', 'kickoff_time', 'id'], na_position='last').reset_index(drop=True)
 
 
-def build(history_df, players_df, fixtures_df, teams_df, prior=None):
+def build(history_df, players_df, fixtures_df, teams_df, prev=None):
     tm = team_matches(history_df, players_df, fixtures_df)
-    ratings = team_ratings(tm, teams_df, prior=prior)
+    ratings = team_ratings(tm, teams_df, prev=prev)
     model = fixture_model(fixtures_df, ratings)
     return ratings, model

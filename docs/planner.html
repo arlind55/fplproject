@@ -125,6 +125,13 @@ td.cell{padding:3px}
 .chip.multi{height:18px;font-size:11px}
 .chip .ha{font-size:10px;opacity:.75;font-weight:500}
 .chip .sc{font-size:11px;opacity:.9;font-weight:500}
+.chip.xp{flex-direction:column;gap:0;line-height:1.15}
+.chip.xp .top{display:flex;gap:4px;align-items:center}
+.chip.xp{min-width:76px}
+.chip .xv{font-size:10px;font-weight:500;opacity:.85;letter-spacing:0;white-space:nowrap}
+.chip.multi.xp{height:auto;min-height:18px;padding:1px 6px}
+.xstat{font:500 13px "IBM Plex Mono",monospace;color:var(--ink-2)}
+.modelonly[hidden]{display:none}
 .chip.d1{background:var(--d1);color:var(--d1-ink)}
 .chip.d2{background:var(--d2);color:var(--d2-ink)}
 .chip.d3{background:var(--d3);color:var(--d3-ink)}
@@ -203,6 +210,8 @@ footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-co
     <div class="seg" id="sort" role="group" aria-label="Sort order">
       <button data-s="easy" aria-pressed="true">Easiest run</button>
       <button data-s="hard" aria-pressed="false">Hardest</button>
+      <button data-s="xg" class="modelonly" hidden aria-pressed="false" title="Most expected goals over the range">xG</button>
+      <button data-s="cs" class="modelonly" hidden aria-pressed="false" title="Most expected clean sheets over the range">CS</button>
       <button data-s="az" aria-pressed="false">A–Z</button>
     </div>
   </div>
@@ -211,6 +220,7 @@ footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-co
     <div class="checks">
       <label><input type="checkbox" id="showScores" checked> Show scores for played matches</label>
       <label><input type="checkbox" id="hideOut"> Hide gameweeks outside range</label>
+      <label class="modelonly" hidden><input type="checkbox" id="showModel" checked> Expected goals and clean sheet % in each fixture</label>
     </div>
   </div>
 </section>
@@ -224,7 +234,7 @@ footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-co
 </div>
 
 <footer>
-  <span>Avg = mean difficulty (under the selected rating) of the team's fixtures in the selected range and venue; lower is easier. Easy = fixtures rated 2 or below. FPL ratings are the official FDR and can change week to week; xG ratings are recomputed from Opta xG every data refresh — <a href="./metrics.html#model">method</a>.</span>
+  <span>Avg = mean difficulty (under the selected rating) of the team's fixtures in the selected range and venue; lower is easier. Easy = fixtures rated 2 or below. xG = the model's expected goals for the team, summed over those fixtures; CS = expected clean sheets (the sum of each fixture's clean-sheet chance). In a fixture, the first number is expected goals for and the second the clean-sheet chance. FPL ratings are the official FDR and can change week to week; xG ratings are recomputed from Opta xG every data refresh — <a href="./metrics.html#model">method</a>.</span>
   <span>Source: <a href="https://github.com/arlind55/fplproject" style="color:inherit">arlind55/fplproject</a> · data/current</span>
 </footer>
 </div>
@@ -249,9 +259,9 @@ let TEAMS={};      // id -> [short, name]
 let BY_TEAM={};    // id -> [gw][] of {opp, venue, diff, score}
 let NEXT_GW=1, MAX_GW=38;
 
-const state={from:null,to:null,venue:"all",sort:"easy",scores:true,hideOut:false,mode:"fpl"};
+const state={from:null,to:null,venue:"all",sort:"easy",scores:true,hideOut:false,mode:"fpl",showModel:true};
 let MODEL=null;   // fixture id -> model row, when fixture_model.csv exists
-const MODE_NOTE={fpl:"FPL's official rating of the opponent, 1–5.",att:"How hard it is for this team's attackers to score: expected goals for, from xG-based attack/defence ratings by venue. Includes the team's own strength.",def:"How hard it is for this team to keep a clean sheet: expected goals against. Tooltip shows clean-sheet probability.",blend:"Average of the FPL rating and the xG model (attack and defence combined)."};
+const MODE_NOTE={fpl:"FPL's official rating of the opponent, 1–5.",att:"How hard it is for this team's attackers to score: expected goals for, from opponent-adjusted xG attack/defence ratings plus home advantage. Includes the team's own strength.",def:"How hard it is for this team to keep a clean sheet: expected goals against. Tooltip shows clean-sheet probability.",blend:"Average of the FPL rating and the xG model (attack and defence combined)."};
 try{const s=JSON.parse(localStorage.getItem("fdr-planner")||"null");if(s&&typeof s==="object")Object.assign(state,s);}catch(e){}
 function save(){try{localStorage.setItem("fdr-planner",JSON.stringify(state));}catch(e){}}
 
@@ -286,8 +296,8 @@ async function load(){
   let fixtures,source="fixtures_lite.csv";
   try{fixtures=await fetchCsv("fixtures_lite.csv");}
   catch(e){source="fixtures.csv";fixtures=await fetchCsv("fixtures.csv");}
-  try{const rows=await fetchCsv("fixture_model.csv");MODEL={};rows.forEach(r=>{MODEL[r.id]=r;});$("ratingCard").hidden=false;}
-  catch(e){MODEL=null;state.mode="fpl";}
+  try{const rows=await fetchCsv("fixture_model.csv");MODEL={};rows.forEach(r=>{MODEL[r.id]=r;});$("ratingCard").hidden=false;document.querySelectorAll(".modelonly").forEach(el=>{el.hidden=false;});}
+  catch(e){MODEL=null;state.mode="fpl";if(state.sort==="xg"||state.sort==="cs")state.sort="easy";}
 
   TEAMS={};teams.forEach(t=>{TEAMS[t.id]=[t.short_name,t.name];});
   const ids=Object.keys(TEAMS);
@@ -343,6 +353,8 @@ seg("venue","venue","v");seg("sort","sort","s");seg("mode","mode","m");
 $("showScores").checked=state.scores;$("hideOut").checked=state.hideOut;
 $("showScores").addEventListener("change",e=>{state.scores=e.target.checked;save();render();});
 $("hideOut").addEventListener("change",e=>{state.hideOut=e.target.checked;save();render();});
+$("showModel").checked=state.showModel;
+$("showModel").addEventListener("change",e=>{state.showModel=e.target.checked;save();render();});
 
 function inScope(fx,gw){return gw>=state.from&&gw<=state.to&&(state.venue==="all"||fx.venue===state.venue);}
 
@@ -353,19 +365,26 @@ function render(){
   document.querySelectorAll("#mode button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.m===state.mode)));
   const gws=[];for(let g=1;g<=MAX_GW;g++){if(!state.hideOut||(g>=state.from&&g<=state.to))gws.push(g);}
   const rows=Object.keys(TEAMS).map(id=>{
-    let sum=0,n=0,easy=0;
-    for(let g=state.from;g<=state.to;g++)for(const fx of BY_TEAM[id][g]){const d=diffOf(fx);if(inScope(fx,g)&&d!==null){sum+=d;n++;if(d<=2)easy++;}}
-    return{id,avg:n?sum/n:null,n,easy};
+    let sum=0,n=0,easy=0,xg=0,cs=0;
+    for(let g=state.from;g<=state.to;g++)for(const fx of BY_TEAM[id][g]){
+      if(!inScope(fx,g))continue;
+      if(fx.m){xg+=fx.m.xgf||0;cs+=fx.m.cs||0;}
+      const d=diffOf(fx);if(d!==null){sum+=d;n++;if(d<=2)easy++;}
+    }
+    return{id,avg:n?sum/n:null,n,easy,xg,cs};
   });
   const name=id=>TEAMS[id][1];
   const cmp={
     easy:(a,b)=>(a.avg??99)-(b.avg??99)||b.easy-a.easy||name(a.id).localeCompare(name(b.id)),
     hard:(a,b)=>(b.avg??-1)-(a.avg??-1)||a.easy-b.easy||name(a.id).localeCompare(name(b.id)),
+    xg:(a,b)=>b.xg-a.xg||name(a.id).localeCompare(name(b.id)),
+    cs:(a,b)=>b.cs-a.cs||name(a.id).localeCompare(name(b.id)),
     az:(a,b)=>name(a.id).localeCompare(name(b.id))
   }[state.sort];
   rows.sort(cmp);
 
   let h=`<th class="rank">#</th><th class="team">Team</th><th class="stat">Avg</th><th class="stat">Easy</th>`;
+  if(MODEL)h+=`<th class="stat" title="Expected goals for, summed over the range">xG</th><th class="stat" title="Expected clean sheets over the range">CS</th>`;
   for(const g of gws){const on=g>=state.from&&g<=state.to;h+=`<th style="${on?"color:var(--ink)":""}">GW${g}</th>`;}
   $("head").innerHTML=h;
 
@@ -377,6 +396,7 @@ function render(){
     out+=`<tr><td class="rank">${state.sort==="az"?"":i+1}</td><td class="team">${nm}<small>${short} · ${r.n} fixture${r.n===1?"":"s"}</small></td>`;
     out+=`<td class="stat"><span class="avg">${avgTxt}</span><span class="bar" title="Easier →"><i style="width:${pct}%"></i></span></td>`;
     out+=`<td class="stat"><span class="easy">${r.easy}</span></td>`;
+    if(MODEL)out+=`<td class="stat"><span class="xstat">${r.xg.toFixed(1)}</span></td><td class="stat"><span class="xstat">${r.cs.toFixed(1)}</span></td>`;
     for(const g of gws){
       const list=BY_TEAM[r.id][g];
       out+=`<td class="cell"><div class="fx">`;
@@ -390,7 +410,11 @@ function render(){
         let tip=`${nm} ${fx.venue==="H"?"vs":"at"} ${oName} · FPL ${fx.diff??"?"}`;
         if(fx.m){tip+=` · model: attack ${fx.m.att} / defence ${fx.m.def} · xG for ${fx.m.xgf?.toFixed(2)} · against ${fx.m.xga?.toFixed(2)} · CS ${Math.round((fx.m.cs||0)*100)}%`;}
         if(fx.score)tip+=` · ${fx.score}`;
-        out+=`<div class="chip ${cls}${list.length>1?" multi":""}" title="${tip}">${oShort}<span class="ha">${fx.venue}</span>${showScore?`<span class="sc">${fx.score}</span>`:""}</div>`;
+        const xp=state.showModel&&fx.m&&!fx.score&&fx.m.xgf!=null;
+        const top=`${oShort}<span class="ha">${fx.venue}</span>${showScore?`<span class="sc">${fx.score}</span>`:""}`;
+        out+=xp
+          ?`<div class="chip xp ${cls}${list.length>1?" multi":""}" title="${tip}"><span class="top">${top}</span><span class="xv">${fx.m.xgf.toFixed(1)} · ${Math.round((fx.m.cs||0)*100)}%</span></div>`
+          :`<div class="chip ${cls}${list.length>1?" multi":""}" title="${tip}">${top}</div>`;
       }
       out+=`</div></td>`;
     }
