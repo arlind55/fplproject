@@ -109,6 +109,13 @@ footer a{color:inherit}
 .loadmsg{margin-top:10px;font-size:13px;color:var(--ink-2)}
 .loadmsg.err{color:var(--err)}
 .loadmsg .btn{margin-top:8px}
+.loadmsg .err-t{color:var(--err)}
+.loadmsg .steps{margin:8px 0;padding-left:20px}
+.loadmsg .steps li{margin:3px 0}
+.loadmsg .steps a{color:var(--accent);font-weight:600}
+.loadmsg textarea{width:100%;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:8px 10px;font:500 13px "IBM Plex Mono",monospace;color:var(--ink);resize:vertical}
+.loadmsg textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.pasteerr{color:var(--err);font-size:12px;min-height:0;margin-top:4px}
 #app[hidden]{display:none}
 /* summary */
 .teamhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
@@ -392,35 +399,39 @@ const signed=(v,d=1)=>(v>0?"+":"")+fmt(v,d);
 //      team endpoints. Set the URL here once it's deployed; it's the reliable route.
 //   2. Public CORS proxies, as a fallback. They're free and sometimes slow or down.
 // If every route fails the page offers to start from the model squad, which you can then edit with Swap.
-const FPL_PROXY="";   // e.g. "https://fpl-proxy.<account>.workers.dev"
+const FPL_PROXY="https://workerfpl-proxyjs.arlind-krasniqi-09.workers.dev";   // worker/fpl-proxy.js, deployed on Cloudflare
 const FPL="https://fantasy.premierleague.com";
 const ROUTES=[
   ...(FPL_PROXY?[{name:"fplvalue proxy",url:p=>FPL_PROXY.replace(/\/$/,"")+p}]:[]),
   {name:"corsproxy.io",url:p=>`https://corsproxy.io/?url=${encodeURIComponent(FPL+p)}`},
   {name:"allorigins",url:p=>`https://api.allorigins.win/raw?url=${encodeURIComponent(FPL+p)}`},
+  {name:"allorigins (wrapped)",url:p=>`https://api.allorigins.win/get?url=${encodeURIComponent(FPL+p)}`,unwrap:j=>JSON.parse(j.contents)},
   {name:"codetabs",url:p=>`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(FPL+p)}`},
 ];
-let routeFirst=0;   // the route that last worked is tried first
 class NotFound extends Error{}
+class BadSquad extends Error{}
+// All routes are tried at once and the first good answer wins, so one slow relay doesn't hold up the rest.
+async function viaRoute(route,path){
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),15000);
+  try{
+    const r=await fetch(route.url(path),{signal:ctl.signal});
+    const text=await r.text();
+    if(r.status===404)throw new NotFound("not found");
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    if(/game is being updated/i.test(text))throw new Error("FPL is updating the game");
+    let j=JSON.parse(text);
+    if(route.unwrap)j=route.unwrap(j);
+    if(j&&j.detail&&/not found/i.test(j.detail))throw new NotFound("not found");
+    if(!j||typeof j!=="object")throw new Error("empty reply");
+    return j;
+  }catch(e){throw ctl.signal.aborted?new Error("timed out"):e;}
+  finally{clearTimeout(t);}
+}
 async function fplGet(path){
-  const order=[...ROUTES.keys()].sort((a,b)=>(a===routeFirst?-1:0)-(b===routeFirst?-1:0));
-  let notFound=false,lastErr=null;
-  for(const i of order){
-    const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),9000);
-    try{
-      const r=await fetch(ROUTES[i].url(path),{signal:ctl.signal});
-      const text=await r.text();
-      if(r.status===404){notFound=true;continue;}
-      if(!r.ok)throw new Error(`HTTP ${r.status}`);
-      if(/game is being updated/i.test(text))throw new Error("FPL is updating the game");
-      const j=JSON.parse(text);
-      if(j&&j.detail&&/not found/i.test(j.detail)){notFound=true;continue;}
-      routeFirst=i;return j;
-    }catch(e){lastErr=e;}
-    finally{clearTimeout(t);}
-  }
-  if(notFound)throw new NotFound("not found");
-  throw lastErr||new Error("no route");
+  try{return await Promise.any(ROUTES.map(r=>viaRoute(r,path)));}
+  catch(e){const errs=e.errors||[e];
+    if(errs.some(x=>x instanceof NotFound)&&errs.every(x=>x instanceof NotFound||/timed out|HTTP 5/.test(x.message)))throw new NotFound("not found");
+    throw new Error("no relay answered");}
 }
 
 // ── Model data ───────────────────────────────────────────────────────────────
@@ -451,6 +462,7 @@ async function loadModel(){
   D.byPos={GKP:[],DEF:[],MID:[],FWD:[]};
   Object.values(D.P).forEach(p=>D.byPos[p.pos]?.push(p));
   for(const k in D.byPos)D.byPos[k].sort((a,b)=>b.n10-a.n10);
+  D.curGw=+(events.find(e=>truthy(e.is_current))?.id||meta?.current_event||0);
   setStatus("ok",describeData(events,meta,fx));
 }
 const oppOf=(p,g)=>D.opp[p.team]?.[g]||null;
@@ -517,26 +529,45 @@ async function loadTeam(id){
     // A Free Hit squad reverts at the next deadline, so project the squad from the week before
     if(picks.active_chip==="freehit"&&gw>1){fh=true;fromGw=gw-1;picks=await fplGet(`/api/entry/${id}/event/${fromGw}/picks/`);}
     let hist=null;try{hist=await fplGet(`/api/entry/${id}/history/`);}catch(e){}
-    const ids=picks.picks.map(p=>p.element);
-    const missing=ids.filter(x=>!D.P[x]);
-    if(missing.length)throw new Error(`${missing.length} of your players aren't in the projections file yet`);
-    Object.assign(T,{id,entry,picksGw:gw,fh,manual:false,history:hist,
-      orig:ids,bank0:(picks.entry_history?.bank??entry.last_deadline_bank??0)/10,
-      lastXI:picks.picks.filter(p=>p.position<=11).map(p=>p.element),
-      lastCap:picks.picks.find(p=>p.is_captain)?.element??null,chip:picks.active_chip||null,ft:estimateFT(hist)});
-    T.squad=loadEdits()||[...T.orig];
-    msg.textContent="";
-    try{localStorage.setItem("fpl-team-id",String(id));}catch(e){}
-    try{window.history.replaceState(null,"",`?id=${id}`);}catch(e){}
-    renderAll();
+    usePicks(id,picks,gw,{entry,fh,hist});
   }catch(e){
     if(e instanceof NotFound){msg.className="loadmsg err";msg.textContent=`No FPL team with ID ${id}. Check the number in your Points page address.`;return;}
-    msg.className="loadmsg err";
-    msg.innerHTML=`Couldn't reach FPL just now (${esc(e.message)}). FPL blocks direct requests from other websites, so this page goes through a relay, and it may be down or FPL may be updating.
-      <br><button class="btn" id="retryBtn" type="button">Try again</button> <button class="btn" id="manualBtn" type="button">Start from the model squad and edit it</button>`;
-    $("retryBtn").onclick=()=>loadTeam(id);
-    $("manualBtn").onclick=()=>startManual(id);
+    if(e instanceof BadSquad){msg.className="loadmsg err";msg.textContent=e.message;return;}
+    showPaste(id);
   }
+}
+function usePicks(id,picks,gw,{entry=null,fh=false,hist=null}={}){
+  const ids=(picks.picks||[]).map(p=>p.element);
+  if(ids.length!==15)throw new BadSquad("That doesn't look like an FPL picks page");
+  const missing=ids.filter(x=>!D.P[x]);
+  if(missing.length)throw new BadSquad(`${missing.length} of your players aren't in the projections file yet`);
+  Object.assign(T,{id,entry,picksGw:gw,fh,manual:false,history:hist,
+    orig:ids,bank0:(picks.entry_history?.bank??entry?.last_deadline_bank??0)/10,
+    lastXI:picks.picks.filter(p=>p.position<=11).map(p=>p.element),
+    lastCap:picks.picks.find(p=>p.is_captain)?.element??null,chip:picks.active_chip||null,ft:estimateFT(hist)});
+  T.squad=loadEdits()||[...T.orig];
+  $("loadMsg").className="loadmsg";$("loadMsg").innerHTML=entry?"":`Loaded from the pasted page. Team name, rank and free transfers need the live connection.`;
+  try{localStorage.setItem("fpl-team-id",String(id));}catch(e){}
+  try{window.history.replaceState(null,"",`?id=${id}`);}catch(e){}
+  renderAll();
+}
+// When no relay answers: open FPL's own page for the squad in a new tab, copy it, paste it here.
+// That request comes from the visitor's browser straight to FPL, so it works whatever the relays are doing.
+function showPaste(id){
+  const gw=D.curGw||1,url=`${FPL}/api/entry/${id}/event/${gw}/picks/`;
+  const msg=$("loadMsg");msg.className="loadmsg";
+  msg.innerHTML=`<b class="err-t">Couldn't connect to FPL automatically</b> (the free relays this page uses didn't answer). You can still load your team in three steps:
+    <ol class="steps"><li><a href="${url}" target="_blank" rel="noopener">Open your GW${gw} squad on FPL ↗</a></li><li>Select all the text on that page and copy it</li><li>Paste it here</li></ol>
+    <textarea id="pasteBox" rows="3" placeholder='Paste here: it starts with {"active_chip"…' aria-label="Pasted FPL squad"></textarea>
+    <div class="pasteerr" id="pasteErr"></div>
+    <button class="btn" id="retryBtn" type="button">Try connecting again</button> <button class="btn" id="manualBtn" type="button">Start from the model squad instead</button>`;
+  $("pasteBox").addEventListener("input",e=>{
+    const t=e.target.value.trim();if(!t)return;
+    try{const a=t.indexOf("{"),b=t.lastIndexOf("}");usePicks(id,JSON.parse(t.slice(a,b+1)),gw);}
+    catch(err){$("pasteErr").textContent=`That didn't work: ${err.message}. Copy the whole page, including the first { and the last }.`;}
+  });
+  $("retryBtn").onclick=()=>loadTeam(id);
+  $("manualBtn").onclick=()=>startManual(id);
 }
 function startManual(id){
   if(D.model.length!==15){$("loadMsg").textContent="The model squad isn't available either. Try again later.";return;}
@@ -561,8 +592,8 @@ function renderAll(){
 
 function renderHeader(){
   const e=T.entry;
-  $("tName").textContent=e?e.name:"Model squad";
-  $("tSub").textContent=e?`${e.player_first_name} ${e.player_last_name} · ID ${T.id} · squad as of the GW${T.fh?T.picksGw-1:T.picksGw} deadline${T.fh?" (your GW"+T.picksGw+" Free Hit reverts)":""}`:"Starting point to edit · not loaded from FPL";
+  $("tName").textContent=e?e.name:T.manual?"Model squad":`Team ${T.id}`;
+  $("tSub").textContent=!e&&!T.manual?`Squad as of the GW${T.picksGw} deadline · pasted from FPL`:e?`${e.player_first_name} ${e.player_last_name} · ID ${T.id} · squad as of the GW${T.fh?T.picksGw-1:T.picksGw} deadline${T.fh?" (your GW"+T.picksGw+" Free Hit reverts)":""}`:"Starting point to edit · not loaded from FPL";
   const f=[];
   if(e?.summary_overall_rank)f.push(`Overall rank <b>${e.summary_overall_rank.toLocaleString()}</b>`);
   if(e?.summary_event_points!=null)f.push(`GW${T.picksGw} <b>${e.summary_event_points} pts</b>`);
