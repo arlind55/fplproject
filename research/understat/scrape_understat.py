@@ -16,6 +16,7 @@ missing, and the script then flattens everything into CSVs under ``data/``:
     team_matches.csv   one row per team per match: xG, npxG, PPDA, deep passes, xPts
     players.csv        one row per player per season: goals, xG, assists, xA, xGChain...
     shots.csv          one row per shot (only with --shots; about 4,500 requests)
+    appearances.csv    one row per player per match: started, minutes, xG, npxG, xA... (with --shots)
 
 Standard library only. Usage:
 
@@ -201,6 +202,46 @@ def flatten_shots(season, shots):
     return rows
 
 
+def flatten_appearances(season, match, md):
+    """Per player per match, from the match page's line-ups. Starters have a real position;
+    substitutes are listed as "Sub" and their `time` is the minutes they actually played."""
+    pens = {}
+    for side in ("h", "a"):
+        for s in md.get("shots", {}).get(side, []):
+            if s.get("situation") == "Penalty":
+                pens[s["player_id"]] = pens.get(s["player_id"], 0.0) + float(s["xG"])
+    rows = []
+    for side, team_key in (("h", "home"), ("a", "away")):
+        for r in md.get("rosters", {}).get(side, {}).values():
+            xg = float(r.get("xG") or 0)
+            rows.append({
+                "season": season_label(season),
+                "match_id": match["match_id"],
+                "date": match["datetime"],
+                "team_id": match[f"{team_key}_id"],
+                "team": match[team_key],
+                "h_a": side,
+                "player_id": num(r["player_id"]),
+                "player": r["player"],
+                "position": r["position"],
+                "started": int(r["position"] != "Sub"),
+                "minutes": num(r.get("time")),
+                "goals": num(r.get("goals")),
+                "own_goals": num(r.get("own_goals")),
+                "shots": num(r.get("shots")),
+                "xG": xg,
+                "npxG": max(xg - pens.get(r["player_id"], 0.0), 0.0),
+                "assists": num(r.get("assists")),
+                "xA": num(r.get("xA")),
+                "key_passes": num(r.get("key_passes")),
+                "xGChain": num(r.get("xGChain")),
+                "xGBuildup": num(r.get("xGBuildup")),
+                "yellow_card": num(r.get("yellow_card")),
+                "red_card": num(r.get("red_card")),
+            })
+    return rows
+
+
 def write_csv(path, rows):
     if not rows:
         return
@@ -223,7 +264,7 @@ def main():
     latest = current_season()
     client = Client(args.out / "raw", args.delay)
 
-    matches, team_matches, players, shots = [], [], [], []
+    matches, team_matches, players, shots, appearances = [], [], [], [], []
     for season in seasons:
         # The season in progress changes week to week, so always refetch it.
         data = client.json(f"/getLeagueData/{LEAGUE}/{season}",
@@ -243,6 +284,7 @@ def main():
                     print(f"  match {m['match_id']}: HTTP {err.code}, skipped", file=sys.stderr)
                     continue
                 shots += flatten_shots(season, md.get("shots", {}))
+                appearances += flatten_appearances(season, m, md)
                 if i % 50 == 0:
                     print(f"  shots: {i}/{len(played)} matches")
 
@@ -252,6 +294,7 @@ def main():
     write_csv(args.out / "players.csv", players)
     if args.shots:
         write_csv(args.out / "shots.csv", shots)
+        write_csv(args.out / "appearances.csv", appearances)
 
 
 if __name__ == "__main__":

@@ -9,9 +9,12 @@ Standalone research kit, separate from the FPL value site.
 python scrape_understat.py            # ~12 requests, a few seconds
 python scrape_understat.py --shots    # + every shot, ~4,500 requests, ~75 min at 1 req/s
 python analyse_xg.py
+python player_strength.py           # needs --shots data
 ```
 
-Outputs: `matches.csv`, `team_matches.csv` (xG, npxG, PPDA, deep passes, xPts per team per match), `players.csv` (per player per season), `shots.csv` (with `--shots`).
+Outputs: `matches.csv`, `team_matches.csv` (xG, npxG, PPDA, deep passes, xPts per team per match), `players.csv` (per player per season), `shots.csv` and `appearances.csv` (per player per match: started, minutes, xG, npxG, xA, xGChain; both with `--shots`).
+
+`player_strength.py` rates each team per match as the sum of its starting XI's npxG and xA per 90 (from all earlier PL appearances, decayed and shrunk towards a new-player prior) and compares that with team xG form on the same hold-out seasons, overall and in matches with big line-up changes. Writes `data/player_strength.md`.
 
 Notes
 - Understat has no official API. These endpoints are what the site's own pages call, and the community libraries (soccerdata, understatapi) use them too. They can change without notice. Keep requests slow (default 1 s apart) and use the data for personal research.
