@@ -162,7 +162,7 @@ index_body = f"""
 <div class="article with-side">{sidebar(posts)}
 <article class="prose wide">
 <h2>Value Blog</h2>
-<p class="lede">Short, data-led pieces built from the numbers on the dashboard and planner: a weekly value report, template checks and fixture swings ahead of the breaks.</p>
+<p class="lede">Short, data-led pieces built from the numbers on the dashboard and planner: a deadline brief before every gameweek, plus value reports, template checks and fixture swings.</p>
 <div class="posts">{cards}
 </div>
 </article>
