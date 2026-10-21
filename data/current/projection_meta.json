@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20T21:32:18Z",
+  "generated_at": "2026-10-21T20:40:21Z",
   "gws": [
     8,
     9,
@@ -20,16 +20,18 @@
     "lam": 0.5,
     "decay": 0.7,
     "n_recent": 6,
-    "goal_cal": 0.94,
+    "goal_cal": 0.93,
+    "pen_conv": 0.8,
+    "k_pens": 20.0,
     "assist_cal": 1.38,
     "cs_cal": 1.0,
     "horizon": 5
   },
   "squad": {
-    "cost": 99.9,
+    "cost": 100.0,
     "budget": 100.0,
-    "xi_value": 213.5,
-    "xi_next_gw": 59.3,
+    "xi_value": 215.7,
+    "xi_next_gw": 59.6,
     "extra_transfers": 0
   },
   "backtest": {
@@ -38,11 +40,11 @@
       "regulars": {
         "model": {
           "weeks": 34.0,
-          "mae": 2.16,
-          "rmse": 2.945,
-          "bias": 0.033,
-          "spearman": 0.36,
-          "top20_actual": 4.609
+          "mae": 2.158,
+          "rmse": 2.944,
+          "bias": 0.027,
+          "spearman": 0.361,
+          "top20_actual": 4.644
         },
         "ppm": {
           "weeks": 34.0,
@@ -72,11 +74,11 @@
       "vs_fpl": {
         "model": {
           "weeks": 7.0,
-          "mae": 2.006,
-          "rmse": 2.812,
-          "bias": 0.035,
-          "spearman": 0.478,
-          "top20_actual": 5.371
+          "mae": 2.004,
+          "rmse": 2.811,
+          "bias": 0.031,
+          "spearman": 0.476,
+          "top20_actual": 5.457
         },
         "ep_next": {
           "weeks": 7.0,
@@ -101,11 +103,11 @@
       "regulars": {
         "model": {
           "weeks": 6.0,
-          "mae": 2.2,
+          "mae": 2.202,
           "rmse": 3.011,
-          "bias": -0.147,
+          "bias": -0.144,
           "spearman": 0.36,
-          "top20_actual": 4.925
+          "top20_actual": 5.0
         },
         "ppm": {
           "weeks": 6.0,
@@ -135,11 +137,11 @@
       "vs_fpl": {
         "model": {
           "weeks": 6.0,
-          "mae": 2.2,
+          "mae": 2.202,
           "rmse": 3.011,
-          "bias": -0.147,
+          "bias": -0.144,
           "spearman": 0.36,
-          "top20_actual": 4.925
+          "top20_actual": 5.0
         },
         "ep_next": {
           "weeks": 6.0,
