@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-21T20:40:21Z",
+  "generated_at": "2026-10-21T21:24:26Z",
   "gws": [
     8,
     9,
@@ -28,10 +28,10 @@
     "horizon": 5
   },
   "squad": {
-    "cost": 100.0,
+    "cost": 99.8,
     "budget": 100.0,
-    "xi_value": 215.7,
-    "xi_next_gw": 59.6,
+    "xi_value": 217.7,
+    "xi_next_gw": 58.8,
     "extra_transfers": 0
   },
   "backtest": {
@@ -40,11 +40,11 @@
       "regulars": {
         "model": {
           "weeks": 34.0,
-          "mae": 2.158,
-          "rmse": 2.944,
-          "bias": 0.027,
-          "spearman": 0.361,
-          "top20_actual": 4.644
+          "mae": 2.153,
+          "rmse": 2.94,
+          "bias": 0.022,
+          "spearman": 0.365,
+          "top20_actual": 4.707
         },
         "ppm": {
           "weeks": 34.0,
@@ -74,11 +74,11 @@
       "vs_fpl": {
         "model": {
           "weeks": 7.0,
-          "mae": 2.004,
-          "rmse": 2.811,
-          "bias": 0.031,
-          "spearman": 0.476,
-          "top20_actual": 5.457
+          "mae": 2.0,
+          "rmse": 2.812,
+          "bias": 0.014,
+          "spearman": 0.481,
+          "top20_actual": 5.229
         },
         "ep_next": {
           "weeks": 7.0,
@@ -103,11 +103,11 @@
       "regulars": {
         "model": {
           "weeks": 6.0,
-          "mae": 2.202,
-          "rmse": 3.011,
-          "bias": -0.144,
-          "spearman": 0.36,
-          "top20_actual": 5.0
+          "mae": 2.215,
+          "rmse": 3.006,
+          "bias": -0.077,
+          "spearman": 0.365,
+          "top20_actual": 4.908
         },
         "ppm": {
           "weeks": 6.0,
@@ -137,11 +137,11 @@
       "vs_fpl": {
         "model": {
           "weeks": 6.0,
-          "mae": 2.202,
-          "rmse": 3.011,
-          "bias": -0.144,
-          "spearman": 0.36,
-          "top20_actual": 5.0
+          "mae": 2.215,
+          "rmse": 3.006,
+          "bias": -0.077,
+          "spearman": 0.365,
+          "top20_actual": 4.908
         },
         "ep_next": {
           "weeks": 6.0,

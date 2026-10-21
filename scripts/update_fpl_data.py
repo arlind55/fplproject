@@ -217,15 +217,15 @@ def main() -> None:
     save_csv(player_future_fixtures_df, 'player_future_fixtures.csv')
 
     # xG-based team strength + model fixture difficulty (see fplvalue/team_model.py).
-    # Last season's final ratings are the prior, so early-season numbers aren't all pulled to average.
-    team_prior = None
+    # Last season's matches carry over with a recency weight, so early-season numbers aren't all pulled to average.
+    team_prev = None
     try:
         from fplvalue.load import load, last_season
-        from fplvalue.project import team_prior_from
-        team_prior = team_prior_from(last_season(load(CURRENT_DIR)), teams_df)
+        from fplvalue.project import last_season_matches
+        team_prev = last_season_matches(last_season(load(CURRENT_DIR)))
     except Exception:
         traceback.print_exc()
-    team_ratings_df, fixture_model_df = build_team_model(player_history_df, players_df, fixtures_df, teams_df, prior=team_prior)
+    team_ratings_df, fixture_model_df = build_team_model(player_history_df, players_df, fixtures_df, teams_df, prev=team_prev)
     save_csv(team_ratings_df, 'team_ratings.csv')
     save_csv(fixture_model_df, 'fixture_model.csv')
 
