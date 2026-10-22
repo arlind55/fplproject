@@ -99,20 +99,42 @@ footer a{color:inherit}
 .brief{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;margin:6px 0 30px;align-items:start}
 .brief h2{font-size:clamp(46px,6.2vw,80px);line-height:.94;margin:10px 0 14px;text-wrap:balance}
 .brief .sub{font-size:16px;line-height:1.5;color:var(--ink-2);margin:0;max-width:62ch}
-.captain{display:block;width:100%;text-align:left;border:0;font:inherit;background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:20px 22px;cursor:pointer;box-shadow:var(--shadow)}
+.captain{background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:20px 22px;box-shadow:var(--shadow)}
 .captain .kicker{color:inherit;opacity:.75}
-.captain .who{font-size:46px;line-height:1;margin:10px 0 4px}
-.captain .fx{font-size:14px;opacity:.8}
-.captain .nums{display:flex;gap:26px;margin-top:16px}
-.captain .nums div{font-size:12px;opacity:.85}
-.captain .nums b{display:block;font:700 28px/1.05 "Barlow Condensed","Arial Narrow",sans-serif;opacity:1}
+.cap{display:block;width:100%;text-align:left;border:0;background:none;color:inherit;font:inherit;cursor:pointer;padding:0}
+.cap .who{font-size:46px;line-height:1;margin:10px 0 4px}
+.cap .fx{font-size:14px;opacity:.8}
+.cap .nums{display:flex;gap:26px;margin-top:14px}
+.cap .nums div{font-size:12px;opacity:.85}
+.cap .nums b{display:block;font:700 28px/1.05 "Barlow Condensed","Arial Narrow",sans-serif;opacity:1}
+.why-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.why-chips span{font-size:12px;padding:3px 8px;border-radius:999px;background:color-mix(in srgb,currentColor 14%,transparent)}
+.cap-alts{margin-top:16px;border-top:1px solid color-mix(in srgb,currentColor 25%,transparent)}
+.cap.alt{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:4px 10px;align-items:baseline;padding:10px 0 2px}
+.cap.alt .n{font:600 12px "IBM Plex Mono",monospace;opacity:.7}
+.cap.alt .nm{font:700 22px/1.1 "Barlow Condensed","Arial Narrow",sans-serif}
+.cap.alt .nm small{font:400 13px "IBM Plex Sans",sans-serif;opacity:.8;margin-left:6px}
+.cap.alt .pts{font:700 22px/1 "Barlow Condensed","Arial Narrow",sans-serif}
+.cap.alt .why-chips{grid-column:2/-1;margin-top:2px}
 .sec{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:0 0 12px}
 .sec h2{font-size:34px;line-height:1;margin:0;text-transform:uppercase}
 .sec p{margin:0;color:var(--ink-3);font:500 12px "IBM Plex Mono",monospace}
 .sec a{color:var(--accent)}
-.buys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:30px}
-.buy{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:inherit;cursor:pointer;padding:16px 18px}
-.buy:hover{border-color:var(--line-strong)}
+.buys{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;margin-bottom:30px}
+.buy{grid-column:span 2;display:flex;flex-direction:column;gap:4px;padding:16px 18px}
+.buy.wide{grid-column:span 3}
+.buy .head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.buy .pickbtn{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.buy .pickbtn:hover .who{color:var(--accent)}
+.own-seg{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.own-seg button{background:var(--surface);border:0;color:var(--ink-3);font:600 11px "IBM Plex Mono",monospace;padding:2px 7px;cursor:pointer}
+.own-seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.alts{list-style:none;margin:10px 0 0;padding:8px 0 0;border-top:1px solid var(--line)}
+.alts li button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:100%;align-items:baseline;background:none;border:0;padding:5px 0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.alts li button:hover .an{color:var(--accent)}
+.alts .an{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alts .an small{font-weight:400;color:var(--ink-3);margin-left:6px;font-size:12px}
+.alts .av{font:600 13px "IBM Plex Mono",monospace;color:var(--ink-2)}
 .buy .top{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--ink-3);font-size:13px}
 .buy .why{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:2px}
 .buy .who{font-size:30px;line-height:1.05;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -121,6 +143,7 @@ footer a{color:inherit}
 .buy .stat span{font-size:13px;color:var(--ink-3)}
 .buy .m{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3);margin-top:4px}
 .buy.warn .stat b{color:var(--warn)}
+.buy.cold .stat b{color:var(--def)}
 .runs{margin-bottom:30px;padding:18px 20px}
 .run{display:grid;grid-template-columns:190px 56px minmax(0,1fr);gap:12px;align-items:center;padding:7px 0}
 .run .t{font-weight:600}
@@ -135,9 +158,9 @@ footer a{color:inherit}
 .more-charts summary{cursor:pointer;color:var(--accent);font-weight:500;font-size:13px;padding:4px 0 12px;list-style:none}
 .more-charts summary::-webkit-details-marker{display:none}
 .more-charts summary::before{content:"+ "}.more-charts[open] summary::before{content:"− "}
-@media (max-width:1000px){.brief{grid-template-columns:1fr}.buys{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1000px){.brief{grid-template-columns:1fr}.buys{grid-template-columns:repeat(2,minmax(0,1fr))}.buy,.buy.wide{grid-column:auto}}
 @media (max-width:640px){.buys{display:grid;grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:80%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-right:-16px;padding-right:16px}
-  .buys::-webkit-scrollbar{display:none}.buy{scroll-snap-align:start}
+  .buys::-webkit-scrollbar{display:none}.buy,.buy.wide{scroll-snap-align:start;grid-column:auto}
   .run{grid-template-columns:1fr auto;}.run .chips{grid-column:1/-1}.captain .who{font-size:38px}}
 .window{display:grid;grid-template-columns:auto minmax(220px,1fr) auto auto;gap:12px;align-items:end;margin-bottom:16px}
 @media (max-width:1000px){.window{grid-template-columns:1fr 1fr}}
@@ -254,12 +277,10 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
     <h2 class="disp" id="briefTitle">Points per pound, every gameweek.</h2>
     <p class="sub">Your shortlist for the deadline: the best value in the game, the captain call and the fixture runs worth moving for. Click any player to compare them in the screener.</p>
   </div>
-  <button class="captain" id="captain" type="button" aria-label="Captain pick: add to the screener">
-    <div class="kicker" id="capKicker">Captain pick</div>
-    <div class="who disp" id="capName">—</div>
-    <div class="fx" id="capFx">Loading projections…</div>
-    <div class="nums"><div>Projected<b id="capProj">—</b></div><div>Haul chance<b id="capHaul">—</b></div><div>Blank risk<b id="capBlank">—</b></div></div>
-  </button>
+  <div class="captain" id="captain">
+    <div class="kicker" id="capKicker">Captain picks</div>
+    <div id="capList"><div class="fx">Loading projections…</div></div>
+  </div>
 </section>
 
 <div class="sec"><h2 class="disp">Best buys</h2><p id="buysNote">Season to date · 90+ mins · available</p></div>
@@ -568,34 +589,63 @@ function detailRow(p){
 // Season-to-date numbers, independent of the explore window, so the briefing reads the same for everyone
 function renderBriefing(events,caps,fixtures){
   const next=events.find(e=>truthy(e.is_next)),gw=next?+next.id:null;
-  if(gw){$("briefKicker").textContent=`GW${gw} briefing`;$("capKicker").textContent=`Captain pick · GW${gw}`;}
-  // Captain: top of captains.csv by projected points for the next gameweek
-  const cap=[...caps].filter(c=>num(c.next_gw)!=null).sort((a,b)=>num(b.next_gw)-num(a.next_gw))[0];
-  if(cap){$("capName").textContent=cap.web_name;$("capFx").textContent=`${cap.team_short_name} v ${cap.next_opp} · ${price(num(cap.price))}`;
-    $("capProj").textContent=fmt(num(cap.next_gw));$("capHaul").textContent=`${Math.round(num(cap.haul_prob)*100)}%`;$("capBlank").textContent=`${Math.round(num(cap.blank_prob)*100)}%`;
-    $("captain").onclick=()=>pickAndShow(String(cap.id));}
-  else $("capFx").textContent="Projections not available yet";
-  // Best buys: four different reasons, no player twice
-  const all=Math.min(...state.gws),last=Math.max(...state.gws);
-  const season=state.players.map(p=>aggregate(p,all,last,"all")).filter(p=>p.mins>=90&&p.price&&(p.status==="a"||(p.status==="d"&&(p.chance??0)>=75)));
-  const used=new Set(),best=(rows,score)=>{const r=rows.filter(p=>!used.has(p.id)&&score(p)!=null&&Number.isFinite(score(p))).sort((a,b)=>score(b)-score(a))[0];if(r)used.add(r.id);return r;};
-  const cards=[
-    {why:"Best value",p:best(season,p=>p.vapm),stat:p=>fmt(p.vapm,2),lab:"value per £m",m:p=>`${fmt(p.ppg)} ppg · ${fmt(p.own)}% owned`},
-    {why:"Under 10% owned",p:best(season.filter(p=>(p.own??100)<10),p=>p.vapm),stat:p=>fmt(p.vapm,2),lab:"value per £m",m:p=>`${fmt(p.ppg)} ppg · ${fmt(p.own)}% owned`},
-    {why:"Projected value, next 5",p:best(season.filter(p=>p.proj5!=null),p=>p.proj5/p.price),stat:p=>fmt(p.proj5/p.price,2),lab:"projected pts per £m",m:p=>`${fmt(p.proj5)} pts projected · ${fmt(p.own)}% owned`},
-    {why:"Running hot: sell-high watch",warn:true,p:best(season,p=>p.delta),stat:p=>signed(p.delta),lab:"points over xPts",m:p=>`${p.pts} pts from ${fmt(p.xpts)} xPts`},
-  ].filter(c=>c.p);
-  $("buysNote").textContent=`GW${all}–${last} · 90+ mins · available`;
-  $("buys").innerHTML=cards.map(c=>{const p=c.p;return `<button type="button" class="card buy${c.warn?" warn":""}" data-pick="${esc(p.id)}">
-    <div class="top"><span class="pos ${p.pos}">${p.pos}</span><span>${esc(p.team)} · ${price(p.price)}</span></div>
-    <div class="why">${c.why}</div><div class="who disp">${esc(p.name)}</div>
-    <div class="stat"><b>${c.stat(p)}</b><span>${c.lab}</span></div><div class="m">${c.m(p)}</div></button>`;}).join("");
+  if(gw){$("briefKicker").textContent=`GW${gw} briefing`;$("capKicker").textContent=`Captain picks · GW${gw}`;}
+  renderCaptains(caps,fixtures,gw);
+  BRIEF.season=null;renderBuys();
   // Fixture runs: easiest average FPL difficulty over the next five gameweeks
   const runs=fixtureRuns(fixtures,gw,5).slice(0,3);
   $("runsNote").textContent=gw?`GW${gw}–${gw+4} · FPL difficulty`:"FPL difficulty";
   $("runs").innerHTML=runs.length?runs.map(r=>`<div class="run"><div class="t">${esc(r.name)}<small>${r.easy} easy of ${r.fx.length}</small></div><div class="avg">${r.avg.toFixed(2)}</div>
     <div class="chips">${r.fx.map(f=>`<div class="chip-fx d${f.d}">${esc(f.opp)} ${f.v}<small>GW${f.gw}</small></div>`).join("")}</div></div>`).join(""):`<div class="note">Fixtures not available yet.</div>`;
 }
+// Captain: top three of captains.csv by projected points, each with the reasons behind it
+function renderCaptains(caps,fixtures,gw){
+  const top=[...caps].filter(c=>num(c.next_gw)!=null).sort((a,b)=>num(b.next_gw)-num(a.next_gw)).slice(0,3);
+  if(!top.length){$("capList").innerHTML='<div class="fx">Projections not available yet</div>';return;}
+  const byId=Object.fromEntries(state.players.map(p=>[p.id,p]));
+  const diffOf=c=>{const pl=byId[String(c.id)];if(!fixtures||!gw||!pl)return null;const tid=Object.keys(state.teams).find(t=>state.teams[t].short===pl.team);
+    const f=fixtures.find(f=>num(f.event)===gw&&(f.team_h===tid||f.team_a===tid));return f?num(f.team_h===tid?f.team_h_difficulty:f.team_a_difficulty):null;};
+  const reasons=c=>{const pl=byId[String(c.id)]||{},out=[],d=diffOf(c),home=/\(H\)/.test(c.next_opp||"");
+    const opp=String(c.next_opp||"").replace(/\s*\([HA]\)/,"");
+    if(d!=null&&d<=2)out.push(`Easy fixture: ${opp} ${home?"at home":"away"}`);else if(home)out.push(`At home to ${opp}`);
+    const h=(state.hist[pl.id]||[]).filter(r=>r.mins>0).slice(-3);if(h.length===3){const f=h.reduce((s,r)=>s+r.pts,0)/3;if(f>=6)out.push(`In form: ${f.toFixed(1)} pts a game, last 3`);}
+    if(pl.pens===1)out.push("On penalties");
+    if(pl.xgi90>=0.6)out.push(`${pl.xgi90.toFixed(2)} xGI per 90`);
+    const haul=num(c.haul_prob);if(out.length<2&&haul!=null)out.push(`${Math.round(haul*100)}% haul chance`);
+    return out.slice(0,3);};
+  const chips=c=>`<div class="why-chips">${reasons(c).map(r=>`<span>${esc(r)}</span>`).join("")}</div>`;
+  const [c1,...alts]=top;
+  $("capList").innerHTML=`<button type="button" class="cap" data-pick="${esc(c1.id)}" aria-label="Add ${esc(c1.web_name)} to the screener">
+      <div class="who disp">${esc(c1.web_name)}</div><div class="fx">${esc(c1.team_short_name)} v ${esc(c1.next_opp)} · ${price(num(c1.price))}</div>
+      <div class="nums"><div>Projected<b>${fmt(num(c1.next_gw),2)}</b></div><div>Haul chance<b>${Math.round(num(c1.haul_prob)*100)}%</b></div><div>Blank risk<b>${Math.round(num(c1.blank_prob)*100)}%</b></div></div>${chips(c1)}</button>
+    <div class="cap-alts">${alts.map((c,i)=>`<button type="button" class="cap alt" data-pick="${esc(c.id)}"><span class="n">#${i+2}</span>
+      <span class="nm">${esc(c.web_name)}<small>v ${esc(c.next_opp)}</small></span><span class="pts">${fmt(num(c.next_gw),2)}</span>${chips(c)}</button>`).join("")}</div>`;
+}
+// Best buys: five lenses on season-to-date numbers (270+ mins, so one big game is not a sample), a top pick and two alternatives each
+const BRIEF={own:10,season:null};
+function renderBuys(){
+  const all=Math.min(...state.gws),last=Math.max(...state.gws);
+  BRIEF.season=BRIEF.season||state.players.map(p=>aggregate(p,all,last,"all")).filter(p=>p.mins>=270&&p.price&&(p.status==="a"||(p.status==="d"&&(p.chance??0)>=75)));
+  const season=BRIEF.season;
+  const top3=(rows,score)=>rows.filter(p=>score(p)!=null&&Number.isFinite(score(p))).sort((a,b)=>score(b)-score(a)).slice(0,3);
+  const ppgOwn=p=>`${fmt(p.ppg)} ppg · ${fmt(p.own)}% owned`;
+  const cards=[
+    {why:"Best value",ps:top3(season,p=>p.vapm),stat:p=>fmt(p.vapm,2),lab:"value per £m",m:ppgOwn},
+    {why:`Under ${BRIEF.own}% owned`,own:true,ps:top3(season.filter(p=>(p.own??100)<BRIEF.own),p=>p.vapm),stat:p=>fmt(p.vapm,2),lab:"value per £m",m:ppgOwn},
+    {why:"Projected value, next 5",ps:top3(season.filter(p=>p.proj5!=null),p=>p.proj5/p.price),stat:p=>fmt(p.proj5/p.price,2),lab:"projected pts per £m",m:p=>`${fmt(p.proj5)} pts projected · ${fmt(p.own)}% owned`},
+    {why:"Running hot: sell-high watch",cls:"warn wide",ps:top3(season,p=>p.delta),stat:p=>signed(p.delta),lab:"points over xPts",m:p=>`${p.pts} pts from ${fmt(p.xpts)} xPts`},
+    {why:"Due a return: scoring below xPts",cls:"cold wide",ps:top3(season.filter(p=>p.xpts>=15),p=>-p.delta),stat:p=>signed(p.delta),lab:"points vs xPts",m:p=>`${p.pts} pts from ${fmt(p.xpts)} xPts`},
+  ];
+  $("buysNote").textContent=`GW${all}–${last} · 270+ mins · available · click a player to compare`;
+  $("buys").innerHTML=cards.map(c=>{const [p,...alts]=c.ps;
+    const head=`<div class="head"><div class="why">${c.why}</div>${c.own?`<div class="own-seg" role="group" aria-label="Ownership cut-off">${[10,1].map(v=>`<button type="button" data-own="${v}" aria-pressed="${BRIEF.own===v}">&lt;${v}%</button>`).join("")}</div>`:""}</div>`;
+    if(!p)return `<div class="card buy ${c.cls||""}">${head}<div class="note">No players qualify yet.</div></div>`;
+    return `<div class="card buy ${c.cls||""}">${head}
+    <button type="button" class="pickbtn" data-pick="${esc(p.id)}"><div class="top"><span class="pos ${p.pos}">${p.pos}</span><span>${esc(p.team)} · ${price(p.price)}</span></div>
+    <div class="who disp">${esc(p.name)}</div><div class="stat"><b>${c.stat(p)}</b><span>${c.lab}</span></div><div class="m">${c.m(p)}</div></button>
+    <ol class="alts">${alts.map(a=>`<li><button type="button" data-pick="${esc(a.id)}"><span class="an">${esc(a.name)}<small>${esc(a.team)} · ${a.pos} · ${price(a.price)}</small></span><span class="av">${c.stat(a)}</span></button></li>`).join("")}</ol></div>`;}).join("");
+}
+$("captain").addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(b)pickAndShow(b.dataset.pick);});
 function fixtureRuns(fixtures,gw,n){
   if(!fixtures||!gw)return[];
   const by={};
@@ -605,7 +655,8 @@ function fixtureRuns(fixtures,gw,n){
     .filter(r=>r.fx.length>=n-1).sort((a,b)=>a.avg-b.avg||b.easy-a.easy);
 }
 function pickAndShow(id){if(!state.picked.includes(id)){state.picked.push(id);save();renderPlayers();}$("players").scrollIntoView({behavior:"smooth",block:"start"});}
-$("buys").addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(b)pickAndShow(b.dataset.pick);});
+$("buys").addEventListener("click",e=>{const o=e.target.closest("[data-own]");if(o){BRIEF.own=+o.dataset.own;renderBuys();return;}
+  const b=e.target.closest("[data-pick]");if(b)pickAndShow(b.dataset.pick);});
 
 // ── Charts ───────────────────────────────────────────────────────────────────
 function tok(){const s=getComputedStyle(document.documentElement),g=k=>s.getPropertyValue(k).trim();return{ink:g("--ink"),muted:g("--ink-3"),accent:g("--accent"),line:g("--line"),surface:g("--surface"),GKP:g("--gkp"),DEF:g("--def"),MID:g("--mid"),FWD:g("--fwd"),gold:g("--warn")};}
@@ -650,7 +701,7 @@ function bindFilters(){
   try{
     const [players,history,teams,events,meta,proj,fx,caps]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("events.csv"),fetchMeta(),fetchCsv("projections.csv").catch(()=>[]),fetchCsv("fixtures_lite.csv").catch(()=>null),fetchCsv("captains.csv").catch(()=>[])]);
     teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
-    const PJ={};proj.forEach(r=>{PJ[r.id]={proj5:num(r.next_n),projNext:num(r.next_gw)};});
+    const PJ={};proj.forEach(r=>{PJ[r.id]={proj5:num(r.next_n),projNext:num(r.next_gw),pens:num(r.penalties_order),xgi90:(num(r.xg90)||0)+(num(r.xa90)||0)};});
     state.players=players.map(shapePlayer).filter(p=>p.name).map(p=>Object.assign(p,PJ[p.id]||{proj5:null,projNext:null}));
     const gws=new Set();history.forEach(h=>{const r=shapeHist(h);if(!r.gw)return;gws.add(r.gw);(state.hist[h.player_id]=state.hist[h.player_id]||[]).push(r);});
     state.gws=gws.size?[...gws].sort((a,b)=>a-b):[1];
