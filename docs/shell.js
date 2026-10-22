@@ -23,7 +23,7 @@ function describeData(events,meta,fixtures){
   let gw=`<b>GW${lastDone}</b> complete`;
   if(cur&&!truthy(cur.finished)&&+cur.id>lastDone){
     const p=fixtures?gwProgress(fixtures)[+cur.id]:null;
-    gw=p&&p.played>=p.total?`<b>GW${cur.id}</b> played · awaiting FPL confirmation`:`<b>GW${cur.id}</b> in progress${p?` (${p.played}/${p.total} played)`:""}`;
+    gw=p&&p.played>=p.total?`<b>GW${cur.id}</b> played <span title="All fixtures played; FPL confirms bonus points and marks the gameweek finished">(confirming)</span>`:`<b>GW${cur.id}</b> in progress${p?` (${p.played}/${p.total} played)`:""}`;
   }
   return `Updated ${when?`<b>${when}</b>`:"<b>—</b>"} · ${gw} · GW${next?next.id:"?"} next`;
 }

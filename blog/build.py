@@ -102,7 +102,7 @@ def page(meta, body, posts, active="Value Blog"):
 <body>
 <div class="wrap">
 <header class="topbar">
-  <div class="brand"><div><h1><a href="../index.html" style="color:inherit;text-decoration:none">FPL Value</a></h1><small>Premier League 2026/27</small></div></div>
+  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><h1><a href="../index.html" style="color:inherit;text-decoration:none">FPL Value</a></h1><small>Premier League 2026/27</small></div></div>
   <nav class="tabs" aria-label="Pages">{tabs(active)}</nav>
   <div class="right">
     <span class="status"><i style="background:var(--accent)"></i><span>{html.escape(meta.get('kicker', 'Value Blog'))}</span></span>

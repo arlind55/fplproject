@@ -62,9 +62,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .brand{display:flex;align-items:center;gap:14px}
 .brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
 .brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+/* Wordmark: £ mark + uppercase name, same brand colours in light and dark */
+.brand{display:flex;align-items:center;gap:10px}.brand h1{text-transform:uppercase;letter-spacing:.01em}
+.brand .mark{flex:none;width:36px;height:36px;border-radius:8px;background:#2f3fa8;color:#ffd60a;display:grid;place-items:center;font:700 23px/1 "Barlow Condensed","Arial Narrow",sans-serif}
 .tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tabs a{padding:7px 14px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
+.tabs a{padding:7px 12px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
 .tabs a:hover{color:var(--ink)}
 .tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
 .right{display:flex;align-items:center;gap:10px}
@@ -90,9 +93,52 @@ footer a{color:inherit}
 @media (max-width:700px){.topbar>.tabs{margin-right:0}.right{gap:8px}.status{white-space:normal;min-width:0;flex:1 1 auto}}
 
 /* ── Dashboard ──────────────────────────────────────────────────────────────── */
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
-.kpi .v{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:28px;line-height:1.05;margin:4px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi .m{color:var(--ink-3);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ── Gameweek briefing: the answer first (captain, best buys, fixture runs), the tools below ── */
+.disp{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;letter-spacing:-.005em}
+.kicker{font:600 12px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.brief{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;margin:6px 0 30px;align-items:start}
+.brief h2{font-size:clamp(46px,6.2vw,80px);line-height:.94;margin:10px 0 14px;text-wrap:balance}
+.brief .sub{font-size:16px;line-height:1.5;color:var(--ink-2);margin:0;max-width:62ch}
+.captain{display:block;width:100%;text-align:left;border:0;font:inherit;background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:20px 22px;cursor:pointer;box-shadow:var(--shadow)}
+.captain .kicker{color:inherit;opacity:.75}
+.captain .who{font-size:46px;line-height:1;margin:10px 0 4px}
+.captain .fx{font-size:14px;opacity:.8}
+.captain .nums{display:flex;gap:26px;margin-top:16px}
+.captain .nums div{font-size:12px;opacity:.85}
+.captain .nums b{display:block;font:700 28px/1.05 "Barlow Condensed","Arial Narrow",sans-serif;opacity:1}
+.sec{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:0 0 12px}
+.sec h2{font-size:34px;line-height:1;margin:0;text-transform:uppercase}
+.sec p{margin:0;color:var(--ink-3);font:500 12px "IBM Plex Mono",monospace}
+.sec a{color:var(--accent)}
+.buys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:30px}
+.buy{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:inherit;cursor:pointer;padding:16px 18px}
+.buy:hover{border-color:var(--line-strong)}
+.buy .top{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--ink-3);font-size:13px}
+.buy .why{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:2px}
+.buy .who{font-size:30px;line-height:1.05;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.buy .stat{display:flex;align-items:baseline;gap:8px;margin-top:2px}
+.buy .stat b{font:700 40px/1 "Barlow Condensed","Arial Narrow",sans-serif;color:var(--accent)}
+.buy .stat span{font-size:13px;color:var(--ink-3)}
+.buy .m{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3);margin-top:4px}
+.buy.warn .stat b{color:var(--warn)}
+.runs{margin-bottom:30px;padding:18px 20px}
+.run{display:grid;grid-template-columns:190px 56px minmax(0,1fr);gap:12px;align-items:center;padding:7px 0}
+.run .t{font-weight:600}
+.run .t small{display:block;font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3)}
+.run .avg{font:600 15px "IBM Plex Mono",monospace}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip-fx{flex:1 0 84px;max-width:160px;padding:8px 10px;border-radius:6px;text-align:center;font:600 12px "IBM Plex Mono",monospace}
+.chip-fx small{display:block;font-size:10px;font-weight:500;opacity:.75;margin-top:1px}
+.chip-fx.d1{background:var(--d1);color:var(--d1-ink)}.chip-fx.d2{background:var(--d2);color:var(--d2-ink)}.chip-fx.d3{background:var(--d3);color:var(--d3-ink)}.chip-fx.d4{background:var(--d4);color:var(--d4-ink)}.chip-fx.d5{background:var(--d5);color:var(--d5-ink)}
+.more-charts{margin-bottom:16px}
+.more-charts summary{cursor:pointer;color:var(--accent);font-weight:500;font-size:13px;padding:4px 0 12px;list-style:none}
+.more-charts summary::-webkit-details-marker{display:none}
+.more-charts summary::before{content:"+ "}.more-charts[open] summary::before{content:"− "}
+@media (max-width:1000px){.brief{grid-template-columns:1fr}.buys{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.buys{display:grid;grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:80%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-right:-16px;padding-right:16px}
+  .buys::-webkit-scrollbar{display:none}.buy{scroll-snap-align:start}
+  .run{grid-template-columns:1fr auto;}.run .chips{grid-column:1/-1}.captain .who{font-size:38px}}
 .window{display:grid;grid-template-columns:auto minmax(220px,1fr) auto auto;gap:12px;align-items:end;margin-bottom:16px}
 @media (max-width:1000px){.window{grid-template-columns:1fr 1fr}}
 @media (max-width:640px){.window{grid-template-columns:1fr}}
@@ -118,7 +164,7 @@ footer a{color:inherit}
 .count{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3)}
 .filters{display:grid;grid-template-columns:minmax(180px,1.4fr) repeat(4,minmax(110px,.8fr)) auto auto;gap:10px;margin-bottom:12px;align-items:end}
 @media (max-width:1100px){.filters{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:640px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis,.charts{grid-template-columns:1fr}}
+@media (max-width:640px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.charts{grid-template-columns:1fr}}
 @media (max-width:1100px){.filters .picker{grid-column:1/-1}}
 /* Player picker: type to filter, pick several to compare just those players */
 .picker{position:relative}
@@ -184,7 +230,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
 <body>
 <div class="wrap">
 <header class="topbar">
-  <div class="brand"><div><h1>FPL Value</h1><small>Premier League 2026/27</small></div></div>
+  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><h1>FPL Value</h1><small>Premier League 2026/27</small></div></div>
   <nav class="tabs" aria-label="Pages">
     <a href="./index.html" aria-current="page">Dashboard</a>
     <a href="./planner.html">Fixture planner</a>
@@ -200,7 +246,30 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
   </div>
 </header>
 
-<!-- Window controls: every metric below (KPIs, charts, screener) is computed over this window -->
+
+<!-- Gameweek briefing: season-to-date picks and next-gameweek projections; doesn't follow the explore controls below -->
+<section class="brief">
+  <div>
+    <div class="kicker" id="briefKicker">Gameweek briefing</div>
+    <h2 class="disp" id="briefTitle">Points per pound, every gameweek.</h2>
+    <p class="sub">Your shortlist for the deadline: the best value in the game, the captain call and the fixture runs worth moving for. Click any player to compare them in the screener.</p>
+  </div>
+  <button class="captain" id="captain" type="button" aria-label="Captain pick: add to the screener">
+    <div class="kicker" id="capKicker">Captain pick</div>
+    <div class="who disp" id="capName">—</div>
+    <div class="fx" id="capFx">Loading projections…</div>
+    <div class="nums"><div>Projected<b id="capProj">—</b></div><div>Haul chance<b id="capHaul">—</b></div><div>Blank risk<b id="capBlank">—</b></div></div>
+  </button>
+</section>
+
+<div class="sec"><h2 class="disp">Best buys</h2><p id="buysNote">Season to date · 90+ mins · available</p></div>
+<section class="buys" id="buys"><div class="card buy"><div class="why">Loading…</div></div></section>
+
+<div class="sec"><h2 class="disp">Fixture runs</h2><p><span id="runsNote">Next 5 gameweeks · FPL difficulty</span> · <a href="./planner.html">Planner →</a></p></div>
+<section class="card runs" id="runs"><div class="note">Loading fixtures…</div></section>
+
+<div class="sec"><h2 class="disp">Explore</h2><p>Every chart and the screener below follow this window</p></div>
+<!-- Window controls: the charts and screener below are computed over this window -->
 <section class="window">
   <div class="card">
     <div class="label">Window</div>
@@ -230,13 +299,6 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
   </div>
 </section>
 
-<section class="kpis">
-  <div class="card kpi"><div class="label">Top points per game <span id="kpiWin1"></span></div><div class="v" id="kpiTopPpg">—</div><div class="m" id="kpiTopPpgMeta">—</div></div>
-  <div class="card kpi"><div class="label">Top VAPM <span>90+ mins</span></div><div class="v" id="kpiTopVapm">—</div><div class="m" id="kpiTopVapmMeta">—</div></div>
-  <div class="card kpi"><div class="label">Most over expected <span>pts − xPts</span></div><div class="v" id="kpiOver">—</div><div class="m" id="kpiOverMeta">—</div></div>
-  <div class="card kpi"><div class="label">Easiest next five <a href="./planner.html" style="color:var(--accent);text-transform:none;letter-spacing:0;font-weight:500">Planner →</a></div><div class="v" id="kpiBestFixtures">—</div><div class="m" id="kpiBestFixturesMeta">—</div></div>
-</section>
-
 <section class="charts">
   <div class="card">
     <div class="chart-head"><h3>Value map</h3><div class="seg" id="valueMode" role="group"><button data-m="xgi" aria-pressed="true">xGI/90 vs price</button><button data-m="vapm" aria-pressed="false">VAPM vs price</button></div></div>
@@ -247,6 +309,9 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
     <div class="chart-head"><h3>Points vs expected</h3><p>Top 15 by points in window · xPts from xG, xA, xGC</p></div>
     <div class="chart-wrap"><canvas id="xpChart"></canvas></div>
   </div>
+</section>
+<details class="more-charts"><summary>More charts: points per game leaders, ownership vs points</summary>
+<section class="charts">
   <div class="card">
     <div class="chart-head"><h3>Points per game leaders</h3><p>Top 10 in window · 90+ mins · coloured by position</p></div>
     <div class="chart-wrap"><canvas id="formChart"></canvas></div>
@@ -256,6 +321,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
     <div class="chart-wrap"><canvas id="ownChart"></canvas></div>
   </div>
 </section>
+</details>
 
 <section class="card" id="players">
   <div class="screener-head">
@@ -302,7 +368,7 @@ async function fetchMeta(){try{const r=await fetch(`${BASE}/meta.json`,{cache:"n
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 const charts={};
-const state={players:[],hist:{},teams:{},teamDifficulty:[],events:[],future:null,filtered:[],rows:[],
+const state={players:[],hist:{},teams:{},events:[],future:null,filtered:[],rows:[],
   gws:[1],from:1,to:1,preset:"season",venue:"all",basis:"total",valueMode:"xgi",sort:{key:"ppg",dir:"desc"},open:null,picked:[]};
 try{const s=JSON.parse(localStorage.getItem("fpl-dash")||"null");if(s&&typeof s==="object")Object.assign(state,s);}catch(e){}
 if(!Array.isArray(state.picked))state.picked=[];
@@ -353,8 +419,8 @@ function shapeHist(h){
     bonus:n0(h.bonus),xg:n0(h.expected_goals),xa:n0(h.expected_assists),xgi:n0(h.expected_goal_involvements),xgc:n0(h.expected_goals_conceded),ict:n0(h.ict_index),defcon:n0(h.defensive_contribution),bps:n0(h.bps)};
 }
 // Aggregate a player's history over the active window / venue
-function aggregate(p){
-  const rows=(state.hist[p.id]||[]).filter(h=>h.gw>=state.from&&h.gw<=state.to&&(state.venue==="all"||(state.venue==="H")===h.home));
+function aggregate(p,from=state.from,to=state.to,venue=state.venue){
+  const rows=(state.hist[p.id]||[]).filter(h=>h.gw>=from&&h.gw<=to&&(venue==="all"||(venue==="H")===h.home));
   const a={games:0,mins:0,pts:0,goals:0,assists:0,cs:0,gc:0,bonus:0,xg:0,xa:0,xgi:0,xgc:0,ict:0,defcon:0,xpts:0,gwsPlayed:0};
   for(const h of rows){if(h.mins>0){a.games++;}a.gwsPlayed++;for(const k of ["mins","pts","goals","assists","cs","gc","bonus","xg","xa","xgi","xgc","ict","defcon"])a[k]+=h[k];a.xpts+=xPtsRow(h,p.pos);}
   a.ppg=a.games?a.pts/a.games:null;
@@ -368,7 +434,7 @@ function aggregate(p){
 function per(pl,v){if(state.basis==="p90")return pl.mins?v/pl.mins*90:null;if(state.basis==="game")return pl.games?v/pl.games:null;return v;}
 const p90=(pl,v)=>pl.mins?v/pl.mins*90:null;
 const vapm=pl=>state.basis==="p90"?pl.vapm90:pl.vapm;
-function recompute(){state.rows=state.players.map(aggregate);}
+function recompute(){state.rows=state.players.map(p=>aggregate(p));}
 
 // ── Window controls ──────────────────────────────────────────────────────────
 const fromEl=$("gwFrom"),toEl=$("gwTo");
@@ -383,14 +449,13 @@ function applyPreset(){
   $("gwOut").textContent=windowLabel()+(custom?"":` · ${state.preset==="season"?"season":"last "+state.preset}`);
   const pct=v=>max===min?0:((v-min)/(max-min)*100);
   $("fill").style.left=pct(state.from)+"%";$("fill").style.right=(100-pct(state.to))+"%";
-  $("kpiWin1").textContent=windowLabel();
   document.querySelectorAll("#preset button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.w===state.preset)));
 }
 function onRange(src){let f=+fromEl.value,t=+toEl.value;if(f>t){if(src==="from")t=f;else f=t;}state.from=f;state.to=t;applyPreset();refresh();}
 fromEl.addEventListener("input",()=>onRange("from"));toEl.addEventListener("input",()=>onRange("to"));
 function seg(id,key,attr,after){document.querySelectorAll(`#${id} button`).forEach(b=>{b.setAttribute("aria-pressed",String(b.dataset[attr]===state[key]));
   b.addEventListener("click",()=>{state[key]=b.dataset[attr];document.querySelectorAll(`#${id} button`).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));after();});});}
-function refresh(){save();recompute();updateKPIs();buildCharts();renderPlayers();}
+function refresh(){save();recompute();buildCharts();renderPlayers();}
 seg("preset","preset","w",()=>{applyPreset();refresh();});
 seg("venue","venue","v",refresh);
 seg("basis","basis","b",()=>{save();renderPlayers();});
@@ -499,18 +564,48 @@ function detailRow(p){
     </div></div></td></tr>`;
 }
 
-// ── KPIs ─────────────────────────────────────────────────────────────────────
-function updateKPIs(){
-  const R=state.rows,set=(id,v)=>$(id).textContent=v;
-  const ppg=[...R].filter(p=>p.mins>=90).sort((a,b)=>(b.ppg??-1)-(a.ppg??-1))[0];
-  const vp=[...R].filter(p=>p.mins>=90&&p.vapm!=null).sort((a,b)=>b.vapm-a.vapm)[0];
-  const ov=[...R].filter(p=>p.delta!=null).sort((a,b)=>b.delta-a.delta)[0];
-  const easy=[...state.teamDifficulty].sort((a,b)=>(num(a.avg_difficulty_next_5)??999)-(num(b.avg_difficulty_next_5)??999))[0];
-  set("kpiTopPpg",ppg?.name||"—");set("kpiTopPpgMeta",ppg?`${ppg.team} · ${ppg.pos} · ${fmt(ppg.ppg)} ppg · ${price(ppg.price)}`:"—");
-  set("kpiTopVapm",vp?.name||"—");set("kpiTopVapmMeta",vp?`${vp.team} · ${fmt(vp.vapm,2)} · ${fmt(vp.ppg)} ppg at ${price(vp.price)}`:"—");
-  set("kpiOver",ov?.name||"—");set("kpiOverMeta",ov?`${ov.team} · ${ov.pts} pts vs ${fmt(ov.xpts)} xPts (${signed(ov.delta)})`:"—");
-  set("kpiBestFixtures",easy?(easy.team_name||easy.team_short_name):"—");set("kpiBestFixturesMeta",easy?`Avg ${fmt(num(easy.avg_difficulty_next_5),2)} · ${easy.opponents_next_5||""}`:"—");
+// ── Gameweek briefing ────────────────────────────────────────────────────────
+// Season-to-date numbers, independent of the explore window, so the briefing reads the same for everyone
+function renderBriefing(events,caps,fixtures){
+  const next=events.find(e=>truthy(e.is_next)),gw=next?+next.id:null;
+  if(gw){$("briefKicker").textContent=`GW${gw} briefing`;$("capKicker").textContent=`Captain pick · GW${gw}`;}
+  // Captain: top of captains.csv by projected points for the next gameweek
+  const cap=[...caps].filter(c=>num(c.next_gw)!=null).sort((a,b)=>num(b.next_gw)-num(a.next_gw))[0];
+  if(cap){$("capName").textContent=cap.web_name;$("capFx").textContent=`${cap.team_short_name} v ${cap.next_opp} · ${price(num(cap.price))}`;
+    $("capProj").textContent=fmt(num(cap.next_gw));$("capHaul").textContent=`${Math.round(num(cap.haul_prob)*100)}%`;$("capBlank").textContent=`${Math.round(num(cap.blank_prob)*100)}%`;
+    $("captain").onclick=()=>pickAndShow(String(cap.id));}
+  else $("capFx").textContent="Projections not available yet";
+  // Best buys: four different reasons, no player twice
+  const all=Math.min(...state.gws),last=Math.max(...state.gws);
+  const season=state.players.map(p=>aggregate(p,all,last,"all")).filter(p=>p.mins>=90&&p.price&&(p.status==="a"||(p.status==="d"&&(p.chance??0)>=75)));
+  const used=new Set(),best=(rows,score)=>{const r=rows.filter(p=>!used.has(p.id)&&score(p)!=null&&Number.isFinite(score(p))).sort((a,b)=>score(b)-score(a))[0];if(r)used.add(r.id);return r;};
+  const cards=[
+    {why:"Best value",p:best(season,p=>p.vapm),stat:p=>fmt(p.vapm,2),lab:"value per £m",m:p=>`${fmt(p.ppg)} ppg · ${fmt(p.own)}% owned`},
+    {why:"Under 10% owned",p:best(season.filter(p=>(p.own??100)<10),p=>p.vapm),stat:p=>fmt(p.vapm,2),lab:"value per £m",m:p=>`${fmt(p.ppg)} ppg · ${fmt(p.own)}% owned`},
+    {why:"Projected value, next 5",p:best(season.filter(p=>p.proj5!=null),p=>p.proj5/p.price),stat:p=>fmt(p.proj5/p.price,2),lab:"projected pts per £m",m:p=>`${fmt(p.proj5)} pts projected · ${fmt(p.own)}% owned`},
+    {why:"Running hot: sell-high watch",warn:true,p:best(season,p=>p.delta),stat:p=>signed(p.delta),lab:"points over xPts",m:p=>`${p.pts} pts from ${fmt(p.xpts)} xPts`},
+  ].filter(c=>c.p);
+  $("buysNote").textContent=`GW${all}–${last} · 90+ mins · available`;
+  $("buys").innerHTML=cards.map(c=>{const p=c.p;return `<button type="button" class="card buy${c.warn?" warn":""}" data-pick="${esc(p.id)}">
+    <div class="top"><span class="pos ${p.pos}">${p.pos}</span><span>${esc(p.team)} · ${price(p.price)}</span></div>
+    <div class="why">${c.why}</div><div class="who disp">${esc(p.name)}</div>
+    <div class="stat"><b>${c.stat(p)}</b><span>${c.lab}</span></div><div class="m">${c.m(p)}</div></button>`;}).join("");
+  // Fixture runs: easiest average FPL difficulty over the next five gameweeks
+  const runs=fixtureRuns(fixtures,gw,5).slice(0,3);
+  $("runsNote").textContent=gw?`GW${gw}–${gw+4} · FPL difficulty`:"FPL difficulty";
+  $("runs").innerHTML=runs.length?runs.map(r=>`<div class="run"><div class="t">${esc(r.name)}<small>${r.easy} easy of ${r.fx.length}</small></div><div class="avg">${r.avg.toFixed(2)}</div>
+    <div class="chips">${r.fx.map(f=>`<div class="chip-fx d${f.d}">${esc(f.opp)} ${f.v}<small>GW${f.gw}</small></div>`).join("")}</div></div>`).join(""):`<div class="note">Fixtures not available yet.</div>`;
 }
+function fixtureRuns(fixtures,gw,n){
+  if(!fixtures||!gw)return[];
+  const by={};
+  for(const f of fixtures){const e=num(f.event);if(e==null||e<gw||e>=gw+n)continue;
+    for(const [t,o,v,d] of [[f.team_h,f.team_a,"H",f.team_h_difficulty],[f.team_a,f.team_h,"A",f.team_a_difficulty]])(by[t]=by[t]||[]).push({gw:e,opp:state.teams[o]?.short||"?",v,d:num(d)||3});}
+  return Object.entries(by).map(([t,fx])=>{fx.sort((a,b)=>a.gw-b.gw);return{name:state.teams[t]?.name||t,fx,avg:fx.reduce((s,f)=>s+f.d,0)/fx.length,easy:fx.filter(f=>f.d<=2).length};})
+    .filter(r=>r.fx.length>=n-1).sort((a,b)=>a.avg-b.avg||b.easy-a.easy);
+}
+function pickAndShow(id){if(!state.picked.includes(id)){state.picked.push(id);save();renderPlayers();}$("players").scrollIntoView({behavior:"smooth",block:"start"});}
+$("buys").addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(b)pickAndShow(b.dataset.pick);});
 
 // ── Charts ───────────────────────────────────────────────────────────────────
 function tok(){const s=getComputedStyle(document.documentElement),g=k=>s.getPropertyValue(k).trim();return{ink:g("--ink"),muted:g("--ink-3"),accent:g("--accent"),line:g("--line"),surface:g("--surface"),GKP:g("--gkp"),DEF:g("--def"),MID:g("--mid"),FWD:g("--fwd"),gold:g("--warn")};}
@@ -553,15 +648,16 @@ function bindFilters(){
 // ── Init ─────────────────────────────────────────────────────────────────────
 (async()=>{
   try{
-    const [players,history,teams,teamDifficulty,events,meta,proj,fx]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("team_fixture_difficulty.csv"),fetchCsv("events.csv"),fetchMeta(),fetchCsv("projections.csv").catch(()=>[]),fetchCsv("fixtures_lite.csv").catch(()=>null)]);
+    const [players,history,teams,events,meta,proj,fx,caps]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("events.csv"),fetchMeta(),fetchCsv("projections.csv").catch(()=>[]),fetchCsv("fixtures_lite.csv").catch(()=>null),fetchCsv("captains.csv").catch(()=>[])]);
     teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
     const PJ={};proj.forEach(r=>{PJ[r.id]={proj5:num(r.next_n),projNext:num(r.next_gw)};});
     state.players=players.map(shapePlayer).filter(p=>p.name).map(p=>Object.assign(p,PJ[p.id]||{proj5:null,projNext:null}));
     const gws=new Set();history.forEach(h=>{const r=shapeHist(h);if(!r.gw)return;gws.add(r.gw);(state.hist[h.player_id]=state.hist[h.player_id]||[]).push(r);});
     state.gws=gws.size?[...gws].sort((a,b)=>a-b):[1];
-    state.teamDifficulty=teamDifficulty;state.events=events;
+    state.events=events;
     fillSelect("position",["GKP","DEF","MID","FWD"]);fillSelect("team",[...new Set(state.players.map(p=>p.team))].filter(Boolean).sort());
     bindFilters();applyPreset();refresh();
+    renderBriefing(events,caps,fx);
     setStatus("ok",describeData(events,meta,fx));
   }catch(err){
     setStatus("err","Could not load repo data");
