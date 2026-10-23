@@ -9,6 +9,11 @@ on:
 permissions:
   contents: write
 
+# Shared with refresh-flags.yml so the two never commit data at the same time
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+
 jobs:
   refresh-data:
     runs-on: ubuntu-latest
