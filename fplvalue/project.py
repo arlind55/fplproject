@@ -375,6 +375,8 @@ def availability(state: State, gws: list[int]) -> pd.DataFrame:
             rec = np.where(status.isin(['i', 's']), 1 - 0.7 ** j, 1 - 0.5 ** j)
             a = c0 + (1 - c0) * rec
         known = back.notna()
+        if j == 0:      # FPL's own chance of playing next round wins for the next gameweek
+            known &= P['chance'].isna()
         a = a.where(~known, np.where(back <= dl[gw] + pd.Timedelta(days=1), np.maximum(a, 0.8), 0.0))
         a = a.where(~status.isin(['u', 'n']), 0.0)
         out[gw] = a

@@ -4,6 +4,7 @@ Python client for the data in `data/`, plus the projection model behind fplvalue
 
 ```bash
 pip install -r requirements.txt
+python scripts/refresh_flags.py                       # pull the latest injury flags / news / prices from FPL, then rebuild projections (also runs 4x a day in Actions)
 python -m fplvalue.publish                            # rebuild projections.csv, projections_long.csv (10 GWs, My team page), captains.csv, model_squad.csv
 python -m fplvalue.backtest                           # walk-forward backtest vs FPL ep_next, form, points/match
 python -m fplvalue.optimise                           # best £100m squad for the next 5 GWs
