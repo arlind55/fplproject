@@ -1,16 +1,16 @@
 id,web_name,team_short_name,pos,price,next_opp,next_gw,next_n,is_starter,is_captain
-1,Raya,ARS,GKP,6.1,EVE (H),4.42,20.87,True,False
-4,Gabriel,ARS,DEF,7.9,EVE (H),6.18,28.66,True,False
-115,De Cuyper,BHA,DEF,5.3,LIV (A),3.68,21.15,True,False
-566,Silva,BOU,DEF,5.0,MUN (A),3.61,20.78,True,False
-426,B.Fernandes,MUN,MID,11.8,BOU (H),6.24,30.28,True,True
-12,Saka,ARS,MID,9.6,EVE (H),6.21,29.25,True,False
-427,Mbeumo,MUN,MID,7.8,BOU (H),5.29,25.67,True,False
-68,Tavernier,BOU,MID,6.2,MUN (A),4.32,23.86,True,False
+1,Raya,ARS,GKP,6.1,EVE (H),4.43,20.88,True,False
+4,Gabriel,ARS,DEF,7.9,EVE (H),6.19,28.66,True,False
+8,Calafiori,ARS,DEF,6.0,EVE (H),5.22,23.97,True,False
+115,De Cuyper,BHA,DEF,5.3,LIV (A),3.68,21.14,True,False
+566,Silva,BOU,DEF,5.0,MUN (A),3.61,20.79,True,False
+426,B.Fernandes,MUN,MID,11.8,BOU (H),6.24,30.29,True,True
+427,Mbeumo,MUN,MID,7.9,BOU (H),5.3,25.72,True,False
+154,Palmer,CHE,MID,9.8,TOT (H),5.03,24.53,True,False
+68,Tavernier,BOU,MID,6.2,MUN (A),4.31,23.8,True,False
 124,Groß,BHA,MID,6.2,LIV (A),4.07,22.67,True,False
-346,Calvert-Lewin,LEE,FWD,6.0,SUN (A),4.29,21.69,True,False
 106,Thiago,BRE,FWD,7.8,HUL (A),4.27,21.47,True,False
-597,Suzuki,AVL,GKP,5.0,MCI (H),3.08,16.25,False,False
-588,Khalaili,CRY,DEF,5.0,NEW (H),4.04,20.03,False,False
-173,Thomas,COV,DEF,4.0,FUL (H),3.92,18.97,False,False
-569,Gonzalo,FUL,FWD,6.1,COV (A),3.98,20.0,False,False
+109,Verbruggen,BHA,GKP,4.6,LIV (A),3.01,15.94,False,False
+173,Thomas,COV,DEF,4.0,FUL (H),3.92,18.98,False,False
+249,Barry,EVE,FWD,5.7,ARS (A),3.04,18.96,False,False
+316,Emersonn,IPS,FWD,5.6,NFO (H),3.63,17.51,False,False

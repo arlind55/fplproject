@@ -7,7 +7,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 23,Fábio Vieira,Arsenal,ARS,3,5.5,0,0
 27,G.Jesus,Arsenal,ARS,4,5.9,0,-1
 4,Gabriel,Arsenal,ARS,2,7.9,0,-1
-25,Gyökeres,Arsenal,ARS,4,7.1,0,-4
+25,Gyökeres,Arsenal,ARS,4,7.0,-1,-5
 26,Havertz,Arsenal,ARS,4,7.5,0,0
 9,Hincapie,Arsenal,ARS,2,5.2,0,-3
 5,J.Timber,Arsenal,ARS,2,6.5,0,0
@@ -59,7 +59,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 48,Onana,Aston Villa,AVL,3,4.9,0,-1
 34,Pau,Aston Villa,AVL,2,4.4,0,-1
 606,Rowe,Aston Villa,AVL,2,4.0,0,0
-596,Ruggeri,Aston Villa,AVL,2,4.5,0,0
+596,Ruggeri,Aston Villa,AVL,2,4.4,-1,-1
 597,Suzuki,Aston Villa,AVL,1,5.0,0,0
 611,Wan-Bissaka,Aston Villa,AVL,2,4.5,0,0
 55,Watkins,Aston Villa,AVL,4,7.8,0,-2
@@ -187,7 +187,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 156,Neto,Chelsea,CHE,3,6.5,0,0
 662,Nicoll-Jazuli,Chelsea,CHE,3,4.5,0,0
 152,Palestra,Chelsea,CHE,2,5.3,0,-2
-154,Palmer,Chelsea,CHE,3,9.7,0,2
+154,Palmer,Chelsea,CHE,3,9.8,1,3
 560,Penders,Chelsea,CHE,1,4.4,0,-1
 164,Quenda,Chelsea,CHE,3,5.3,0,-2
 40,Rogers,Chelsea,CHE,3,8.0,1,5
@@ -244,7 +244,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 595,Gozo,Crystal Palace,CRY,3,4.9,0,-1
 42,Guessand,Crystal Palace,CRY,3,5.4,0,-1
 198,Henderson,Crystal Palace,CRY,1,4.9,0,-1
-212,Hughes,Crystal Palace,CRY,3,4.4,0,-1
+212,Hughes,Crystal Palace,CRY,3,4.3,-1,-2
 219,J.Rak-Sakyi,Crystal Palace,CRY,3,4.9,0,-1
 214,Kamada,Crystal Palace,CRY,3,5.0,0,0
 588,Khalaili,Crystal Palace,CRY,2,5.0,0,0
@@ -310,8 +310,8 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 251,Lecomte,Fulham,FUL,1,4.0,0,0
 250,Leno,Fulham,FUL,1,4.5,0,0
 252,McNally,Fulham,FUL,1,4.0,0,0
-271,Muniz,Fulham,FUL,4,5.4,0,-1
-570,Palacios,Fulham,FUL,3,5.4,0,-1
+271,Muniz,Fulham,FUL,4,5.3,-1,-2
+570,Palacios,Fulham,FUL,3,5.3,-1,-2
 270,Reed,Fulham,FUL,3,4.4,0,-1
 254,Robinson,Fulham,FUL,2,4.4,-1,-1
 269,Sessegnon,Fulham,FUL,2,4.3,0,-2
@@ -399,14 +399,14 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 321,Walle Egeli,Ipswich Town,IPS,4,4.5,0,0
 300,Walton,Ipswich Town,IPS,1,4.4,0,-1
 337,Aaronson,Leeds,LEE,3,5.3,0,-2
-338,Ampadu,Leeds,LEE,3,5.4,0,-1
+338,Ampadu,Leeds,LEE,3,5.3,-1,-2
 648,Bahoya,Leeds,LEE,3,4.9,0,-1
 641,Bard,Leeds,LEE,2,4.5,0,0
 327,Bijol,Leeds,LEE,2,5.0,0,0
 330,Bogle,Leeds,LEE,2,4.7,0,2
 333,Bornauw,Leeds,LEE,2,4.5,0,0
 625,Cairns,Leeds,LEE,1,4.0,0,0
-346,Calvert-Lewin,Leeds,LEE,4,6.0,0,0
+346,Calvert-Lewin,Leeds,LEE,4,6.1,1,1
 604,Cresswell,Leeds,LEE,3,4.5,0,0
 598,Elvedi,Leeds,LEE,2,4.5,0,0
 341,Gnonto,Leeds,LEE,3,5.0,0,0
@@ -419,7 +419,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 339,Longstaff,Leeds,LEE,3,4.8,0,-2
 349,Mateo Joseph,Leeds,LEE,4,4.5,0,0
 334,Muharemović,Leeds,LEE,2,5.0,0,0
-347,Nmecha,Leeds,LEE,4,5.4,0,-1
+347,Nmecha,Leeds,LEE,4,5.3,-1,-2
 336,Okafor,Leeds,LEE,3,5.8,0,-2
 326,Perri,Leeds,LEE,1,4.5,0,0
 348,Piroe,Leeds,LEE,4,5.0,0,0
@@ -440,13 +440,13 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 355,Davies,Liverpool,LIV,1,4.0,0,0
 380,Ekitiké,Liverpool,LIV,4,7.4,0,-1
 383,Elliott,Liverpool,LIV,3,5.4,0,-1
-374,Endo,Liverpool,LIV,3,4.9,0,-1
+374,Endo,Liverpool,LIV,3,4.8,-1,-2
 357,Frimpong,Liverpool,LIV,2,5.2,0,-3
 367,Gakpo,Liverpool,LIV,3,7.1,0,1
 359,Gomez,Liverpool,LIV,2,4.9,0,-1
 371,Gravenberch,Liverpool,LIV,3,5.8,0,-2
 379,Isak,Liverpool,LIV,4,9.0,0,0
-362,Jacquet,Liverpool,LIV,2,5.0,0,0
+362,Jacquet,Liverpool,LIV,2,5.1,1,1
 354,Jaros,Liverpool,LIV,1,4.0,0,0
 358,Kerkez,Liverpool,LIV,2,5.3,0,-2
 381,Koumas,Liverpool,LIV,3,5.0,0,0
@@ -518,11 +518,11 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 434,J.Fletcher,Man Utd,MUN,3,4.9,0,-1
 435,Lacey,Man Utd,MUN,3,4.9,0,-1
 412,Lammens,Man Utd,MUN,1,4.9,0,-1
-418,Maguire,Man Utd,MUN,2,4.8,0,-2
+418,Maguire,Man Utd,MUN,2,4.7,-1,-3
 432,Mainoo,Man Utd,MUN,3,5.5,0,0
 419,Martinez,Man Utd,MUN,2,4.9,0,-1
 422,Mazraoui,Man Utd,MUN,2,4.3,0,-2
-427,Mbeumo,Man Utd,MUN,3,7.8,0,-2
+427,Mbeumo,Man Utd,MUN,3,7.9,1,-1
 430,Mount,Man Utd,MUN,3,5.4,0,-1
 441,Obi,Man Utd,MUN,4,4.5,0,0
 429,Rashford,Man Utd,MUN,3,6.9,0,-1
@@ -575,7 +575,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 581,Diomande,Nott'm Forest,NFO,2,5.4,0,-1
 487,Dominguez,Nott'm Forest,NFO,3,4.8,0,-2
 480,Gibbs-White,Nott'm Forest,NFO,3,7.9,-1,-1
-482,Hudson-Odoi,Nott'm Forest,NFO,3,5.8,0,-2
+482,Hudson-Odoi,Nott'm Forest,NFO,3,5.7,-1,-3
 484,Hutchinson,Nott'm Forest,NFO,3,5.4,0,-1
 488,I.Sangaré,Nott'm Forest,NFO,3,4.8,0,-2
 491,Igor Jesus,Nott'm Forest,NFO,4,5.7,0,-3

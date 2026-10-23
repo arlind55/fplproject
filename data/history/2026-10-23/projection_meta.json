@@ -1,0 +1,177 @@
+{
+  "generated_at": "2026-10-23T16:52:04Z",
+  "gws": [
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "first_gw": 8,
+  "last_season_prior": "2026-07-20",
+  "params": {
+    "k_xg": 4.0,
+    "k_xa": 4.0,
+    "k_saves": 6.0,
+    "k_bonus": 8.0,
+    "k_cards": 10.0,
+    "k_defcon": 4.0,
+    "k_min": 0.5,
+    "lam": 0.5,
+    "decay": 0.7,
+    "n_recent": 6,
+    "goal_cal": 0.93,
+    "pen_conv": 0.8,
+    "k_pens": 20.0,
+    "assist_cal": 1.38,
+    "cs_cal": 1.0,
+    "horizon": 5
+  },
+  "squad": {
+    "cost": 99.9,
+    "budget": 100.0,
+    "xi_value": 215.9,
+    "xi_next_gw": 58.6,
+    "extra_transfers": 0
+  },
+  "long_gws": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ],
+  "backtest": {
+    "last_season": {
+      "label": "2025/26",
+      "regulars": {
+        "model": {
+          "weeks": 34.0,
+          "mae": 2.153,
+          "rmse": 2.94,
+          "bias": 0.022,
+          "spearman": 0.365,
+          "top20_actual": 4.707
+        },
+        "ppm": {
+          "weeks": 34.0,
+          "mae": 2.268,
+          "rmse": 3.099,
+          "bias": 0.028,
+          "spearman": 0.257,
+          "top20_actual": 4.231
+        },
+        "form": {
+          "weeks": 34.0,
+          "mae": 2.438,
+          "rmse": 3.275,
+          "bias": 0.357,
+          "spearman": 0.253,
+          "top20_actual": 3.881
+        },
+        "ep_next": {
+          "weeks": 7.0,
+          "mae": 2.278,
+          "rmse": 3.194,
+          "bias": 0.222,
+          "spearman": 0.384,
+          "top20_actual": 4.707
+        }
+      },
+      "vs_fpl": {
+        "model": {
+          "weeks": 7.0,
+          "mae": 2.0,
+          "rmse": 2.812,
+          "bias": 0.014,
+          "spearman": 0.481,
+          "top20_actual": 5.229
+        },
+        "ep_next": {
+          "weeks": 7.0,
+          "mae": 2.278,
+          "rmse": 3.194,
+          "bias": 0.222,
+          "spearman": 0.384,
+          "top20_actual": 4.707
+        },
+        "form": {
+          "weeks": 7.0,
+          "mae": 2.355,
+          "rmse": 3.205,
+          "bias": 0.45,
+          "spearman": 0.337,
+          "top20_actual": 4.286
+        }
+      }
+    },
+    "this_season": {
+      "label": "2026/27",
+      "regulars": {
+        "model": {
+          "weeks": 6.0,
+          "mae": 2.215,
+          "rmse": 3.006,
+          "bias": -0.077,
+          "spearman": 0.365,
+          "top20_actual": 4.908
+        },
+        "ppm": {
+          "weeks": 6.0,
+          "mae": 2.684,
+          "rmse": 3.634,
+          "bias": 0.359,
+          "spearman": 0.214,
+          "top20_actual": 3.975
+        },
+        "form": {
+          "weeks": 6.0,
+          "mae": 2.694,
+          "rmse": 3.657,
+          "bias": 0.369,
+          "spearman": 0.214,
+          "top20_actual": 3.858
+        },
+        "ep_next": {
+          "weeks": 6.0,
+          "mae": 2.502,
+          "rmse": 3.486,
+          "bias": 0.012,
+          "spearman": 0.279,
+          "top20_actual": 4.617
+        }
+      },
+      "vs_fpl": {
+        "model": {
+          "weeks": 6.0,
+          "mae": 2.215,
+          "rmse": 3.006,
+          "bias": -0.077,
+          "spearman": 0.365,
+          "top20_actual": 4.908
+        },
+        "ep_next": {
+          "weeks": 6.0,
+          "mae": 2.502,
+          "rmse": 3.486,
+          "bias": 0.012,
+          "spearman": 0.279,
+          "top20_actual": 4.617
+        },
+        "form": {
+          "weeks": 6.0,
+          "mae": 2.694,
+          "rmse": 3.657,
+          "bias": 0.369,
+          "spearman": 0.214,
+          "top20_actual": 3.858
+        }
+      }
+    }
+  }
+}
