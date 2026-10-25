@@ -34,7 +34,7 @@ from math import lgamma
 import numpy as np
 import pandas as pd
 
-from . import team_model
+from . import overrides, team_model
 from .load import DATA, Snapshot
 
 GOAL = {'GKP': 10, 'DEF': 6, 'MID': 5, 'FWD': 4}
@@ -117,6 +117,7 @@ class State:
     prior_history: pd.DataFrame | None = None     # last season, with 'code' and 'pos'
     prior_players: pd.DataFrame | None = None     # last season end: code, pos, price
     team_prev: pd.DataFrame | None = None         # last season's team matches, clubs as codes
+    overrides: pd.DataFrame | None = None         # news-driven start probabilities (overrides.py), live only
 
 
 def last_season_matches(last: Snapshot | None) -> pd.DataFrame | None:
@@ -425,6 +426,13 @@ def project(state: State, prm: Params | None = None, gws: list[int] | None = Non
     base = P[['team', 'pos']].join(R).join(M).reset_index()
     x = base.merge(tf, on='team', how='inner')
     x['avail'] = [A.at[i, e] for i, e in zip(x['id'], x['event'])]
+    if state.overrides is not None and len(state.overrides):
+        # team news: replace the recent-starts estimate; a dropped player mostly moves to the bench
+        x = x.merge(overrides.per_gw(state.overrides, gws), on=['id', 'event'], how='left')
+        new = x['p_start_adj'].fillna(x['p_start'])
+        benched = (x['p_start'] - new).clip(lower=0)
+        x['p_sub'] = np.minimum(x['p_sub'] + 0.6 * benched, 1 - new)
+        x['p_start'] = new
     pos = x['pos']
     ps, pb, q60, ms, mb = x['p_start'], x['p_sub'], x['q60'], x['m_start'], x['m_sub']
     emin = ps * ms + pb * mb
@@ -469,6 +477,11 @@ def project(state: State, prm: Params | None = None, gws: list[int] | None = Non
     out['next_opp'] = fx
     out['avail_next'] = A[gws[0]]
     out = out.join(M).join(R).join(wide).join(nxt)
+    if 'adj_note' in x:
+        nx = x[x['event'] == gws[0]].groupby('id')[['p_start', 'p_sub']].first()
+        hit = nx.index[x[x['event'] == gws[0]].groupby('id')['adj_note'].first().notna()]
+        out.loc[hit, ['p_start', 'p_sub']] = nx.loc[hit, ['p_start', 'p_sub']]
+        out['adj_note'] = x.groupby('id')['adj_note'].first().reindex(out.index)
     out['pen90'] = x[x['event'] == gws[0]].groupby('id')['pen90'].max().reindex(P.index).fillna(0)
     out['pens_taken'] = strip_pens(state.history, season_label(state.events)).groupby('player_id')['pens'].sum().reindex(P.index).fillna(0)
     out['next_gw'] = out[f'gw_{gws[0]}']

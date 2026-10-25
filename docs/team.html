@@ -197,6 +197,7 @@ td.heat span i{display:block;font:500 9.5px "IBM Plex Mono",monospace;font-style
 td.total{font-weight:600;color:var(--accent)}
 .flag{font:500 11px "IBM Plex Mono",monospace;padding:2px 6px;border-radius:3px}
 .flag.a0{background:var(--d5);color:var(--d5-ink)} .flag.a1{background:var(--d4);color:var(--d4-ink)} .flag.a2{background:var(--warn);color:#1b1407}
+.flag.news{border:1px solid var(--warn);color:var(--ink-2);cursor:help}
 @media (max-width:640px){td.who{min-width:118px;max-width:130px}.hide-sm{display:none}}
 /* captain rotation */
 .rot{display:grid;gap:0}
@@ -442,7 +443,7 @@ const D={P:{},gws:[],opp:{},nfix:{},caps:{},model:[],nextGw:null};
 const POS_ORDER={GKP:0,DEF:1,MID:2,FWD:3};
 function shape(r){
   const o={id:+r.id,name:r.web_name,team:+r.team||null,club:r.team_short_name,pos:r.pos,price:num(r.price),own:num(r.selected_by_percent)??0,status:r.status,
-    avail:num(r.avail_next),pstart:num(r.p_start),news:r.news||"",gw:{}};
+    avail:num(r.avail_next),pstart:num(r.p_start),news:r.news||"",adj:r.adj_note||"",gw:{}};
   for(const k in r)if(k.startsWith("gw_"))o.gw[+k.slice(3)]=num(r[k])??0;
   return o;
 }
@@ -585,7 +586,8 @@ function startManual(id){
 const P=id=>D.P[id];
 function oppShort(p,g){const o=oppOf(p,g);if(!o)return null;return o.split(" + ").map(s=>{const [t,v]=s.split(" ");return v==="(H)"?t:t.toLowerCase();}).join("+");}
 function heat(v){if(v==null)return"";if(v>=6)return"background:var(--d1);color:var(--d1-ink)";if(v>=4.5)return"background:var(--d2);color:var(--d2-ink)";if(v>=3)return"background:var(--d3);color:var(--d3-ink)";return"color:var(--ink-3)";}
-function fitFlag(p){return p.avail==null||p.avail>=.99?"":`<span class="flag ${p.avail<.3?"a0":p.avail<.7?"a1":"a2"}" title="${esc(p.news)}">${pct(p.avail)}</span>`;}
+function fitFlag(p){return (p.avail==null||p.avail>=.99?"":`<span class="flag ${p.avail<.3?"a0":p.avail<.7?"a1":"a2"}" title="${esc(p.news)}">${pct(p.avail)}</span>`)
+  +(p.adj?` <span class="flag news" title="${esc(p.adj)}">news</span>`:"");}
 const isNew=id=>!T.orig.includes(id);
 
 function renderAll(){

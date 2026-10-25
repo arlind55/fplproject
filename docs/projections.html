@@ -169,6 +169,7 @@ td.total{font-weight:600;color:var(--accent)}
 .pos.GKP{background:var(--gkp)} .pos.DEF{background:var(--def)} .pos.MID{background:var(--mid)} .pos.FWD{background:var(--fwd)}
 .avail{font:500 11px "IBM Plex Mono",monospace;padding:2px 6px;border-radius:3px}
 .avail.a0{background:var(--d5);color:var(--d5-ink)} .avail.a1{background:var(--d4);color:var(--d4-ink)} .avail.a2{background:var(--warn);color:#1b1407}
+.newsadj{font:500 10px "IBM Plex Mono",monospace;padding:1px 5px;margin-left:6px;border-radius:3px;border:1px solid var(--warn);color:var(--ink-2);vertical-align:1px;cursor:help}
 tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;border-bottom:1px solid var(--line-strong)}
 .brk{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px 18px;font-size:11px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
 .brk b{display:block;font:600 14px "IBM Plex Mono",monospace;color:var(--ink);letter-spacing:0;text-transform:none;margin-top:2px}
@@ -299,7 +300,7 @@ const COMP=[["app","Appearance"],["goals","Goals (open play)"],["pens","Penaltie
 
 function shape(r){
   const o={id:r.id,name:r.web_name,team:r.team_short_name,pos:r.pos,price:num(r.price),own:num(r.selected_by_percent),status:r.status,opp:r.next_opp,
-    avail:num(r.avail_next),pstart:num(r.p_start),xmins:num(r.next_xmins),xg90:num(r.xg90),xa90:num(r.xa90),penord:num(r.penalties_order),pen90:num(r.pen90),pens:num(r.pens_taken),next_gw:num(r.next_gw),next_n:num(r.next_n),gw:{},c:{}};
+    avail:num(r.avail_next),pstart:num(r.p_start),adj:r.adj_note||"",xmins:num(r.next_xmins),xg90:num(r.xg90),xa90:num(r.xa90),penord:num(r.penalties_order),pen90:num(r.pen90),pens:num(r.pens_taken),next_gw:num(r.next_gw),next_n:num(r.next_n),gw:{},c:{}};
   for(const k in r){if(k.startsWith("gw_"))o.gw[+k.slice(3)]=num(r[k]);if(k.startsWith("next_")&&COMP.some(c=>"next_"+c[0]===k))o.c[k.slice(5)]=num(r[k]);}
   o.per_m=o.price?o.next_n/o.price:null;
   return o;
@@ -339,7 +340,7 @@ function renderSquad(sq,meta){
 function heat(v){if(v==null)return"";if(v>=6)return"background:var(--d1);color:var(--d1-ink)";if(v>=4.5)return"background:var(--d2);color:var(--d2-ink)";if(v>=3)return"background:var(--d3);color:var(--d3-ink)";return"color:var(--ink-3)";}
 function cols(){
   const base=[
-    {key:"name",label:"Player",cls:"name",str:true,render:p=>esc(p.name)},
+    {key:"name",label:"Player",cls:"name",str:true,render:p=>esc(p.name)+(p.adj?`<span class="newsadj" title="${esc(p.adj)}">news</span>`:"")},
     {key:"team",label:"Team",str:true,render:p=>esc(p.team)},
     {key:"pos",label:"Pos",str:true,render:p=>`<span class="pos ${p.pos}">${p.pos}</span>`},
     {key:"price",label:"Price",num:true,render:p=>price(p.price)},
@@ -372,7 +373,7 @@ function detail(p,span){
   const gw=S.gws[0];
   return `<tr class="detail"><td colspan="${span}"><div class="label">GW${gw} breakdown · ${esc(p.opp)} · ${fmt(p.next_gw,2)} projected</div><div class="brk">
     ${COMP.map(([k,l])=>{const v=p.c[k];return v!=null&&Math.abs(v)>=.005?`<div>${l}<b class="${v<0?"neg":""}">${v>0?"+":""}${fmt(v,2)}</b></div>`:"";}).join("")}
-    <div class="inputs">Inputs: starts ${pct(p.pstart)} of the time · ${fmt(p.xmins,0)} expected minutes · npxG/90 ${fmt(p.xg90,2)} · xA/90 ${fmt(p.xa90,2)}${p.penord?` · penalty taker #${p.penord} (${fmt(p.pens,0)} taken this season)`:""}${p.avail!=null&&p.avail<.99?` · ${pct(p.avail)} chance of being available`:""}</div></div></td></tr>`;
+    <div class="inputs">Inputs: starts ${pct(p.pstart)} of the time · ${fmt(p.xmins,0)} expected minutes · npxG/90 ${fmt(p.xg90,2)} · xA/90 ${fmt(p.xa90,2)}${p.penord?` · penalty taker #${p.penord} (${fmt(p.pens,0)} taken this season)`:""}${p.avail!=null&&p.avail<.99?` · ${pct(p.avail)} chance of being available`:""}${p.adj?` · Team news: ${esc(p.adj)}`:""}</div></div></td></tr>`;
 }
 $("thead").addEventListener("click",e=>{const th=e.target.closest("th[data-key]");if(!th)return;const k=th.dataset.key,cur=S.sort||{key:S.rank,dir:"desc"};
   const str=["name","team","pos"].includes(k);S.sort=cur.key===k?{key:k,dir:cur.dir==="desc"?"asc":"desc"}:{key:k,dir:str?"asc":"desc"};render();});
