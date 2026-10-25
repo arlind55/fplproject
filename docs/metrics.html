@@ -19,6 +19,9 @@
 <meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
 <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "headline": "FPL metrics explained: PPG, PPM, VAPM, xG and xPts", "url": "https://fplvalue.co/metrics.html", "mainEntityOfPage": "https://fplvalue.co/metrics.html", "description": "Plain-English definitions of the FPL metrics used on FPL Value: points per game, points per million, VAPM, xG, xA, xGI, xGC, expected points (xPts) and the over/under-performance delta — with formulas, examples and caveats.", "inLanguage": "en-GB", "author": {"@id": "https://fplvalue.co/#org"}, "publisher": {"@id": "https://fplvalue.co/#org"}, "image": "https://fplvalue.co/og-image.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "FPL Value", "item": "https://fplvalue.co/"}, {"@type": "ListItem", "position": 2, "name": "Metrics", "item": "https://fplvalue.co/metrics.html"}]}, {"@type": "Organization", "@id": "https://fplvalue.co/#org", "name": "FPL Value", "url": "https://fplvalue.co/", "logo": "https://fplvalue.co/apple-touch-icon.png", "sameAs": ["https://github.com/arlind55/fplproject"]}]}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 :root{
@@ -52,10 +55,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
 /* ── Shared shell (keep in sync with index.html) ─────────────────────────────── */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
-.brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand .name{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
 .brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
 /* Wordmark: £ mark + uppercase name, same brand colours in light and dark */
-.brand{display:flex;align-items:center;gap:10px}.brand h1{text-transform:uppercase;letter-spacing:.01em}
+.brand{display:flex;align-items:center;gap:10px}.brand .name{text-transform:uppercase;letter-spacing:.01em}
 .brand .mark{flex:none;width:36px;height:36px;border-radius:8px;background:#2f3fa8;color:#ffd60a;display:grid;place-items:center;font:700 23px/1 "Barlow Condensed","Arial Narrow",sans-serif}
 .tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -84,7 +87,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
 .toc a.sub{padding-left:24px;color:var(--ink-3);font-size:12px}
 .prose{max-width:72ch}
-.prose h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:34px;line-height:1.05;margin:0 0 8px;letter-spacing:-.01em;text-wrap:balance}
+.prose h1,.prose h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:34px;line-height:1.05;margin:0 0 8px;letter-spacing:-.01em;text-wrap:balance}
 .prose .lede{font-size:16px;color:var(--ink-2);margin:0 0 28px;line-height:1.55}
 .prose h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:24px;margin:40px 0 8px;letter-spacing:.005em;scroll-margin-top:20px}
 .prose h3 small{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3);margin-left:10px;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
@@ -114,9 +117,9 @@ hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 <body>
 <div class="wrap">
 <header class="topbar">
-  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><h1>FPL Value</h1><small>Premier League 2026/27</small></div></div>
+  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><div class="name">FPL Value</div><small>Premier League 2026/27</small></div></div>
   <nav class="tabs" aria-label="Pages">
-    <a href="./index.html">Home</a>
+    <a href="./">Home</a>
     <a href="./planner.html">Fixture planner</a>
     <a href="./projections.html">Projections</a>
     <a href="./team.html">My team</a>
@@ -150,7 +153,7 @@ hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 </nav>
 
 <article class="prose">
-<h2>The metrics, explained</h2>
+<h1>The metrics, explained</h1>
 <p class="lede">Every number on FPL Value is either published by Fantasy Premier League or derived from FPL's own data with a formula shown on this page. Nothing is a black box. Here is what each one means, how it's calculated, and when it will mislead you.</p>
 
 <h3 id="scoring">How FPL scores a player</h3>
@@ -276,7 +279,7 @@ hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 
 <footer>
   <span>FPL Value · independent and unaffiliated with the Premier League or Fantasy Premier League.</span>
-  <span><a href="./index.html">Home</a> · <a href="./planner.html">Fixture planner</a></span>
+  <span><a href="./">Home</a> · <a href="./planner.html">Fixture planner</a></span>
 </footer>
 </div>
 

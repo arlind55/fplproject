@@ -4,6 +4,10 @@ Posts are HTML fragments in `posts/` with a JSON front-matter comment on line 1:
 
     <!--META {"title":"…","description":"…","date":"YYYY-MM-DD","tag":"Value report","kicker":"Value report · after GW7"} -->
 
+Add `"seo_title"` to set the browser/Google title and social cards separately from the on-page title. Lead with
+what people search for, e.g. `"FPL GW9 value report: best value players and xPts under-performers"`, and keep it
+under about 65 characters. Deadline briefs get one automatically from `preview.py` (override with `seo_title:` in the notes meta).
+
 Write the body with `<h3>` section headings (ids are added automatically and become the sidebar links).
 
 ## Weekly routine (from the repo root)

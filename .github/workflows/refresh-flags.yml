@@ -37,11 +37,14 @@ jobs:
       - name: Refresh flags and projections
         run: python scripts/refresh_flags.py
 
+      - name: Pre-render data snapshot into the pages
+        run: python scripts/prerender.py
+
       - name: Commit refreshed data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/current/
+          git add data/current/ docs/
           git diff --staged --quiet && exit 0
           git commit -m "Injury flags refresh"
           for attempt in 1 2 3; do

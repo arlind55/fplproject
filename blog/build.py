@@ -17,7 +17,7 @@ def nice(d): return datetime.date.fromisoformat(d).strftime("%-d %b %Y")
 
 def tabs(active):
     cur = ' aria-current="page"'
-    items = [("Home", "../index.html"), ("Fixture planner", "../planner.html"), ("Projections", "../projections.html"), ("My team", "../team.html"), ("Track record", "../accuracy.html"), ("Metrics", "../metrics.html"), ("Value Blog", "./index.html")]
+    items = [("Home", "../"), ("Fixture planner", "../planner.html"), ("Projections", "../projections.html"), ("My team", "../team.html"), ("Track record", "../accuracy.html"), ("Metrics", "../metrics.html"), ("Value Blog", "./")]
     return "".join(f'<a href="{h}"{cur if n == active else ""}>{n}</a>' for n, h in items)
 
 def slugify(text):
@@ -60,25 +60,44 @@ def sidebar(posts, current=None, current_sections=()):
             if here_ and current_sections:
                 parts.append('<div class="secs">' + "".join(f'<a href="#{i}">{html.escape(t)}</a>' for i, t in current_sections) + "</div>")
         parts.append("</details>")
-    parts.append('<a class="all" href="./index.html">All posts →</a></nav>')
+    parts.append('<a class="all" href="./">All posts →</a></nav>')
     return "".join(parts)
+
+def json_ld(meta, url, img):
+    """schema.org markup: BlogPosting + breadcrumbs for a post, Blog for the index."""
+    publisher = {"@type": "Organization", "name": "FPL Value", "url": SITE + "/", "logo": {"@type": "ImageObject", "url": SITE + "/apple-touch-icon.png"}}
+    crumbs = [{"@type": "ListItem", "position": 1, "name": "FPL Value", "item": SITE + "/"},
+              {"@type": "ListItem", "position": 2, "name": "Value Blog", "item": SITE + "/blog/"}]
+    if meta.get("date"):
+        crumbs.append({"@type": "ListItem", "position": 3, "name": meta["title"], "item": url})
+        main = {"@type": "BlogPosting", "headline": meta.get("seo_title") or meta["title"], "description": meta["description"],
+                "image": img, "datePublished": meta["date"], "dateModified": meta.get("modified", meta["date"]),
+                "url": url, "mainEntityOfPage": url, "inLanguage": "en-GB", "author": publisher, "publisher": publisher,
+                "isPartOf": {"@type": "Blog", "name": "Value Blog", "url": SITE + "/blog/"}}
+    else:
+        main = {"@type": "Blog", "name": "Value Blog", "description": meta["description"], "url": url, "inLanguage": "en-GB", "publisher": publisher}
+    data = {"@context": "https://schema.org", "@graph": [main, {"@type": "BreadcrumbList", "itemListElement": crumbs}]}
+    return '<script type="application/ld+json">' + json.dumps(data, ensure_ascii=False).replace("</", "<\\/") + "</script>"
 
 def page(meta, body, posts, active="Value Blog"):
     url = SITE + meta["path"]
     is_post = bool(meta.get("date"))
     img = meta.get("image") or f"{SITE}/og-image.png"
     date_meta = f'<meta property="article:published_time" content="{meta["date"]}">' if is_post else ""
+    # <title> and social titles use the search-friendly seo_title when a post has one
+    head_title = meta.get("seo_title") or f"{meta['title']} — FPL Value"
+    social_title = meta.get("seo_title") or meta["title"]
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(meta['title'])} — FPL Value</title>
+<title>{html.escape(head_title)}</title>
 <meta name="description" content="{html.escape(meta['description'])}">
 <link rel="canonical" href="{url}">
 <meta property="og:type" content="{'article' if is_post else 'website'}">
 <meta property="og:site_name" content="FPL Value">
-<meta property="og:title" content="{html.escape(meta['title'])}">
+<meta property="og:title" content="{html.escape(social_title)}">
 <meta property="og:description" content="{html.escape(meta['description'])}">
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{img}">
@@ -86,13 +105,16 @@ def page(meta, body, posts, active="Value Blog"):
 <meta property="og:image:height" content="630">
 {date_meta}
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{html.escape(meta['title'])}">
+<meta name="twitter:title" content="{html.escape(social_title)}">
 <meta name="twitter:description" content="{html.escape(meta['description'])}">
 <meta name="twitter:image" content="{img}">
 <meta name="theme-color" content="#131521" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{json_ld(meta, url, img)}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 {shell_css}
@@ -102,7 +124,7 @@ def page(meta, body, posts, active="Value Blog"):
 <body>
 <div class="wrap">
 <header class="topbar">
-  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><h1><a href="../index.html" style="color:inherit;text-decoration:none">FPL Value</a></h1><small>Premier League 2026/27</small></div></div>
+  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><div class="name"><a href="../" style="color:inherit;text-decoration:none">FPL Value</a></div><small>Premier League 2026/27</small></div></div>
   <nav class="tabs" aria-label="Pages">{tabs(active)}</nav>
   <div class="right">
     <span class="status"><i style="background:var(--accent)"></i><span>{html.escape(meta.get('kicker', 'Value Blog'))}</span></span>
@@ -112,7 +134,7 @@ def page(meta, body, posts, active="Value Blog"):
 {body}
 <footer>
   <span>FPL Value · independent and unaffiliated with the Premier League or Fantasy Premier League. Data: official FPL API via <a href="https://github.com/arlind55/fplproject">fplproject</a>.</span>
-  <span><a href="../index.html">Home</a> · <a href="../planner.html">Fixture planner</a> · <a href="../projections.html">Projections</a> · <a href="../team.html">My team</a> · <a href="../accuracy.html">Track record</a> · <a href="../metrics.html">Metrics</a></span>
+  <span><a href="../">Home</a> · <a href="../planner.html">Fixture planner</a> · <a href="../projections.html">Projections</a> · <a href="../team.html">My team</a> · <a href="../accuracy.html">Track record</a> · <a href="../metrics.html">Metrics</a></span>
 </footer>
 </div>
 <script>
@@ -143,7 +165,7 @@ for i, p in enumerate(posts):
         body = re.sub(r"(</p>)", r"\1" + fig, body, count=1) if 'class="lede"' in body else fig + body
     # prev / next
     newer = posts[i - 1] if i > 0 else None; older = posts[i + 1] if i + 1 < len(posts) else None
-    nav = '<div class="next">' + (f'<a href=".{older["path"][5:]}">← {html.escape(older["title"])}</a>' if older else "<span></span>") + (f'<a href=".{newer["path"][5:]}">{html.escape(newer["title"])} →</a>' if newer else '<a href="./index.html">All posts</a>') + "</div>"
+    nav = '<div class="next">' + (f'<a href=".{older["path"][5:]}">← {html.escape(older["title"])}</a>' if older else "<span></span>") + (f'<a href=".{newer["path"][5:]}">{html.escape(newer["title"])} →</a>' if newer else '<a href="./">All posts</a>') + "</div>"
     body = re.sub(r'<div class="next">.*?</div>', nav, body, flags=re.S) if '<div class="next">' in body else body.replace("</article>", nav + "</article>")
     body = body.replace('<div class="article">', '<div class="article with-side">' + sidebar(posts, p["path"], sections(body)), 1)
     (blog_out / f"{p['slug']}.html").write_text(page(p, body, posts))
@@ -161,7 +183,7 @@ cards = "".join(f"""
 index_body = f"""
 <div class="article with-side">{sidebar(posts)}
 <article class="prose wide">
-<h2>Value Blog</h2>
+<h1>Value Blog</h1>
 <p class="lede">Short, data-led pieces built from the numbers on the dashboard and planner: a deadline brief before every gameweek, plus value reports, template checks and fixture swings.</p>
 <div class="posts">{cards}
 </div>
@@ -174,7 +196,7 @@ sm = out / "sitemap.xml"
 if sm.exists():
     s = sm.read_text()
     s = re.sub(r"\s*<url><loc>https://fplvalue\.co/blog/[^<]*</loc>.*?</url>", "", s, flags=re.S)
-    block = f'\n  <url><loc>{SITE}/blog/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>' + "".join(
+    block = f'\n  <url><loc>{SITE}/blog/</loc><lastmod>{posts[0]["date"]}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>' + "".join(
         f'\n  <url><loc>{SITE}{p["path"]}</loc><lastmod>{p["date"]}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>' for p in posts)
     sm.write_text(s.replace("\n</urlset>", block + "\n</urlset>"))
 print(f"built {len(posts)} posts + index; sitemap updated")

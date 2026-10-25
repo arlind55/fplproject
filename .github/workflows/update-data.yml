@@ -35,11 +35,14 @@ jobs:
       - name: Run updater
         run: python scripts/update_fpl_data.py
 
+      - name: Pre-render data snapshot into the pages
+        run: python scripts/prerender.py
+
       - name: Commit refreshed data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/
+          git add data/ docs/
           git diff --staged --quiet || git commit -m "Weekly Premier League data refresh v2"
           # Someone may have pushed while the refresh ran (it takes a few minutes).
           # Rebase our data commit onto whatever is on main now, then push; retry a couple of times.
