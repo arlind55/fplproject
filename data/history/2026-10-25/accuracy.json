@@ -1,0 +1,72 @@
+{
+  "summary": {
+    "weeks": 2,
+    "model_mae": 1.954,
+    "captain_points": 14,
+    "head_to_head_weeks": 2,
+    "model_wins": 2,
+    "fpl_mae": 2.278,
+    "model_mae_same_weeks": 1.954
+  },
+  "weeks": [
+    {
+      "gw": 6,
+      "snapshot": "2026-10-06",
+      "n": 349,
+      "model": {
+        "mae": 1.941,
+        "bias": -0.301,
+        "spearman": 0.315,
+        "top20_actual": 4.75,
+        "captain": {
+          "name": "B.Fernandes",
+          "team": "MUN",
+          "projected": 7.23,
+          "actual": 1
+        }
+      },
+      "fpl": {
+        "mae": 2.209,
+        "bias": -0.02,
+        "spearman": 0.327,
+        "top20_actual": 4.05,
+        "captain": {
+          "name": "Gro\u00df",
+          "team": "BHA",
+          "projected": 15.5,
+          "actual": 6
+        }
+      }
+    },
+    {
+      "gw": 7,
+      "snapshot": "2026-10-13",
+      "n": 352,
+      "model": {
+        "mae": 1.967,
+        "bias": -0.257,
+        "spearman": 0.373,
+        "top20_actual": 4.05,
+        "captain": {
+          "name": "Haaland",
+          "team": "MCI",
+          "projected": 7.72,
+          "actual": 13
+        }
+      },
+      "fpl": {
+        "mae": 2.347,
+        "bias": -0.049,
+        "spearman": 0.261,
+        "top20_actual": 3.95,
+        "captain": {
+          "name": "De Cuyper",
+          "team": "BHA",
+          "projected": 10.5,
+          "actual": 6
+        }
+      }
+    }
+  ],
+  "generated_at": "2026-10-25T16:23:40Z"
+}
