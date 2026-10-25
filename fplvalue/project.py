@@ -109,7 +109,7 @@ def _apply_linear(coef: dict, pos: pd.Series, price: pd.Series, lo=0.0, hi=None)
 @dataclass
 class State:
     players: pd.DataFrame          # id, code, web_name, team, pos, price, status, chance, news, (+ display cols)
-    history: pd.DataFrame          # per-player per-fixture rows from before first_gw
+    history: pd.DataFrame          # per-player per-fixture rows from finished gameweeks
     fixtures: pd.DataFrame         # whole season, 'finished' consistent with first_gw
     teams: pd.DataFrame
     events: pd.DataFrame
@@ -149,11 +149,12 @@ def _prior_tables(last: Snapshot | None):
 
 
 def state_from_snapshot(snap: Snapshot, last: Snapshot | None = None) -> State:
-    """Live state: everything finished so far, projecting from the next gameweek."""
-    first = snap.last_finished_gw + 1
+    """Live state: everything played so far, projecting from the next gameweek still open for picks
+    (so a mid-gameweek refresh does not project the week already under way)."""
+    played = snap.last_finished_gw     # a gameweek under way has partial rows (and 0-minute ones for unplayed games)
     lh, lp = _prior_tables(last)
-    return State(_players_frame(snap), snap.history[snap.history['round'] < first].copy(), snap.fixtures,
-                 snap.teams, snap.events, first, lh, lp, last_season_matches(last))
+    return State(_players_frame(snap), snap.history[snap.history['round'] <= played].copy(), snap.fixtures,
+                 snap.teams, snap.events, snap.next_open_gw, lh, lp, last_season_matches(last))
 
 
 def state_as_of(snap: Snapshot, gw: int, avail: Snapshot | None = None, last: Snapshot | None = None) -> State:

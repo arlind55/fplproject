@@ -55,6 +55,14 @@ class Snapshot:
         done |= {int(gw) for gw, ok in played.groupby(f['event']).all().items() if ok}
         return max(done, default=0)
 
+    @property
+    def next_open_gw(self) -> int:
+        """First gameweek whose deadline has not passed: the one teams and captains are still being picked for.
+        Mid-gameweek (deadline gone, matches still to play) that is the following week, not the one in progress;
+        FPL's is_next flag says which, with last finished + 1 as the floor when it is missing (end of season)."""
+        nxt = self.events.loc[_bool(self.events['is_next']), 'id'] if 'is_next' in self.events else pd.Series(dtype=int)
+        return max(self.last_finished_gw + 1, int(nxt.iloc[0]) if len(nxt) else 0)
+
     def deadline(self, gw: int) -> pd.Timestamp:
         row = self.events[self.events['id'] == gw]
         return pd.to_datetime(row['deadline_time'].iloc[0], utc=True)
