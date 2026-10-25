@@ -2,7 +2,7 @@
 
 A *snapshot* is any folder the pipeline writes: data/current or data/history/<YYYY-MM-DD>.
 Everything the projection model needs is in one:
-  players.csv, teams.csv, fixtures.csv, events.csv, player_history.csv, meta.json (optional)
+  players.csv, teams.csv, fixtures.csv, events.csv, player_history.csv, meta.json and odds.csv (optional)
 """
 from __future__ import annotations
 
@@ -37,6 +37,7 @@ class Snapshot:
     events: pd.DataFrame
     history: pd.DataFrame
     meta: dict = field(default_factory=dict)
+    odds: pd.DataFrame | None = None     # bookmaker expected goals per fixture (odds.py), when fetched
 
     @property
     def season_start(self) -> pd.Timestamp:
@@ -81,6 +82,7 @@ def load(path: str | Path | None = None) -> Snapshot:
     except pd.errors.EmptyDataError:
         history = pd.DataFrame()
     meta = json.loads((path / 'meta.json').read_text()) if (path / 'meta.json').exists() else {}
+    odds = pd.read_csv(path / 'odds.csv') if (path / 'odds.csv').exists() else None
 
     players['pos'] = players['element_type'].map(POS)
     for c in ('now_cost', 'selected_by_percent', 'chance_of_playing_next_round', 'ep_next', 'form', 'points_per_game'):
@@ -105,7 +107,7 @@ def load(path: str | Path | None = None) -> Snapshot:
         history = history.merge(fixtures[['id', 'team_h', 'team_a']].rename(columns={'id': 'fixture'}), on='fixture', how='left')
         history['team'] = np.where(history['was_home'], history['team_h'], history['team_a'])
         history = history.drop(columns=['team_h', 'team_a'])
-    return Snapshot(path, players, teams, fixtures, events, history, meta)
+    return Snapshot(path, players, teams, fixtures, events, history, meta, odds)
 
 
 def snapshot_dirs(root: Path | None = None) -> list[Path]:
