@@ -45,3 +45,10 @@ Recommended app tables:
 - `next_fixtures.csv` for fixture views
 - `team_fixture_difficulty.csv` for schedule analysis
 - `player_history.csv` for trend charts
+
+## Site snapshot (SEO)
+
+`scripts/prerender.py` writes a plain-HTML "at a glance" summary of the current data into `docs/index.html`,
+`docs/projections.html` and `docs/planner.html` (between `<!-- snapshot:start -->` / `<!-- snapshot:end -->`) and bumps
+`<lastmod>` in `docs/sitemap.xml`, so search engines see real numbers without running JavaScript. Both data workflows
+run it after refreshing the data.

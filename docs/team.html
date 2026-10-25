@@ -22,6 +22,9 @@
 <meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
 <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "My FPL team analyser", "url": "https://fplvalue.co/team.html", "description": "Enter your FPL team ID to see your squad's projected points for the next gameweek, five and ten weeks, a captain rotation for the next ten gameweeks, the best transfers for your budget, and where your ownership leaves you exposed.", "applicationCategory": "SportsApplication", "operatingSystem": "Any", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "GBP"}, "publisher": {"@id": "https://fplvalue.co/#org"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "FPL Value", "item": "https://fplvalue.co/"}, {"@type": "ListItem", "position": 2, "name": "My team", "item": "https://fplvalue.co/team.html"}]}, {"@type": "Organization", "@id": "https://fplvalue.co/#org", "name": "FPL Value", "url": "https://fplvalue.co/", "logo": "https://fplvalue.co/apple-touch-icon.png", "sameAs": ["https://github.com/arlind55/fplproject"]}]}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 /* ── Shared shell (keep in sync with planner.html) ─────────────────────────── */
@@ -59,10 +62,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
 .brand{display:flex;align-items:center;gap:14px}
-.brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand .name{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
 .brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
 /* Wordmark: £ mark + uppercase name, same brand colours in light and dark */
-.brand{display:flex;align-items:center;gap:10px}.brand h1{text-transform:uppercase;letter-spacing:.01em}
+.brand{display:flex;align-items:center;gap:10px}.brand .name{text-transform:uppercase;letter-spacing:.01em}
 .brand .mark{flex:none;width:36px;height:36px;border-radius:8px;background:#2f3fa8;color:#ffd60a;display:grid;place-items:center;font:700 23px/1 "Barlow Condensed","Arial Narrow",sans-serif}
 .tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -96,7 +99,7 @@ footer a{color:inherit}
 .head h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:22px;margin:0}
 .head p{margin:2px 0 0;color:var(--ink-3);font-size:12px}
 .intro{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-bottom:16px}
-.intro h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:26px;margin:0 0 6px;line-height:1.1}
+.intro h1,.intro h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:26px;margin:0 0 6px;line-height:1.1}
 .intro p{margin:0;color:var(--ink-2);max-width:70ch}
 .intro a{color:var(--accent)}
 .idform{display:flex;gap:8px;margin-top:4px}
@@ -268,9 +271,9 @@ dialog::backdrop{background:rgba(10,12,20,.55)}
 <body>
 <div class="wrap">
 <header class="topbar">
-  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><h1>FPL Value</h1><small>Premier League 2026/27</small></div></div>
+  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><div class="name">FPL Value</div><small>Premier League 2026/27</small></div></div>
   <nav class="tabs" aria-label="Pages">
-    <a href="./index.html">Home</a>
+    <a href="./">Home</a>
     <a href="./planner.html">Fixture planner</a>
     <a href="./projections.html">Projections</a>
     <a href="./team.html" aria-current="page">My team</a>
@@ -286,7 +289,7 @@ dialog::backdrop{background:rgba(10,12,20,.55)}
 
 <section class="intro">
   <div class="card">
-    <h2>Your team, through the model</h2>
+    <h1>Your team, through the model</h1>
     <p>Enter your FPL team ID to see what the <a href="./projections.html">projections</a> expect from your squad over the next one, five and ten gameweeks, who to captain each week, which transfers gain the most for your budget, and where your ownership leaves you exposed.</p>
   </div>
   <div class="card">

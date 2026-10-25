@@ -22,8 +22,10 @@
 <meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
 <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://fplvalue.co/#org", "name": "FPL Value", "url": "https://fplvalue.co/", "logo": "https://fplvalue.co/apple-touch-icon.png", "sameAs": ["https://github.com/arlind55/fplproject"]}, {"@type": "WebSite", "@id": "https://fplvalue.co/#website", "name": "FPL Value", "url": "https://fplvalue.co/", "inLanguage": "en-GB", "publisher": {"@id": "https://fplvalue.co/#org"}}, {"@type": "WebApplication", "name": "FPL Value player screener", "url": "https://fplvalue.co/", "description": "Free Fantasy Premier League dashboard: screen every player by form, xG, xA, expected points and VAPM over any gameweek window, home or away, with next-five fixtures and a fixture difficulty planner. Refreshed weekly from official FPL data.", "applicationCategory": "SportsApplication", "operatingSystem": "Any", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "GBP"}, "publisher": {"@id": "https://fplvalue.co/#org"}}]}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 /* ── Shared shell (keep in sync with planner.html) ─────────────────────────── */
 :root{
@@ -60,10 +62,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
 .brand{display:flex;align-items:center;gap:14px}
-.brand h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand .name{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
 .brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
 /* Wordmark: £ mark + uppercase name, same brand colours in light and dark */
-.brand{display:flex;align-items:center;gap:10px}.brand h1{text-transform:uppercase;letter-spacing:.01em}
+.brand{display:flex;align-items:center;gap:10px}.brand .name{text-transform:uppercase;letter-spacing:.01em}
 .brand .mark{flex:none;width:36px;height:36px;border-radius:8px;background:#2f3fa8;color:#ffd60a;display:grid;place-items:center;font:700 23px/1 "Barlow Condensed","Arial Narrow",sans-serif}
 .tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -97,7 +99,7 @@ footer a{color:inherit}
 .disp{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;letter-spacing:-.005em}
 .kicker{font:600 12px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
 .brief{margin:6px 0 30px}
-.brief h2{font-size:clamp(46px,6.2vw,80px);line-height:.94;margin:10px 0 14px;text-wrap:balance}
+.brief h1{font-size:clamp(46px,6.2vw,80px);line-height:.94;margin:10px 0 14px;text-wrap:balance}
 .brief .sub{font-size:16px;line-height:1.5;color:var(--ink-2);margin:0;max-width:62ch}
 .caps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:30px}
 .cap{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;padding:16px 18px}
@@ -257,9 +259,9 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
 <body>
 <div class="wrap">
 <header class="topbar">
-  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><h1>FPL Value</h1><small>Premier League 2026/27</small></div></div>
+  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><div class="name">FPL Value</div><small>Premier League 2026/27</small></div></div>
   <nav class="tabs" aria-label="Pages">
-    <a href="./index.html" aria-current="page">Home</a>
+    <a href="./" aria-current="page">Home</a>
     <a href="./planner.html">Fixture planner</a>
     <a href="./projections.html">Projections</a>
     <a href="./team.html">My team</a>
@@ -277,7 +279,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
 <!-- Gameweek briefing: season-to-date picks and next-gameweek projections; doesn't follow the explore controls below -->
 <section class="brief">
   <div class="kicker" id="briefKicker">Gameweek briefing</div>
-  <h2 class="disp" id="briefTitle">Points per pound, every gameweek.</h2>
+  <h1 class="disp" id="briefTitle">Points per pound, every gameweek.</h1>
   <p class="sub">Your shortlist for the deadline: the captain call, the best value in the game and the fixture runs worth moving for. Click any player to compare them in the screener.</p>
 </section>
 
@@ -372,12 +374,38 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
   </div>
 </section>
 
+<!-- snapshot:start -->
+<section class="snap" aria-labelledby="snapTitle">
+<style>
+.snap{margin:28px 0 8px;padding:20px 22px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.snap h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:26px;line-height:1.1;margin:0 0 4px}
+.snap h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:19px;margin:0 0 8px}
+.snap>p{margin:0 0 16px;color:var(--ink-2);font-size:14px;line-height:1.5}
+.snap .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px 28px}
+.snap ol{margin:0;padding-left:20px;font-size:14px;line-height:1.6}
+.snap ol span{color:var(--ink-3)}
+.snap .tw{overflow-x:auto}
+.snap table{border-collapse:collapse;width:100%;font-size:13.5px}
+.snap th,.snap td{text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.snap th{font-weight:600;color:var(--ink-3);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.snap td.n,.snap th.n{text-align:right;font-variant-numeric:tabular-nums}
+.snap td.w{white-space:normal}
+.snap a{color:var(--accent)}
+</style>
+<h2 id="snapTitle">GW9 at a glance</h2>
+<p>The headline numbers from the FPL Value model, updated 25 October 2026. Full detail is in the <a href="./projections.html">projections</a> and the <a href="./planner.html">fixture planner</a>.</p>
+<div class="cols"><div><h3>Captain shortlist, GW9</h3><ol><li>Haaland <span>(MCI)</span> v BHA (H): 6.5 pts</li><li>B.Fernandes <span>(MUN)</span> v CHE (A): 5.7 pts</li><li>Gabriel <span>(ARS)</span> v LIV (A): 5.1 pts</li><li>Tavernier <span>(BOU)</span> v LEE (H): 5.0 pts</li><li>Palmer <span>(CHE)</span> v MUN (H): 4.9 pts</li></ol></div><div><h3>Best value, GW9–13</h3><ol><li>Thomas <span>(COV)</span> £4.0m: 17.2 pts, 4.29 per £m</li><li>Silva <span>(BOU)</span> £5.0m: 21.3 pts, 4.26 per £m</li><li>Van Hecke <span>(TOT)</span> £4.9m: 20.7 pts, 4.22 per £m</li><li>Konsa <span>(ARS)</span> £4.6m: 18.9 pts, 4.10 per £m</li><li>Rudoni <span>(COV)</span> £4.9m: 19.7 pts, 4.02 per £m</li></ol></div><div><h3>Easiest fixture runs</h3><ol><li>Coventry City <span>(avg difficulty 2.6)</span></li><li>Crystal Palace <span>(avg difficulty 2.8)</span></li><li>Ipswich Town <span>(avg difficulty 2.8)</span></li><li>Leeds <span>(avg difficulty 2.8)</span></li><li>Spurs <span>(avg difficulty 2.8)</span></li></ol></div></div>
+</section>
+<!-- snapshot:end -->
+
 <footer>
   <span>PPM = points ÷ price. VAPM = (points per game − 2) ÷ price. xPts replaces goals, assists, clean sheets and goals conceded with their expected equivalents (xG × goal value, xA × 3, P(clean sheet) = e<sup>−xGC</sup>, xGC ÷ 2); appearance, bonus, saves, cards and DefCon points are taken as scored. Δ = points − xPts. <a href="./metrics.html">Full definitions →</a></span>
   <span>Source: <a href="https://github.com/arlind55/fplproject">arlind55/fplproject</a> · data/current</span>
 </footer>
 </div>
 
+<!-- Chart.js loads after the markup so it no longer blocks the first paint -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="./shell.js"></script>
 <script>
 // ── Shared: theme + data status (keep in sync with planner.html) ──────────────

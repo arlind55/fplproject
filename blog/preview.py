@@ -244,13 +244,14 @@ record = f"""<h3>Track record <small>live since GW{wk[0]['gw']}</small></h3>
 
 # ── Assemble ───────────────────────────────────────────────────────────────────
 headline = meta_n["headline"]
-post_meta = {"title": meta_n["title"], "description": meta_n["description"], "date": meta_n.get("date", today), "tag": "Deadline brief",
+post_meta = {"seo_title": meta_n.get("seo_title") or f"FPL GW{GW} deadline brief: captain picks, transfers and best team",
+             "title": meta_n["title"], "description": meta_n["description"], "date": meta_n.get("date", today), "tag": "Deadline brief",
              "kicker": f"Deadline brief · GW{GW}", "calls": [{k: c[k] for k in ("label", "id", "name", "team", "gw")} for c in calls]}
 body = f"""<!--META {json.dumps(post_meta, ensure_ascii=False)} -->
 <div class="article">
 <article class="prose brief-post">
 <div class="kicker"><span>Deadline brief</span><time datetime="{post_meta['date']}">GW{GW} · deadline {deadline:%a %-d %b, %H:%M} UK</time></div>
-<h2>{headline}</h2>
+<h1>{headline}</h1>
 <p class="lede">{notes['lede']}</p>
 <h3>The brief <small>three calls for GW{GW}</small></h3>
 {brief}
