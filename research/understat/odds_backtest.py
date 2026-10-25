@@ -55,12 +55,18 @@ def fetch(season: str) -> pd.DataFrame:
     os.makedirs(RAW, exist_ok=True)
     path = f'{RAW}/E0_{season}.csv'
     if not os.path.exists(path) or season == SEASONS[-1]:
-        req = urllib.request.Request(URL.format(season), headers={'User-Agent': 'fplvalue-research'})
-        with urllib.request.urlopen(req, timeout=60) as r:
-            body = r.read()
-        with open(path, 'wb') as f:
-            f.write(body)
-        time.sleep(1)
+        try:
+            req = urllib.request.Request(URL.format(season), headers={'User-Agent': 'fplvalue-research'})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                body = r.read()
+        except OSError:
+            if not os.path.exists(path):
+                raise
+            print(f'{season}: download failed, using cached {path}')
+        else:
+            with open(path, 'wb') as f:
+                f.write(body)
+            time.sleep(1)
     with open(path, 'rb') as f:
         return pd.read_csv(io.BytesIO(f.read()), encoding='latin-1', on_bad_lines='skip')
 
