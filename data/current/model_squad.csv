@@ -9,8 +9,8 @@ id,web_name,team_short_name,pos,price,next_opp,next_gw,next_n,is_starter,is_capt
 124,Groß,BHA,MID,6.2,MCI (A),4.1,22.81,True,False
 183,Rudoni,COV,MID,4.9,SUN (H),4.08,19.72,True,False
 411,Haaland,MCI,FWD,15.7,BHA (H),6.53,30.83,True,True
-249,Barry,EVE,FWD,5.7,NEW (A),3.92,19.69,True,False
-109,Verbruggen,BHA,GKP,4.6,MCI (A),2.82,15.85,False,False
-173,Thomas,COV,DEF,4.0,SUN (H),3.1,17.16,False,False
-304,O'Shea,IPS,DEF,4.0,HUL (A),3.35,15.55,False,False
+346,Calvert-Lewin,LEE,FWD,6.1,BOU (A),4.07,21.4,True,False
+496,Kinsky,TOT,GKP,4.4,CRY (H),3.0,14.74,False,False
+259,Diop,IPS,DEF,3.9,HUL (A),3.16,14.62,False,False
+175,van Ewijk,COV,DEF,3.9,SUN (H),2.64,11.94,False,False
 194,Thomas-Asante,COV,FWD,5.0,SUN (H),2.51,12.35,False,False
