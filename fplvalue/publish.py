@@ -7,6 +7,8 @@ or by hand:  python -m fplvalue.publish
     data/current/projections_long.csv one row per player: gw_<n> columns for the next ten gameweeks (the My team page)
     data/current/projection_meta.json gameweeks, parameters, squad totals, backtest summary
     data/current/accuracy.json        live track record of past published projections (see accuracy.py)
+
+Start probabilities from team news in data/overrides.csv (see overrides.py) are applied here.
 """
 from __future__ import annotations
 
@@ -18,7 +20,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from . import accuracy, backtest
+from . import accuracy, backtest, overrides
 from .load import DATA, last_season, load
 from .optimise import optimise
 from .project import COMPONENTS, Params, project, state_from_snapshot
@@ -27,9 +29,9 @@ from .simulate import captain_table
 warnings.simplefilter('ignore', category=FutureWarning)
 
 LONG_HORIZON = 10
-LONG_COLS = ['id', 'web_name', 'team', 'team_short_name', 'pos', 'price', 'selected_by_percent', 'status', 'avail_next', 'p_start']
+LONG_COLS = ['id', 'web_name', 'team', 'team_short_name', 'pos', 'price', 'selected_by_percent', 'status', 'avail_next', 'p_start', 'adj_note']
 PROJ_COLS = ['id', 'web_name', 'team_short_name', 'pos', 'price', 'selected_by_percent', 'status', 'next_opp',
-             'avail_next', 'p_start', 'next_xmins', 'xg90', 'xa90', 'penalties_order', 'pens_taken', 'pen90', 'next_gw', 'next_n']
+             'avail_next', 'p_start', 'next_xmins', 'xg90', 'xa90', 'penalties_order', 'pens_taken', 'pen90', 'next_gw', 'next_n', 'adj_note']
 
 
 def write(out_dirs: list[Path] | None = None, with_backtest: bool = True, prm: Params | None = None) -> dict:
@@ -38,6 +40,7 @@ def write(out_dirs: list[Path] | None = None, with_backtest: bool = True, prm: P
     last = last_season(snap)
     prm = prm or Params()
     st = state_from_snapshot(snap, last)
+    st.overrides = overrides.read()
     proj, x = project(st, prm, detail=True)
     gws = proj.attrs['gws']
     gw_cols = [f'gw_{g}' for g in gws]

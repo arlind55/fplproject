@@ -1,0 +1,78 @@
+name: Team news scan
+
+# Once a day before the deadline: Claude reads the latest press-conference and team-news reports for
+# selection risks the FPL flags miss (scripts/news_scan.py), updates the auto rows of data/overrides.csv
+# and re-runs the projections. When anything changes it comments on the "News adjustments" issue, so you
+# get a GitHub notification. Editing data/overrides.csv by hand re-runs the projections too.
+# Needs the ANTHROPIC_API_KEY repository secret; without it the scan is skipped.
+on:
+  workflow_dispatch:
+  schedule:
+    # 16:00 UTC: after most same-day press conferences
+    - cron: '0 16 * * *'
+  push:
+    branches: [main]
+    paths: ['data/overrides.csv']
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+
+jobs:
+  news-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Scan team news
+        if: github.event_name != 'push'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/news_scan.py --summary "$RUNNER_TEMP/news.md"
+
+      - name: Re-apply hand edits
+        if: github.event_name == 'push'
+        run: python scripts/news_scan.py --republish
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/overrides.csv data/current/
+          git diff --staged --quiet && exit 0
+          git commit -m "Team news adjustments"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main && git push && break
+            echo "push attempt $attempt failed, retrying…"; sleep 15
+          done
+
+      - name: Notify
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          body="$RUNNER_TEMP/news.md"
+          [ -f "$body" ] || exit 0
+          printf '\n@%s · edit or delete a row in [data/overrides.csv](%s/%s/blob/main/data/overrides.csv) to change it (set origin to manual to stop the scan touching it).\n' \
+            "${{ github.repository_owner }}" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" >> "$body"
+          num=$(gh issue list --state open --search 'in:title "News adjustments"' --json number --jq '.[0].number')
+          if [ -z "$num" ]; then
+            gh issue create --title "News adjustments" --body-file "$body"
+          else
+            gh issue comment "$num" --body-file "$body"
+          fi

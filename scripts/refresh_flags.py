@@ -76,9 +76,15 @@ def main(force: bool = False) -> None:
         print(f'  {names[pid]}: {before.at[pid, "status"]} -> {after.at[pid, "status"]}, '
               f'chance {after.at[pid, "chance_of_playing_next_round"]}, £{after.at[pid, "now_cost"]}m, {after.at[pid, "news"]!r}')
 
+    republish('flags_updated_at')
+
+
+def republish(stamp: str) -> None:
+    """Rewrite the projection outputs from data/current, keeping last week's backtest. `stamp` names the
+    meta.json field to set alongside updated_at (flags_updated_at, news_updated_at)."""
     meta_path = CURRENT_DIR / 'meta.json'
     meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
-    meta['updated_at'] = meta['flags_updated_at'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    meta['updated_at'] = meta[stamp] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     write_json(meta_path, meta)
 
     # The backtest only changes when a gameweek is played, so keep last week's result instead of re-running it.
