@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-25T17:01:35Z",
+  "generated_at": "2026-10-25T22:14:08Z",
   "gws": [
     9,
     10,
@@ -28,10 +28,10 @@
     "horizon": 5
   },
   "squad": {
-    "cost": 100.0,
+    "cost": 99.8,
     "budget": 100.0,
-    "xi_value": 215.4,
-    "xi_next_gw": 58.3,
+    "xi_value": 215.3,
+    "xi_next_gw": 58.4,
     "extra_transfers": 0
   },
   "long_gws": [
@@ -64,7 +64,7 @@
           "rmse": 3.099,
           "bias": 0.028,
           "spearman": 0.257,
-          "top20_actual": 4.237
+          "top20_actual": 4.231
         },
         "form": {
           "weeks": 34.0,
@@ -72,7 +72,7 @@
           "rmse": 3.275,
           "bias": 0.357,
           "spearman": 0.253,
-          "top20_actual": 3.937
+          "top20_actual": 3.881
         },
         "ep_next": {
           "weeks": 7.0,
@@ -80,7 +80,7 @@
           "rmse": 3.194,
           "bias": 0.222,
           "spearman": 0.384,
-          "top20_actual": 4.614
+          "top20_actual": 4.707
         }
       },
       "vs_fpl": {
@@ -98,7 +98,7 @@
           "rmse": 3.194,
           "bias": 0.222,
           "spearman": 0.384,
-          "top20_actual": 4.614
+          "top20_actual": 4.707
         },
         "form": {
           "weeks": 7.0,
@@ -106,7 +106,7 @@
           "rmse": 3.205,
           "bias": 0.45,
           "spearman": 0.337,
-          "top20_actual": 4.264
+          "top20_actual": 4.286
         }
       }
     },
@@ -114,62 +114,62 @@
       "label": "2026/27",
       "regulars": {
         "model": {
-          "weeks": 6.0,
-          "mae": 2.212,
-          "rmse": 3.006,
-          "bias": -0.08,
-          "spearman": 0.365,
-          "top20_actual": 4.908
+          "weeks": 7.0,
+          "mae": 2.218,
+          "rmse": 2.998,
+          "bias": -0.079,
+          "spearman": 0.357,
+          "top20_actual": 4.879
         },
         "ppm": {
-          "weeks": 6.0,
-          "mae": 2.684,
-          "rmse": 3.634,
-          "bias": 0.359,
-          "spearman": 0.214,
-          "top20_actual": 4.0
+          "weeks": 7.0,
+          "mae": 2.674,
+          "rmse": 3.594,
+          "bias": 0.354,
+          "spearman": 0.2,
+          "top20_actual": 3.886
         },
         "form": {
-          "weeks": 6.0,
-          "mae": 2.694,
-          "rmse": 3.657,
-          "bias": 0.369,
-          "spearman": 0.214,
-          "top20_actual": 3.817
+          "weeks": 7.0,
+          "mae": 2.695,
+          "rmse": 3.629,
+          "bias": 0.379,
+          "spearman": 0.203,
+          "top20_actual": 3.579
         },
         "ep_next": {
-          "weeks": 6.0,
-          "mae": 2.502,
-          "rmse": 3.486,
-          "bias": 0.012,
-          "spearman": 0.279,
-          "top20_actual": 4.667
+          "weeks": 7.0,
+          "mae": 2.524,
+          "rmse": 3.49,
+          "bias": 0.045,
+          "spearman": 0.272,
+          "top20_actual": 4.421
         }
       },
       "vs_fpl": {
         "model": {
-          "weeks": 6.0,
-          "mae": 2.212,
-          "rmse": 3.006,
-          "bias": -0.08,
-          "spearman": 0.365,
-          "top20_actual": 4.908
+          "weeks": 7.0,
+          "mae": 2.218,
+          "rmse": 2.998,
+          "bias": -0.079,
+          "spearman": 0.357,
+          "top20_actual": 4.879
         },
         "ep_next": {
-          "weeks": 6.0,
-          "mae": 2.502,
-          "rmse": 3.486,
-          "bias": 0.012,
-          "spearman": 0.279,
-          "top20_actual": 4.667
+          "weeks": 7.0,
+          "mae": 2.524,
+          "rmse": 3.49,
+          "bias": 0.045,
+          "spearman": 0.272,
+          "top20_actual": 4.421
         },
         "form": {
-          "weeks": 6.0,
-          "mae": 2.694,
-          "rmse": 3.657,
-          "bias": 0.369,
-          "spearman": 0.214,
-          "top20_actual": 3.817
+          "weeks": 7.0,
+          "mae": 2.695,
+          "rmse": 3.629,
+          "bias": 0.379,
+          "spearman": 0.203,
+          "top20_actual": 3.579
         }
       }
     }

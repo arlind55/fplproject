@@ -1,12 +1,12 @@
 {
   "summary": {
-    "weeks": 2,
-    "model_mae": 1.954,
+    "weeks": 3,
+    "model_mae": 2.008,
     "captain_points": 14,
-    "head_to_head_weeks": 2,
-    "model_wins": 2,
-    "fpl_mae": 2.278,
-    "model_mae_same_weeks": 1.954
+    "head_to_head_weeks": 3,
+    "model_wins": 3,
+    "fpl_mae": 2.32,
+    "model_mae_same_weeks": 2.008
   },
   "weeks": [
     {
@@ -66,7 +66,36 @@
           "actual": 6
         }
       }
+    },
+    {
+      "gw": 8,
+      "snapshot": "2026-10-20",
+      "n": 353,
+      "model": {
+        "mae": 2.118,
+        "bias": -0.381,
+        "spearman": 0.208,
+        "top20_actual": 3.25,
+        "captain": {
+          "name": "B.Fernandes",
+          "team": "MUN",
+          "projected": 6.39,
+          "actual": 0
+        }
+      },
+      "fpl": {
+        "mae": 2.404,
+        "bias": -0.212,
+        "spearman": 0.213,
+        "top20_actual": 2.45,
+        "captain": {
+          "name": "De Cuyper",
+          "team": "BHA",
+          "projected": 10.5,
+          "actual": 1
+        }
+      }
     }
   ],
-  "generated_at": "2026-10-25T19:49:45Z"
+  "generated_at": "2026-10-25T22:14:08Z"
 }
