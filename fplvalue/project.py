@@ -23,7 +23,8 @@ early-season prior for how much a player will be involved.
 
 Fixture multipliers come from the xG team model (team_model.py): the team's expected xG in that
 fixture divided by its average, so a player's rate goes up against weak defences and down against
-strong ones.
+strong ones. Where bookmaker odds are out for a fixture (usually the next round), its expected xG blends
+them in (odds.py).
 """
 from __future__ import annotations
 
@@ -118,6 +119,7 @@ class State:
     prior_players: pd.DataFrame | None = None     # last season end: code, pos, price
     team_prev: pd.DataFrame | None = None         # last season's team matches, clubs as codes
     overrides: pd.DataFrame | None = None         # news-driven start probabilities (overrides.py), live only
+    odds: pd.DataFrame | None = None              # bookmaker expected goals per fixture (odds.py), live only
 
 
 def last_season_matches(last: Snapshot | None) -> pd.DataFrame | None:
@@ -155,7 +157,7 @@ def state_from_snapshot(snap: Snapshot, last: Snapshot | None = None) -> State:
     played = snap.last_finished_gw     # a gameweek under way has partial rows (and 0-minute ones for unplayed games)
     lh, lp = _prior_tables(last)
     return State(_players_frame(snap), snap.history[snap.history['round'] <= played].copy(), snap.fixtures,
-                 snap.teams, snap.events, snap.next_open_gw, lh, lp, last_season_matches(last))
+                 snap.teams, snap.events, snap.next_open_gw, lh, lp, last_season_matches(last), odds=snap.odds)
 
 
 def state_as_of(snap: Snapshot, gw: int, avail: Snapshot | None = None, last: Snapshot | None = None) -> State:
@@ -390,12 +392,13 @@ def team_fixtures(state: State, gws: list[int]) -> tuple[pd.DataFrame, float]:
     pl = state.players[['id', 'pos']].copy()
     pl['element_type'] = pl['pos'].map({'GKP': 1, 'DEF': 2, 'MID': 3, 'FWD': 4})
     if len(state.history):
-        ratings, model = team_model.build(state.history, pl, state.fixtures, state.teams, prev=state.team_prev)
+        ratings, model = team_model.build(state.history, pl, state.fixtures, state.teams, prev=state.team_prev,
+                                          odds=state.odds)
     else:   # first gameweek of a season: last season's matches only
         tm = pd.DataFrame(columns=['fixture', 'team', 'opp', 'round', 'was_home', 'xg', 'xga', 'gf', 'ga'])
         tm = tm.astype({'was_home': bool, 'round': int, 'xg': float, 'xga': float, 'gf': float, 'ga': float})
         ratings = team_model.team_ratings(tm, state.teams, prev=state.team_prev)
-        model = team_model.fixture_model(state.fixtures, ratings)
+        model = team_model.fixture_model(state.fixtures, ratings, state.odds)
     avg = float(ratings['league_avg_xg'].iloc[0])
     r = ratings.set_index('team_id')
     m = model[model['event'].isin(gws)]

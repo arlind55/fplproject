@@ -27,6 +27,8 @@ Bands follow FPL's shape: 10% / 20% / 40% / 20% / 10% across all remaining fixtu
 import numpy as np
 import pandas as pd
 
+from . import odds as odds_mod
+
 HALF_LIFE = 15       # matches; a match this many games back counts half
 PRIOR_GAMES = 2
 PRIOR_GAMES_NO_HISTORY = 6   # when there is no last season to carry over (early backtest weeks)
@@ -140,8 +142,10 @@ def _band(series: pd.Series, harder_when_high: bool) -> pd.Series:
     return r if harder_when_high else 6 - r
 
 
-def fixture_model(fixtures_df: pd.DataFrame, ratings: pd.DataFrame) -> pd.DataFrame:
-    """Per fixture: expected xG for each side and 1-5 model difficulties from each side's view."""
+def fixture_model(fixtures_df: pd.DataFrame, ratings: pd.DataFrame, odds: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Per fixture: expected xG for each side and 1-5 model difficulties from each side's view.
+    Unplayed fixtures with bookmaker odds (odds.py: fixture, odds_xg_home, odds_xg_away) blend them in at
+    odds.W; xg_*_model keeps the team model alone."""
     r = ratings.set_index('team_id')
     avg = float(ratings['league_avg_xg'].iloc[0]) if len(ratings) else 1.3
     f = fixtures_df[['id', 'event', 'kickoff_time', 'finished', 'team_h', 'team_a', 'team_h_difficulty', 'team_a_difficulty']].copy()
@@ -151,6 +155,15 @@ def fixture_model(fixtures_df: pd.DataFrame, ratings: pd.DataFrame) -> pd.DataFr
     he = float(ratings['home_edge'].iloc[0]) if len(ratings) else 1.1
     f['xg_home'] = avg * r.loc[f['team_h'], 'att'].values * r.loc[f['team_a'], 'def'].values * he
     f['xg_away'] = avg * r.loc[f['team_a'], 'att'].values * r.loc[f['team_h'], 'def'].values * (2 - he)
+    f['xg_home_model'], f['xg_away_model'] = f['xg_home'], f['xg_away']
+    f['odds'] = False
+    if odds is not None and len(odds):
+        o = odds.set_index('fixture')
+        live = f['id'].isin(o.index) & ~f['finished'].astype(str).str.lower().eq('true')
+        ids = f.loc[live, 'id']
+        f.loc[live, 'xg_home'] = odds_mod.blend(f.loc[live, 'xg_home'], ids.map(o['odds_xg_home']))
+        f.loc[live, 'xg_away'] = odds_mod.blend(f.loc[live, 'xg_away'], ids.map(o['odds_xg_away']))
+        f.loc[live, 'odds'] = True
     f['cs_prob_home'] = np.exp(-f['xg_away'])       # P(home team clean sheet)
     f['cs_prob_away'] = np.exp(-f['xg_home'])
     # Bands computed across unplayed fixtures only (both sides pooled), so the scale reflects the remaining calendar
@@ -166,13 +179,13 @@ def fixture_model(fixtures_df: pd.DataFrame, ratings: pd.DataFrame) -> pd.DataFr
     f['model_diff_away'] = np.rint((f['att_diff_away'] + f['def_diff_away']) / 2).astype(int)
     f['blend_diff_home'] = np.rint((f['team_h_difficulty'].fillna(3) + f['model_diff_home']) / 2).astype(int)
     f['blend_diff_away'] = np.rint((f['team_a_difficulty'].fillna(3) + f['model_diff_away']) / 2).astype(int)
-    for c in ('xg_home', 'xg_away', 'cs_prob_home', 'cs_prob_away'):
+    for c in ('xg_home', 'xg_away', 'xg_home_model', 'xg_away_model', 'cs_prob_home', 'cs_prob_away'):
         f[c] = f[c].round(3)
     return f.sort_values(['event', 'kickoff_time', 'id'], na_position='last').reset_index(drop=True)
 
 
-def build(history_df, players_df, fixtures_df, teams_df, prev=None):
+def build(history_df, players_df, fixtures_df, teams_df, prev=None, odds=None):
     tm = team_matches(history_df, players_df, fixtures_df)
     ratings = team_ratings(tm, teams_df, prev=prev)
-    model = fixture_model(fixtures_df, ratings)
+    model = fixture_model(fixtures_df, ratings, odds)
     return ratings, model

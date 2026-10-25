@@ -68,15 +68,44 @@ def main(force: bool = False) -> None:
     changed = (before.fillna('').astype(str) != after.fillna('').astype(str)).any(axis=1)
     names = players.set_index('id')['web_name']
     print(f'{int(changed.sum())} players with changed flags, news or price')
-    if not changed.any():
+    odds_moved = refresh_odds()
+    if not changed.any() and not odds_moved:
         return
-    raw.to_csv(CURRENT_DIR / 'players.csv', index=False)
-    write_json(CURRENT_DIR / 'bootstrap_static.json', bootstrap)
+    if changed.any():
+        raw.to_csv(CURRENT_DIR / 'players.csv', index=False)
+        write_json(CURRENT_DIR / 'bootstrap_static.json', bootstrap)
     for pid in changed[changed].index:
         print(f'  {names[pid]}: {before.at[pid, "status"]} -> {after.at[pid, "status"]}, '
               f'chance {after.at[pid, "chance_of_playing_next_round"]}, £{after.at[pid, "now_cost"]}m, {after.at[pid, "news"]!r}')
 
-    republish('flags_updated_at')
+    republish('flags_updated_at' if changed.any() else 'odds_updated_at')
+
+
+def refresh_odds() -> bool:
+    """Next round's bookmaker odds (fplvalue/odds.py; football-data.co.uk posts them on Friday afternoon for
+    weekend games). When a price moved, rewrite odds.csv and the fixture model the planner reads."""
+    from fplvalue import odds, team_model
+    from fplvalue.load import load, last_season
+    from fplvalue.project import last_season_matches
+    path = CURRENT_DIR / 'odds.csv'
+    old = pd.read_csv(path) if path.exists() else None
+    try:
+        snap = load(CURRENT_DIR)
+        new = odds.fetch(snap.fixtures, snap.teams, old)
+    except Exception as e:
+        print(f'odds not refreshed: {e!r}')
+        return False
+    cols = ['fixture', 'odds_xg_home', 'odds_xg_away']
+    if old is not None and old[cols].round(3).equals(new[cols].round(3)):
+        print('odds unchanged')
+        return False
+    new.to_csv(path, index=False)
+    print(f'odds for {len(new)} fixtures')
+    if len(snap.history):   # same inputs as the weekly refresh, plus the new odds
+        prev = last_season_matches(last_season(snap))
+        _, model = team_model.build(snap.history, snap.players, snap.fixtures, snap.teams, prev=prev, odds=new)
+        model.to_csv(CURRENT_DIR / 'fixture_model.csv', index=False)
+    return True
 
 
 def republish(stamp: str) -> None:

@@ -180,6 +180,21 @@ def fetch_player_summaries(player_ids):
     return pd.DataFrame(history_rows), pd.DataFrame(fixture_rows)
 
 
+def refresh_odds(fixtures_df: pd.DataFrame, teams_df: pd.DataFrame):
+    """Next round's bookmaker odds (fplvalue/odds.py) into odds.csv. A failed download keeps the last file."""
+    path = CURRENT_DIR / 'odds.csv'
+    old = pd.read_csv(path) if path.exists() else None
+    try:
+        from fplvalue.odds import fetch as fetch_odds
+        odds_df = fetch_odds(fixtures_df, teams_df, old)
+    except Exception:
+        traceback.print_exc()
+        return old
+    save_csv(odds_df, 'odds.csv')
+    print(f'odds for {len(odds_df)} fixtures')
+    return odds_df
+
+
 def main() -> None:
     ensure_dir(CURRENT_DIR)
     ensure_dir(HISTORY_DIR)
@@ -225,7 +240,9 @@ def main() -> None:
         team_prev = last_season_matches(last_season(load(CURRENT_DIR)))
     except Exception:
         traceback.print_exc()
-    team_ratings_df, fixture_model_df = build_team_model(player_history_df, players_df, fixtures_df, teams_df, prev=team_prev)
+    odds_df = refresh_odds(fixtures_df, teams_df)
+    team_ratings_df, fixture_model_df = build_team_model(player_history_df, players_df, fixtures_df, teams_df,
+                                                         prev=team_prev, odds=odds_df)
     save_csv(team_ratings_df, 'team_ratings.csv')
     save_csv(fixture_model_df, 'fixture_model.csv')
 
