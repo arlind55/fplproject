@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-25T23:24:37Z",
+  "generated_at": "2026-10-26T15:20:33Z",
   "gws": [
     9,
     10,
@@ -28,10 +28,10 @@
     "horizon": 5
   },
   "squad": {
-    "cost": 99.8,
+    "cost": 100.0,
     "budget": 100.0,
-    "xi_value": 215.3,
-    "xi_next_gw": 58.4,
+    "xi_value": 215.0,
+    "xi_next_gw": 58.2,
     "extra_transfers": 0
   },
   "long_gws": [

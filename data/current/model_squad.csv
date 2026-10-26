@@ -4,13 +4,13 @@ id,web_name,team_short_name,pos,price,next_opp,next_gw,next_n,is_starter,is_capt
 566,Silva,BOU,DEF,5.0,LEE (H),4.54,21.61,True,False
 60,Hill,BOU,DEF,5.5,LEE (H),4.49,21.32,True,False
 112,Van Hecke,TOT,DEF,4.9,CRY (H),4.34,21.26,True,False
+31,Konsa,ARS,DEF,4.7,LIV (A),3.78,20.22,True,False
 427,Mbeumo,MUN,MID,7.9,CHE (A),4.89,26.06,True,False
 68,Tavernier,BOU,MID,6.3,LEE (H),5.02,24.72,True,False
 154,Palmer,CHE,MID,9.8,MUN (H),4.95,24.58,True,False
 124,Groß,BHA,MID,6.2,MCI (A),4.07,22.78,True,False
 411,Haaland,MCI,FWD,15.7,BHA (H),6.49,30.57,True,True
-346,Calvert-Lewin,LEE,FWD,6.1,BOU (A),3.99,20.78,True,False
 496,Kinsky,TOT,GKP,4.4,CRY (H),3.2,15.92,False,False
-173,Thomas,COV,DEF,4.0,SUN (H),2.98,16.7,False,False
 183,Rudoni,COV,MID,4.9,SUN (H),4.03,19.64,False,False
+249,Barry,EVE,FWD,5.6,NEW (A),3.91,19.52,False,False
 194,Thomas-Asante,COV,FWD,5.0,SUN (H),2.65,13.13,False,False
