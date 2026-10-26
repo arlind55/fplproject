@@ -167,6 +167,26 @@ def understat_part(lines):
     allf = ['npxG90', 'np_shots90', 'sot90', 'box90', 'xg_per_shot', 'npg90', 'xg_rise', 'shot_rise', 'xGChain90']
     g = gain(te, fit_dev(tr, te, ['npxG90'], 'next_npg'), fit_dev(tr, te, allf, 'next_npg'))
     lines += [f'All goal signals together on top of npxG/90: {fmt(g)}.', '']
+    # by position: pooled gains can just be a signal telling forwards from defenders
+    lines += ['## By position (fitted and scored within each position)', '',
+              'Understat position from the player\'s most common starting role; GKs left out.', '',
+              '| Target | Signal on top of the base rate | FWD | MID | DEF |', '|---|---|---|---|---|']
+    for target, base, feats in (
+            ('next_npg', 'npxG90', ['np_shots90', 'sot90', 'xg_per_shot', 'box90', 'head_share', 'npg90', 'finishing',
+                                    'xg_rise', 'xGChain90']),
+            ('next_ast', 'xA90', ['key_passes90', 'np_shots90', 'npxG90', 'xGChain90'])):
+        cells = {f: [] for f in [base] + feats}
+        for pos in ('FWD', 'MID', 'DEF'):
+            ptr, pte = tr[tr['pos'] == pos], te[te['pos'] == pos]
+            d0, db = fit_dev(ptr, pte, [], target), fit_dev(ptr, pte, [base], target)
+            cells[base].append(fmt(gain(pte, d0, db)))
+            for f in feats:
+                cells[f].append(fmt(gain(pte, db, fit_dev(ptr, pte, [base, f], target))))
+        name = 'goals' if target == 'next_npg' else 'assists'
+        lines.append(f'| {name} | *{LABELS[base]} alone (vs flat rate)* | ' + ' | '.join(cells[base]) + ' |')
+        for f in feats:
+            lines.append(f'| {name} | {LABELS[f]} | ' + ' | '.join(cells[f]) + ' |')
+    lines.append('')
     # what does a rise look like in raw terms
     te2 = te.assign(rise=pd.qcut(te['xg_rise'].rank(method='first'), 5, labels=['lowest', '2', '3', '4', 'highest']))
     t = te2.groupby('rise', observed=True).apply(lambda x: pd.Series({

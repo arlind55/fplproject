@@ -37,6 +37,28 @@ Baseline already in the model: **xA / 90**, which alone explains +13.75% (+11.28
 
 All goal signals together on top of npxG/90: +2.48% (+1.74, +3.22) *.
 
+## By position (fitted and scored within each position)
+
+Understat position from the player's most common starting role; GKs left out.
+
+| Target | Signal on top of the base rate | FWD | MID | DEF |
+|---|---|---|---|---|
+| goals | *npxG / 90 alone (vs flat rate)* | +5.25% (+1.59, +9.30) * | +13.40% (+9.39, +17.51) * | +3.63% (+1.26, +6.46) * |
+| goals | Shots / 90 (non-pen) | +0.08% (-0.78, +1.02) | +0.75% (+0.03, +1.48) * | +0.43% (-0.34, +1.15) |
+| goals | Shots on target / 90 | -0.10% (-0.57, +0.41) | +0.76% (+0.34, +1.16) * | +0.31% (-0.06, +0.70) |
+| goals | xG per shot | +0.06% (-0.92, +1.03) | +0.90% (+0.09, +1.70) * | +0.57% (-0.22, +1.22) |
+| goals | Shots in the box / 90 | +0.47% (-0.00, +0.94) | +0.57% (-0.03, +1.14) | -0.04% (-0.63, +0.65) |
+| goals | Share of shots that are headers | -0.23% (-0.74, +0.20) | +0.19% (-0.12, +0.46) | -0.29% (-0.55, +0.01) |
+| goals | Non-penalty goals / 90 | -0.07% (-0.24, +0.09) | +0.06% (-0.05, +0.18) | +0.04% (-0.04, +0.12) |
+| goals | Goals minus xG (finishing, damped) | -0.14% (-0.40, +0.12) | +0.11% (-0.07, +0.30) | +0.04% (-0.09, +0.15) |
+| goals | Rising xG (last 3 vs last 10) | +0.05% (-0.03, +0.11) | +0.05% (-0.15, +0.23) | +0.02% (-0.17, +0.22) |
+| goals | xGChain / 90 | -0.19% (-1.03, +0.71) | +0.39% (-0.25, +1.01) | +0.29% (+0.04, +0.54) * |
+| assists | *xA / 90 alone (vs flat rate)* | +4.39% (+1.35, +7.50) * | +7.05% (+3.04, +11.04) * | +9.98% (+6.37, +13.58) * |
+| assists | Key passes / 90 | +0.81% (-0.22, +1.86) | +0.05% (-0.93, +0.99) | +1.87% (+1.19, +2.51) * |
+| assists | Shots / 90 (non-pen) | +0.02% (-0.77, +0.82) | +0.81% (-0.06, +1.77) | +0.32% (-0.03, +0.66) |
+| assists | npxG / 90 | -0.12% (-1.06, +0.84) | +0.28% (-0.59, +1.07) | -0.01% (-0.13, +0.13) |
+| assists | xGChain / 90 | +0.62% (-1.39, +2.49) | +0.77% (+0.24, +1.29) * | +0.33% (-0.24, +0.91) |
+
 **Recent xG rise, in plain numbers** (test seasons, players split into fifths by last-3 vs last-10 npxG):
 
 | Last-3 vs last-10 | Past npxG/90 (last 10) | Next-6 goals/90 | Ratio |
@@ -53,7 +75,7 @@ FPL 2025/26 + 2026/27 so far, 5,442 rows, 5-fold cross-validation by player (goa
 
 | Target | Signal | Alone | On top of FPL xG (or xA) |
 |---|---|---|---|
-| npg | FPL xG / 90 | +28.71% (+23.14, +33.21) * | — |
-| npg | Threat / 90 | +28.93% (+23.64, +34.28) * | +1.10% (-1.05, +2.89) |
-| ast | FPL xA / 90 | +8.93% (+4.51, +13.25) * | — |
-| ast | Creativity / 90 | +9.97% (+5.70, +14.87) * | +1.54% (+0.20, +2.84) * |
+| npg | FPL xG / 90 | +28.74% (+23.70, +33.13) * | — |
+| npg | Threat / 90 | +29.11% (+24.47, +33.67) * | +2.17% (+0.71, +3.71) * |
+| ast | FPL xA / 90 | +8.58% (+4.04, +12.96) * | — |
+| ast | Creativity / 90 | +9.62% (+4.70, +14.45) * | +1.50% (+0.17, +2.94) * |
