@@ -1,14 +1,4 @@
 id,event,kickoff_time,team_h,team_h_name,team_h_short,team_h_difficulty,team_a,team_a_name,team_a_short,team_a_difficulty
-77,8,2026-10-23T19:00:00Z,12,Ipswich Town,IPS,3,18,Nott'm Forest,NFO,2
-72,8,2026-10-24T11:30:00Z,2,Aston Villa,AVL,4,15,Man City,MCI,3
-71,8,2026-10-24T14:00:00Z,1,Arsenal,ARS,3,9,Everton,EVE,5
-74,8,2026-10-24T14:00:00Z,7,Coventry City,COV,2,10,Fulham,FUL,2
-73,8,2026-10-24T16:30:00Z,6,Chelsea,CHE,2,19,Spurs,TOT,4
-75,8,2026-10-25T14:00:00Z,8,Crystal Palace,CRY,3,17,Newcastle,NEW,3
-76,8,2026-10-25T14:00:00Z,11,Hull City,HUL,3,4,Brentford,BRE,2
-78,8,2026-10-25T14:00:00Z,14,Liverpool,LIV,3,5,Brighton,BHA,4
-79,8,2026-10-25T14:00:00Z,16,Man Utd,MUN,3,3,Bournemouth,BOU,4
-80,8,2026-10-25T16:30:00Z,20,Sunderland,SUN,3,13,Leeds,LEE,3
 84,9,2026-10-31T12:30:00Z,6,Chelsea,CHE,4,16,Man Utd,MUN,4
 82,9,2026-10-31T15:00:00Z,3,Bournemouth,BOU,3,13,Leeds,LEE,3
 83,9,2026-10-31T15:00:00Z,4,Brentford,BRE,3,18,Nott'm Forest,NFO,3
