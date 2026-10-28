@@ -616,9 +616,11 @@ function detailRow(p){
       <div>xGC / 90<b>${fmt(p90(p,p.xgc),2)}</b></div>
       <div>Clean sheets<b>${p.cs}</b></div>
       <div>Bonus<b>${p.bonus}</b></div>
-      <div>Non-pen goals / 90<b>${p.careerG90==null?"—":fmt(p.careerG90,2)} → ${fmt(p.seasonG90,2)} <span class="muted">career → this season</span></b></div>
-      <div>Career finishing<b>${p.finishing==null?"No PL history":`${signed(p.finishing,0)}% <span class="muted">${p.careerG} G from ${fmt(p.careerXG,1)} npxG</span>`}</b></div>
       <div>Projected next GW<b>${p.projNext==null?"—":fmt(p.projNext)} <span class="muted">next 5: ${p.proj5==null?"—":fmt(p.proj5)}</span></b></div>
+      <div>Non-pen goals / 90<b>${p.careerG90==null?"—":fmt(p.careerG90,2)} → ${fmt(p.seasonG90,2)} <span class="muted">career → this season</span></b></div>
+      <div>Non-pen xG / 90<b>${p.careerXG90==null?"—":fmt(p.careerXG90,2)} → ${fmt(p.seasonXG90,2)} <span class="muted">career → this season</span></b></div>
+      <div>Goals vs xG / 90<b>${p.seasonG90==null||p.seasonXG90==null?"—":`<span class="delta ${p.seasonG90-p.seasonXG90>0.05?"up":p.seasonG90-p.seasonXG90<-0.05?"down":""}">${signed(p.seasonG90-p.seasonXG90,2)}</span>`} <span class="muted">this season</span></b></div>
+      <div>Career finishing<b>${p.finishing==null?"No PL history":`${signed(p.finishing,0)}% <span class="muted">${p.careerG} G from ${fmt(p.careerXG,1)} npxG</span>`}</b></div>
       <div>Transfers this GW<b><span class="delta up">+${p.tin.toLocaleString()}</span> <span class="delta down">−${p.tout.toLocaleString()}</span></b></div>
     </div></div></td></tr>`;
 }
@@ -748,7 +750,7 @@ function bindFilters(){
     teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
     const PJ={};proj.forEach(r=>{PJ[r.id]={proj5:num(r.next_n),projNext:num(r.next_gw),pens:num(r.penalties_order),xgi90:(num(r.xg90)||0)+(num(r.xa90)||0)};});
     // Career finishing (finishing.csv): only shown once a player has some Premier League history
-    const FN={};fin.forEach(r=>{const xg=num(r.career_npxg)||0;FN[r.id]=xg>=1?{careerG90:num(r.career_npg90),finishing:Math.round((num(r.finishing)-1)*100),careerG:n0(r.career_npg),careerXG:xg,seasonG90:num(r.season_npg90)}:{careerG90:null,finishing:null,seasonG90:num(r.season_npg90)};});
+    const FN={};fin.forEach(r=>{const xg=num(r.career_npxg)||0;FN[r.id]=xg>=1?{careerG90:num(r.career_npg90),finishing:Math.round((num(r.finishing)-1)*100),careerG:n0(r.career_npg),careerXG:xg,careerXG90:num(r.career_npxg90),seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90)}:{careerG90:null,finishing:null,careerXG90:null,seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90)};});
     state.players=players.map(shapePlayer).filter(p=>p.name).map(p=>Object.assign(p,PJ[p.id]||{proj5:null,projNext:null},FN[p.id]||{careerG90:null,finishing:null}));
     const gws=new Set();history.forEach(h=>{const r=shapeHist(h);if(!r.gw)return;gws.add(r.gw);(state.hist[h.player_id]=state.hist[h.player_id]||[]).push(r);});
     state.gws=gws.size?[...gws].sort((a,b)=>a-b):[1];
