@@ -57,7 +57,10 @@ class Params:
     lam: float = 0.5              # weight of a last-season 90 relative to a this-season 90
     decay: float = 0.7            # recency weight per match for the minutes model
     n_recent: int = 6             # matches looked at for the minutes model
-    goal_cal: float = 0.93        # FPL non-penalty goals per Opta npxG (2025/26)
+    # FPL non-penalty goals per projected npxG, by position. Fitted walk-forward on 2025/26 (scored on 2026/27
+    # so far): one flat 0.93 under-projected MID/FWD goals by ~10% and over-projected DEF by ~10%, in line with
+    # Understat finding set-piece headers (most defender xG) the most overrated shot type.
+    goal_cal: dict = field(default_factory=lambda: {'GKP': 0.85, 'DEF': 0.85, 'MID': 1.03, 'FWD': 1.04})
     pen_conv: float = 0.80        # penalties scored per penalty taken (Understat, 1,175 PL penalties since 2014/15)
     k_pens: float = 20.0          # team penalty-rate prior weight, in matches
     assist_cal: float = 1.38      # FPL assists per Opta xA (FPL counts rebounds, pens won, deflections)
@@ -445,7 +448,7 @@ def project(state: State, prm: Params | None = None, gws: list[int] | None = Non
 
     x['xmins'] = emin
     x['app'] = (ps + pb) + p60
-    x['goals'] = x['xg90'] * prm.goal_cal * x['mult_att'] * emin / 90 * pos.map(GOAL)
+    x['goals'] = x['xg90'] * pos.map(prm.goal_cal) * x['mult_att'] * emin / 90 * pos.map(GOAL)
     # penalties: the team's rate × attack multiplier, taken by the first listed taker who is on the pitch.
     # on = share of the match a player is expected to be on (incl. availability); pen90 is per 90 on the pitch.
     x['on'] = (emin / 90 * x['avail']).clip(0, 1)
