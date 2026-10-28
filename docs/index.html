@@ -366,7 +366,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
     </div>
     <div class="field"><label for="position">Position</label><select id="position"><option value="">All</option></select></div>
     <div class="field"><label for="team">Team</label><select id="team"><option value="">All</option></select></div>
-    <div class="field"><label for="luck" title="This season's non-penalty goals vs xG: 1.5+ goals either side of their xG, once they have 1.5+ xG">Finishing run</label><select id="luck"><option value="">All</option><option value="hot">Running hot</option><option value="level">In line with xG</option><option value="cold">Running cold</option></select></div>
+    <div class="field"><label for="luck" title="This season's non-penalty goals vs what their career finishing says they should have scored from their xG: 1.5+ goals either side, once they have 1.5+ xG">Finishing run</label><select id="luck"><option value="">All</option><option value="hot">Running hot</option><option value="level">Usual finishing</option><option value="cold">Running cold</option></select></div>
     <div class="field"><label for="maxPrice">Max price</label><input id="maxPrice" type="number" step="0.1" min="0" placeholder="8.0"></div>
     <div class="field"><label for="minMins">Min minutes</label><input id="minMins" type="number" step="10" min="0" value="90"></div>
     <div class="field"><label>&nbsp;</label><label class="check"><input type="checkbox" id="hideUnavail"> Hide unavailable</label></div>
@@ -489,10 +489,13 @@ function aggregate(p,from=state.from,to=state.to,venue=state.venue){
   a.delta=a.games?a.pts-a.xpts:null;
   return Object.assign({},p,a);
 }
-// Finishing run this season: non-penalty goals 1.5+ above or below xG, once a player has 1.5+ npxG.
-// Hot and cold runs mostly revert to the xG rate (research/understat/finishing_backtest.md), so they flag luck.
-const RUN={hot:"Running hot",level:"In line with xG",cold:"Running cold"};
-function runFlag(g,x){if(g==null||x==null||x<1.5)return null;const d=g-x;return d>=1.5?"hot":d<=-1.5?"cold":"level";}
+// Finishing run this season: non-penalty goals vs what the player's own career finishing says they should have
+// scored from their npxG (npxG × career goals per xG). 1.5+ goals either side is hot / cold, once they have 1.5+ npxG.
+// A goals gap rather than a % one: on 3 npxG a single goal is +33%. Hot and cold runs mostly revert to that
+// expected rate (research/understat/finishing_backtest.md), so they flag luck.
+const RUN={hot:"Running hot",level:"Usual finishing",cold:"Running cold"};
+function expGoals(x,fin){return x==null?null:x*(1+(fin||0)/100);}
+function runFlag(g,x,fin){if(g==null||x==null||x<1.5)return null;const d=g-expGoals(x,fin);return d>=1.5?"hot":d<=-1.5?"cold":"level";}
 function per(pl,v){if(state.basis==="p90")return pl.mins?v/pl.mins*90:null;if(state.basis==="game")return pl.games?v/pl.games:null;return v;}
 const p90=(pl,v)=>pl.mins?v/pl.mins*90:null;
 const vapm=pl=>state.basis==="p90"?pl.vapm90:pl.vapm;
@@ -627,7 +630,7 @@ function detailRow(p){
       <div>Non-pen goals / 90<b>${p.careerG90==null?"—":fmt(p.careerG90,2)} → ${fmt(p.seasonG90,2)} <span class="muted">career → this season</span></b></div>
       <div>Non-pen xG / 90<b>${p.careerXG90==null?"—":fmt(p.careerXG90,2)} → ${fmt(p.seasonXG90,2)} <span class="muted">career → this season</span></b></div>
       <div>Goals vs xG / 90<b>${p.seasonG90==null||p.seasonXG90==null?"—":`<span class="delta ${p.seasonG90-p.seasonXG90>0.05?"up":p.seasonG90-p.seasonXG90<-0.05?"down":""}">${signed(p.seasonG90-p.seasonXG90,2)}</span>`} <span class="muted">this season</span></b></div>
-      <div>Finishing run<b>${p.run?`<span class="run-flag ${p.run}">${RUN[p.run]}</span> <span class="muted">${p.seasonG} G from ${fmt(p.seasonXG,1)} npxG${p.run==="hot"?" · likely to cool":p.run==="cold"?(p.finishing!=null&&p.finishing<=-5?" · poor career finisher, partly real":" · likely to pick up"):""}</span>`:`<span class="muted">Under 1.5 npxG so far</span>`}</b></div>
+      <div>Finishing run<b>${p.run?(()=>{const e=expGoals(p.seasonXG,p.finishing),pct=e>0?Math.round((p.seasonG/e-1)*100):null;return `<span class="run-flag ${p.run}">${RUN[p.run]}</span> <span class="muted">${p.seasonG} G vs ${fmt(e,1)} expected${pct==null?"":` (${pct>0?"+":""}${pct}%)`}${p.run==="hot"?" · likely to cool":p.run==="cold"?" · likely to pick up":""}</span>`;})():`<span class="muted">Under 1.5 npxG so far</span>`}</b></div>
       <div>Career finishing<b>${p.finishing==null?"No PL history":`${signed(p.finishing,0)}% <span class="muted">${p.careerG} G from ${fmt(p.careerXG,1)} npxG</span>`}</b></div>
       <div>Transfers this GW<b><span class="delta up">+${p.tin.toLocaleString()}</span> <span class="delta down">−${p.tout.toLocaleString()}</span></b></div>
     </div></div></td></tr>`;
@@ -758,7 +761,7 @@ function bindFilters(){
     teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
     const PJ={};proj.forEach(r=>{PJ[r.id]={proj5:num(r.next_n),projNext:num(r.next_gw),pens:num(r.penalties_order),xgi90:(num(r.xg90)||0)+(num(r.xa90)||0)};});
     // Career finishing (finishing.csv): only shown once a player has some Premier League history
-    const FN={};fin.forEach(r=>{const xg=num(r.career_npxg)||0,sg=num(r.season_npg),sx=num(r.season_npxg),run=runFlag(sg,sx);FN[r.id]=xg>=1?{careerG90:num(r.career_npg90),finishing:Math.round((num(r.finishing)-1)*100),careerG:n0(r.career_npg),careerXG:xg,careerXG90:num(r.career_npxg90),seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90),seasonG:sg,seasonXG:sx,run}:{careerG90:null,finishing:null,careerXG90:null,seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90),seasonG:sg,seasonXG:sx,run};});
+    const FN={};fin.forEach(r=>{const xg=num(r.career_npxg)||0,sg=num(r.season_npg),sx=num(r.season_npxg),cf=xg>=1?Math.round((num(r.finishing)-1)*100):0,run=runFlag(sg,sx,cf);FN[r.id]=xg>=1?{careerG90:num(r.career_npg90),finishing:Math.round((num(r.finishing)-1)*100),careerG:n0(r.career_npg),careerXG:xg,careerXG90:num(r.career_npxg90),seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90),seasonG:sg,seasonXG:sx,run}:{careerG90:null,finishing:null,careerXG90:null,seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90),seasonG:sg,seasonXG:sx,run};});
     state.players=players.map(shapePlayer).filter(p=>p.name).map(p=>Object.assign(p,PJ[p.id]||{proj5:null,projNext:null},FN[p.id]||{careerG90:null,finishing:null}));
     const gws=new Set();history.forEach(h=>{const r=shapeHist(h);if(!r.gw)return;gws.add(r.gw);(state.hist[h.player_id]=state.hist[h.player_id]||[]).push(r);});
     state.gws=gws.size?[...gws].sort((a,b)=>a-b):[1];
