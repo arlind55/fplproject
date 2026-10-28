@@ -51,7 +51,7 @@ Multiplying each player's projected goals by their damped career finishing befor
 | 150 | -0.02% (-0.07 to +0.03) | +0.06% (-0.05 to +0.17) |
 | 600 | -0.01% (-0.02 to +0.01) | +0.02% (-0.01 to +0.06) |
 
-90% intervals from resampling players. Finishing skill is real but small: the true spread between attackers is about ±7.5% of xG against ±19% of noise for a typical career sample (split-half correlation 0.34 for players with 15+ npxG). So `data/finishing.csv` is published for reading, not fed into projections.
+90% intervals from resampling players. Finishing skill is real but small: the true spread between attackers is about ±7.5% of xG against ±19% of noise for a typical career sample (split-half correlation 0.34 for players with 15+ npxG). So `data/current/finishing.csv` is shown in the screener for reading, not fed into projections.
 
 ## Do underperformers bounce back?
 

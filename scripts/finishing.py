@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Career finishing for every FPL player from Understat -> data/finishing.csv.
+"""Career finishing for every FPL player from Understat -> data/current/finishing.csv (shown in the screener).
 
 For each player this season, from every Premier League match Understat has (2014/15 onwards):
 
@@ -36,7 +36,7 @@ from fplvalue.project import penalties, strip_pens  # noqa: E402
 from penalties import TEAM, norm as _norm  # noqa: E402
 
 UNDERSTAT = ROOT / "research" / "understat" / "data"
-OUT = DATA / "finishing.csv"
+OUT = DATA / "current" / "finishing.csv"
 K = 150.0
 PARTICLES = {"de", "da", "do", "dos", "das", "di", "del", "van", "von", "der", "den", "el", "al", "la", "le", "ben", "bin"}
 

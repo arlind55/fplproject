@@ -253,7 +253,7 @@ def main() -> None:
     except Exception:
         traceback.print_exc()
 
-    # Career vs this-season finishing per player (data/finishing.csv). For reading only, not a model input.
+    # Career vs this-season finishing per player (finishing.csv, shown in the screener). Not a model input.
     try:
         from finishing import build as build_finishing, OUT as FINISHING_OUT
         build_finishing().to_csv(FINISHING_OUT, index=False)
