@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compare FPL players — projections, xG, finishing and fixtures side by side</title>
+<meta name="description" content="Compare up to five Fantasy Premier League players side by side: projected points, expected goals, chance of scoring 2+ or 3+, minutes, penalties, finishing runs, xG per 90, fixtures and value. The best number in every row is highlighted.">
+<link rel="canonical" href="https://fplvalue.co/compare.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FPL Value">
+<meta property="og:title" content="Compare FPL players side by side">
+<meta property="og:description" content="Up to five players, every projection and underlying number in one table, with the best in each row highlighted.">
+<meta property="og:url" content="https://fplvalue.co/compare.html">
+<meta property="og:image" content="https://fplvalue.co/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Compare FPL players side by side">
+<meta name="twitter:image" content="https://fplvalue.co/og-image.png">
+<meta name="theme-color" content="#131521" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f4f8" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* ── Shared shell (keep in sync with planner.html) ─────────────────────────── */
+:root{
+  --bg:#f3f4f8; --surface:#ffffff; --surface-2:#e9ebf2; --line:#d5d8e3; --line-strong:#b9bdcc;
+  --ink:#171a26; --ink-2:#4a4f63; --ink-3:#7a8096; --accent:#2f3fa8; --accent-ink:#ffffff;
+  --d1:#1f7a4d; --d2:#3fa66e; --d3:#c9ccd6; --d4:#d95f6a; --d5:#8f1f33;
+  --d1-ink:#ffffff; --d2-ink:#0f2a1c; --d3-ink:#2b2f3d; --d4-ink:#ffffff; --d5-ink:#ffffff;
+  --muted-cell:#f0f1f5; --ok:#1f7a4d; --warn:#b8741a; --err:#a8323f;
+  --gkp:#b8860b; --def:#2f6fb5; --mid:#2f8f5b; --fwd:#d0663a;
+  --shadow:0 1px 2px rgba(23,26,38,.06),0 6px 20px rgba(23,26,38,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+    --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+    --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+    --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+    --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+    --gkp:#e0b23a; --def:#6fa3e6; --mid:#5fc48f; --fwd:#f08a5c;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131521; --surface:#1b1e2c; --surface-2:#232739; --line:#2f3449; --line-strong:#434961;
+  --ink:#eef0f7; --ink-2:#b4b9cc; --ink-3:#7c8299; --accent:#8b97ff; --accent-ink:#0f1120;
+  --d1:#1d6b45; --d2:#2f8a5b; --d3:#3a3f52; --d4:#b34a56; --d5:#7a1a2c;
+  --d1-ink:#e6f6ec; --d2-ink:#e6f6ec; --d3-ink:#d8dbe6; --d4-ink:#fff0f1; --d5-ink:#ffe9ec;
+  --muted-cell:#1f2231; --ok:#5fc48f; --warn:#e0a24a; --err:#e57a86;
+  --gkp:#e0b23a; --def:#6fa3e6; --mid:#5fc48f; --fwd:#f08a5c;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:1400px;margin:0 auto;padding:22px 24px 48px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand .name{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:30px;line-height:1;letter-spacing:-.01em;margin:0}
+.brand small{display:block;font:500 11px "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+/* Wordmark: £ mark + uppercase name, same brand colours in light and dark */
+.brand{display:flex;align-items:center;gap:10px}.brand .name{text-transform:uppercase;letter-spacing:.01em}
+.brand .mark{flex:none;width:36px;height:36px;border-radius:8px;background:#2f3fa8;color:#ffd60a;display:grid;place-items:center;font:700 23px/1 "Barlow Condensed","Arial Narrow",sans-serif}
+.tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{padding:7px 10px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+.right{display:flex;align-items:center;gap:10px}
+.status{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:12px;white-space:nowrap}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block;flex:none}
+.status.ok i{background:var(--ok)} .status.warn i{background:var(--warn)} .status.err i{background:var(--err)}
+.status b{font:600 12px "IBM Plex Mono",monospace;color:var(--ink)}
+.theme{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink-2);display:grid;place-items:center}
+.theme:hover{color:var(--ink)}
+.theme svg{width:16px;height:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;gap:8px}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{flex:1;background:var(--surface);color:var(--ink-2);border:0;border-right:1px solid var(--line);padding:7px 10px;font:500 13px "IBM Plex Sans",sans-serif;cursor:pointer;white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible,.tabs a:focus-visible,.theme:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+footer{margin-top:14px;color:var(--ink-3);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{color:inherit}
+@media (max-width:700px){.topbar{align-items:flex-start}.right{width:100%;justify-content:space-between}}
+/* Tabs sit right after the brand on every page so they don't shift with the status text; on phones the status wraps instead of widening the page */
+.topbar>.tabs{margin-right:auto}
+@media (max-width:700px){.topbar>.tabs{margin-right:0}.right{gap:8px}.status{white-space:normal;min-width:0;flex:1 1 auto}}
+/* ── Compare ───────────────────────────────────────────────────────────── */
+.disp{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;letter-spacing:-.005em}
+.kicker{font:600 12px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.intro{margin:6px 0 22px}
+.intro h1{font-size:clamp(40px,5.4vw,68px);line-height:.95;margin:10px 0 12px}
+.intro p{font-size:15px;line-height:1.5;color:var(--ink-2);margin:0;max-width:66ch}
+.controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;margin-bottom:14px}
+@media (max-width:760px){.controls{grid-template-columns:1fr}}
+.controls .card{padding:10px 14px}
+.label .hint{font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink-3)}
+/* Player picker: type to filter, pick several to compare just those players */
+.picker{position:relative}
+.pick{display:flex;flex-wrap:wrap;gap:4px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:3px 4px;min-height:35px}
+.pick:focus-within{outline:2px solid var(--accent);outline-offset:-1px}
+.field .pick input,.field .pick input:focus{border:0;outline:0;padding:4px 6px;flex:1;min-width:140px;width:auto;background:transparent}
+.filters.comparing>.field:not(.picker):not(:last-child){opacity:.45}
+.chip{display:inline-flex;align-items:center;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:2px 2px 2px 8px;font-size:12px;font-weight:500;color:var(--ink);white-space:nowrap}
+.chip button{border:0;background:none;color:var(--ink-3);cursor:pointer;font-size:15px;line-height:1;padding:0 4px}
+.chip button:hover{color:var(--err)}
+.chip.clear{background:none;border-color:transparent;color:var(--accent);cursor:pointer;padding:2px 6px;font:inherit;font-size:12px}
+.pick-list{position:absolute;z-index:5;left:0;right:0;top:100%;margin:4px 0 0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;box-shadow:var(--shadow);max-height:320px;overflow:auto;min-width:260px}
+.pick-list li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;cursor:pointer;font-size:13px}
+.pick-list li.on,.pick-list li:hover{background:var(--muted-cell)}
+.pick-list li .t{color:var(--ink-3);font:500 12px "IBM Plex Mono",monospace;margin-left:auto}
+.pick-list li.none{color:var(--ink-3);cursor:default}
+.field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+.field input,.field select{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font:inherit;color:var(--ink)}
+.field input:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.pick input{border:0;outline:0;padding:4px 6px;flex:1;min-width:140px;width:auto;background:transparent;font:inherit;color:var(--ink)}
+.pick input:disabled{cursor:not-allowed}
+.quick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;font-size:12px;color:var(--ink-3)}
+.quick button{background:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font:500 12px "IBM Plex Sans",sans-serif;color:var(--ink-2);cursor:pointer}
+.quick button:hover{border-color:var(--accent);color:var(--accent)}
+.pos{font:600 10px "IBM Plex Mono",monospace;padding:2px 6px;border-radius:3px;color:#fff;letter-spacing:.04em}
+.pos.GKP{background:var(--gkp)} .pos.DEF{background:var(--def)} .pos.MID{background:var(--mid)} .pos.FWD{background:var(--fwd)}
+.cmpwrap{border:1px solid var(--line);border-radius:8px;overflow-x:auto;background:var(--surface);box-shadow:var(--shadow)}
+table.cmp{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums;table-layout:fixed}
+.cmp col.lab{width:230px}
+table.cmp{min-width:calc(230px + var(--n,1) * 150px)}
+@media (max-width:760px){.cmp col.lab{width:118px}table.cmp{min-width:calc(118px + var(--n,1) * 106px)}}
+.cmp th,.cmp td{border-bottom:1px solid var(--line);padding:8px 12px;text-align:right;vertical-align:middle}
+.cmp td{font:500 13.5px "IBM Plex Mono",monospace}
+.cmp tbody th{position:sticky;left:0;z-index:1;background:var(--surface);text-align:left;font:500 13px "IBM Plex Sans",sans-serif;color:var(--ink);border-right:1px solid var(--line)}
+.cmp tbody th small{display:block;color:var(--ink-3);font-size:11.5px;font-weight:400;line-height:1.3;margin-top:1px}
+@media (max-width:760px){.cmp tbody th{font-size:12.5px}.cmp tbody th small{font-size:10.5px}.cmp th,.cmp td{padding:8px 8px}.cmp td{font-size:12.5px}.cmp tr.sec th,.cmp tr.sec td{padding:7px 8px}}
+.cmp thead th{vertical-align:top;text-align:left;padding:14px 12px;border-bottom:1px solid var(--line-strong);background:var(--surface)}
+.cmp thead th.corner{position:sticky;left:0;z-index:2;border-right:1px solid var(--line);font:600 11px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);vertical-align:bottom}
+.ph{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ph .r1{display:flex;justify-content:space-between;align-items:center;gap:6px;font:500 12px "IBM Plex Sans",sans-serif;color:var(--ink-3)}
+.ph .x{border:0;background:none;color:var(--ink-3);cursor:pointer;font-size:18px;line-height:1;padding:0 2px}
+.ph .x:hover{color:var(--err)}
+.ph .who{font:700 26px/1.05 "Barlow Condensed","Arial Narrow",sans-serif;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ph .meta{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-2)}
+.ph .wins{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--ok)}
+.flags{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.flag{font:600 11px "IBM Plex Sans",sans-serif;padding:2px 7px;border-radius:4px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.flag.hot{background:var(--warn);color:#fff}.flag.cold{background:var(--accent);color:var(--accent-ink)}
+.flag.bad{background:var(--err);color:#fff}.flag.doubt{background:color-mix(in srgb,var(--warn) 22%,var(--surface));color:var(--ink)}
+.flag.pen{background:color-mix(in srgb,var(--ok) 18%,var(--surface));color:var(--ink)}
+@media (max-width:760px){.ph .who{font-size:21px}.cmp thead th{padding:12px 8px}}
+.cmp tr.sec th,.cmp tr.sec td{background:var(--surface-2);border-bottom:1px solid var(--line-strong);padding:7px 12px;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.cmp tr.sec th{color:var(--accent)}
+.cmp tr.sec td{text-align:right;font-weight:500;letter-spacing:.02em;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmp td.best{background:color-mix(in srgb,var(--ok) 15%,var(--surface));color:var(--ink);font-weight:700;box-shadow:inset 3px 0 0 var(--ok)}
+.cmp td.na{color:var(--ink-3)}
+.cmp td .sub{display:block;font:400 11px "IBM Plex Sans",sans-serif;color:var(--ink-3);margin-top:1px}
+.cmp td.best .sub{color:var(--ink-2)}
+.up{color:var(--ok)} .down{color:var(--err)}
+.cmp td .run{font:600 10.5px "IBM Plex Sans",sans-serif;padding:1px 6px;border-radius:3px;margin-right:6px;vertical-align:1px}
+@media (max-width:760px){.cmp td .run{display:inline-block;margin:0 0 3px}}
+.run.hot{background:var(--warn);color:#fff}.run.cold{background:var(--accent);color:var(--accent-ink)}.run.level{background:var(--surface-2);color:var(--ink-2)}
+.fxs{display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap}
+.fx{min-width:44px;padding:4px 4px;border-radius:4px;text-align:center;font:600 11px/1.15 "IBM Plex Mono",monospace}
+.fx small{display:block;font-size:9.5px;font-weight:500;opacity:.8}
+.fx.d1{background:var(--d1);color:var(--d1-ink)}.fx.d2{background:var(--d2);color:var(--d2-ink)}.fx.d3{background:var(--d3);color:var(--d3-ink)}.fx.d4{background:var(--d4);color:var(--d4-ink)}.fx.d5{background:var(--d5);color:var(--d5-ink)}
+.fx.blank{background:transparent;border:1px dashed var(--line-strong);color:var(--ink-3)}
+.empty{padding:40px 20px;text-align:center;color:var(--ink-3)}
+.empty.err{color:var(--err)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 2px 0;color:var(--ink-3);font-size:12px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-2px;margin-right:5px;background:color-mix(in srgb,var(--ok) 15%,var(--surface));box-shadow:inset 3px 0 0 var(--ok)}
+@media (prefers-reduced-motion:no-preference){.tabs a,.seg button{transition:background-color .15s,color .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand"><span class="mark" aria-hidden="true">£</span><div><div class="name">FPL Value</div><small>Premier League 2026/27</small></div></div>
+  <nav class="tabs" aria-label="Pages">
+    <a href="./">Home</a>
+    <a href="./planner.html">Fixture planner</a>
+    <a href="./projections.html">Projections</a>
+    <a href="./compare.html" aria-current="page">Compare</a>
+    <a href="./team.html">My team</a>
+    <a href="./accuracy.html">Track record</a>
+    <a href="./metrics.html">Metrics</a>
+    <a href="./blog/">Value Blog</a>
+  </nav>
+  <div class="right">
+    <span class="status" id="status"><i></i><span>Loading data…</span></span>
+    <button class="theme" id="themeBtn" type="button" aria-label="Toggle light / dark"></button>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="kicker" id="kicker">Player comparison</div>
+  <h1 class="disp">Compare players</h1>
+  <p>Pick up to five players. Every projection and underlying number sits side by side, and the best in each row is highlighted, so it's clear who wins on what. The link updates as you pick, so you can share a comparison.</p>
+</section>
+
+<section class="controls">
+  <div class="card">
+    <div class="label"><span>Players <span class="hint" id="pickCount">· up to 5</span></span></div>
+    <div class="picker">
+      <div class="pick"><span id="chips" style="display:contents"></span><input id="search" type="text" placeholder="Search a player or team" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="pickList" aria-label="Add a player"></div>
+      <ul class="pick-list" id="pickList" role="listbox" hidden></ul>
+    </div>
+    <div class="quick" id="quick"></div>
+  </div>
+  <div class="card">
+    <div class="label">Form window</div>
+    <div class="seg" id="win" role="group" aria-label="Window for season stats"><button data-w="season" aria-pressed="true">Season</button><button data-w="6" aria-pressed="false">Last 6</button><button data-w="3" aria-pressed="false">Last 3</button></div>
+  </div>
+</section>
+
+<div class="cmpwrap"><table class="cmp" id="cmp"><tbody><tr><td class="empty">Loading players…</td></tr></tbody></table></div>
+<div class="legend"><span><i></i>Best in the row</span><span>Rows marked “no winner” are context, not better or worse</span><span>Hover a row name for how it's worked out</span></div>
+
+<footer>
+  <span>Projections are the FPL Value model's (<a href="./projections.html">Projections</a>, <a href="./metrics.html#model">method</a>). Chance of 2+ / 3+ goals treats the next-five expected goals as a Poisson count. Finishing run: this season's non-penalty goals vs what the player's career finishing says they should have scored from their npxG; 1.5+ goals either side is hot / cold and tends to revert. Career numbers are Premier League only, from Understat.</span>
+  <span>Source: <a href="https://github.com/arlind55/fplproject">arlind55/fplproject</a> · data/current</span>
+</footer>
+</div>
+
+<script src="./shell.js"></script>
+<script>
+// ── Shared: theme + data status (keep in sync with index.html) ───────────────
+const REPO={owner:"arlind55",repo:"fplproject",branch:"main"};
+const BASE=`https://raw.githubusercontent.com/${REPO.owner}/${REPO.repo}/${REPO.branch}/data/current`;
+const $=id=>document.getElementById(id);
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function currentTheme(){const t=document.documentElement.getAttribute("data-theme");if(t)return t;return matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme");$("themeBtn").innerHTML=currentTheme()==="dark"?SUN:MOON;}
+try{applyTheme(localStorage.getItem("fpl-theme")||null);}catch(e){applyTheme(null);}
+$("themeBtn").addEventListener("click",()=>{const next=currentTheme()==="dark"?"light":"dark";try{localStorage.setItem("fpl-theme",next);}catch(e){}applyTheme(next);});
+function setStatus(cls,html){const el=$("status");el.className="status "+cls;el.lastElementChild.innerHTML=html;}
+async function fetchMeta(){try{const r=await fetch(`${BASE}/meta.json`,{cache:"no-cache"});return r.ok?await r.json():null;}catch(e){return null;}}
+function csvToObjects(text){
+  const rows=[];let row=[],cell="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];
+    if(c==='"'){if(q&&n==='"'){cell+='"';i++;}else q=!q;}
+    else if(c===","&&!q){row.push(cell);cell="";}
+    else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&n==="\n")i++;row.push(cell);rows.push(row);row=[];cell="";}
+    else cell+=c;}
+  if(cell.length||row.length){row.push(cell);rows.push(row);}
+  const [h,...b]=rows.filter(r=>r.some(v=>v!==""));
+  return b.map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]??"").trim()])));
+}
+async function fetchCsv(file){const res=await fetch(`${BASE}/${file}`,{cache:"no-cache"});if(!res.ok)throw new Error(`${file}: HTTP ${res.status}`);return csvToObjects(await res.text());}
+const num=v=>{const n=parseFloat(v);return Number.isFinite(n)?n:null;};
+const n0=v=>num(v)||0;
+const truthy=v=>/^(true|1)$/i.test(String(v));
+const fmt=(v,d=1)=>v==null||!Number.isFinite(v)?"—":v.toFixed(d);
+const signed=(v,d=1)=>{if(v==null||!Number.isFinite(v))return"—";const s=v.toFixed(d);return /^-0\.?0*$/.test(s)?s.slice(1):(v>0&&+s!==0?"+":"")+s;};
+const pct=v=>v==null||!Number.isFinite(v)?"—":`${Math.round(v*100)}%`;
+const price=v=>v==null?"—":`£${v.toFixed(1)}m`;
+const ord=n=>n==null?"—":n+(["th","st","nd","rd"][n%100>10&&n%100<14?0:n%10]||"th");
+const POS={"1":"GKP","2":"DEF","3":"MID","4":"FWD"};
+const STATUS={a:"Available",d:"Doubtful",i:"Injured",s:"Suspended",u:"Unavailable",n:"Not in squad"};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+// ── State ────────────────────────────────────────────────────────────────────
+const MAX=5;
+const state={players:[],byId:{},hist:{},teams:{},xgc:{},fixtures:[],gws:[1],nextGw:null,projGws:[],win:"season",picked:[]};
+function readPicked(){
+  const q=new URLSearchParams(location.search).get("p");
+  if(q!=null)return q.split(",").filter(Boolean);
+  try{const s=JSON.parse(localStorage.getItem("fpl-compare")||"null");if(Array.isArray(s))return s;}catch(e){}
+  return null;
+}
+try{const w=localStorage.getItem("fpl-compare-win");if(["season","6","3"].includes(w))state.win=w;}catch(e){}
+function save(){
+  const u=new URL(location.href);if(state.picked.length)u.searchParams.set("p",state.picked.join(","));else u.searchParams.delete("p");
+  history.replaceState(null,"",u);
+  try{localStorage.setItem("fpl-compare",JSON.stringify(state.picked));localStorage.setItem("fpl-compare-win",state.win);}catch(e){}
+}
+
+// ── Season numbers (same definitions as the screener on the home page) ──────
+const GOAL_PTS={GKP:6,DEF:6,MID:5,FWD:4}, CS_PTS={GKP:4,DEF:4,MID:1,FWD:0};
+const MODEL_GOAL={GKP:10,DEF:6,MID:5,FWD:4};   // goal points in the projection model (fplvalue/project.py GOAL)
+function xPtsRow(h,pos){
+  const g=GOAL_PTS[pos]??4,cs=CS_PTS[pos]??0,gk=pos==="GKP"||pos==="DEF";
+  const actual=h.goals*g+h.assists*3+h.cs*cs-(gk?Math.floor(h.gc/2):0);
+  const expected=h.xg*g+h.xa*3+(h.mins>=60?Math.exp(-h.xgc)*cs:0)-(gk?h.xgc/2:0);
+  return h.pts-actual+expected;
+}
+function shapePlayer(p){
+  return{id:p.id,name:p.web_name,full:`${p.first_name||""} ${p.second_name||""}`.trim(),team:p.team_short_name||p.team_name,teamId:p.team,teamName:p.team_name,pos:POS[String(p.element_type)]||"—",
+    price:num(p.now_cost),form:num(p.form),own:num(p.selected_by_percent),tin:n0(p.transfers_in_event),tout:n0(p.transfers_out_event),
+    seasonPts:n0(p.total_points),status:(p.status||"a").toLowerCase(),news:p.news||"",chance:num(p.chance_of_playing_next_round)};
+}
+function shapeHist(h,penXG=0){
+  return{npxg:Math.max(0,n0(h.expected_goals)-penXG),gw:n0(h.round),mins:n0(h.minutes),pts:n0(h.total_points),goals:n0(h.goals_scored),assists:n0(h.assists),cs:n0(h.clean_sheets),gc:n0(h.goals_conceded),
+    bonus:n0(h.bonus),xg:n0(h.expected_goals),xa:n0(h.expected_assists),xgi:n0(h.expected_goal_involvements),xgc:n0(h.expected_goals_conceded),defcon:n0(h.defensive_contribution)};
+}
+function windowRange(){const max=Math.max(...state.gws),min=Math.min(...state.gws);return state.win==="season"?[min,max]:[Math.max(min,max-(+state.win)+1),max];}
+function aggregate(p){
+  const [from,to]=windowRange();
+  const rows=(state.hist[p.id]||[]).filter(h=>h.gw>=from&&h.gw<=to);
+  const a={games:0,mins:0,pts:0,goals:0,assists:0,cs:0,bonus:0,xg:0,npxg:0,xa:0,xgi:0,defcon:0,xpts:0};
+  for(const h of rows){if(h.mins>0)a.games++;for(const k of ["mins","pts","goals","assists","cs","bonus","xg","npxg","xa","xgi","defcon"])a[k]+=h[k];a.xpts+=xPtsRow(h,p.pos);}
+  const p90=v=>a.mins?v/a.mins*90:null;
+  return{...a,ppg:a.games?a.pts/a.games:null,ppm:a.games&&p.price?a.pts/p.price:null,vapm:a.games&&p.price?(a.pts/a.games-2)/p.price:null,
+    delta:a.games?a.pts-a.xpts:null,giDelta:a.games?a.goals+a.assists-a.xgi:null,
+    xg90:p90(a.xg),npxg90:p90(a.npxg),xa90:p90(a.xa),xgi90:p90(a.xgi),defcon90:p90(a.defcon),pts90:p90(a.pts)};
+}
+// Finishing run (same rule as the screener's filter): npG vs npxG × career finishing, 1.5+ goals either side once npxG ≥ 1.5
+const RUN={hot:"Running hot",level:"Usual finishing",cold:"Running cold"};
+function expGoals(x,fin){return x==null?null:x*(1+(fin||0)/100);}
+function runFlag(g,x,fin){if(g==null||x==null||x<1.5)return null;const d=g-expGoals(x,fin);return d>=1.5?"hot":d<=-1.5?"cold":"level";}
+// P(N ≥ k) for a Poisson count with mean λ
+function pAtLeast(lam,k){if(lam==null)return null;let s=0,t=Math.exp(-lam);for(let i=0;i<k;i++){s+=t;t*=lam/(i+1);}return Math.max(0,1-s);}
+
+// Next five gameweeks of fixtures for a team, blanks included
+function nextFixtures(teamId){
+  const g0=state.nextGw;if(!g0)return[];
+  const out=[];
+  for(let gw=g0;gw<g0+5;gw++){
+    const fx=state.fixtures.filter(f=>num(f.event)===gw&&(f.team_h===teamId||f.team_a===teamId));
+    if(!fx.length)out.push({gw,blank:true});
+    for(const f of fx){const home=f.team_h===teamId,opp=home?f.team_a:f.team_h;out.push({gw,opp:state.teams[opp]?.short||"?",home,d:num(home?f.team_h_difficulty:f.team_a_difficulty)||3,xgc:state.xgc[opp]??null});}
+  }
+  return out;
+}
+
+// ── Rows ─────────────────────────────────────────────────────────────────────
+// best: "max" / "min" highlights the winner; omit it for context rows where neither direction is better.
+// v returns the number compared; show renders the cell (defaults to the formatted number).
+function rows(){
+  const [from,to]=windowRange(),wl=from===to?`GW${from}`:`GW${from}–${to}`,g0=state.nextGw,pg=state.projGws;
+  const pr=pg.length?`GW${pg[0]}–${pg[pg.length-1]}`:"next 5";
+  return[
+    {sec:`Projection · ${pr}`},
+    {label:"Projected points",hint:`Next ${pg.length||5} gameweeks`,best:"max",v:p=>p.proj5,d:1},
+    ...pg.map(g=>({label:`GW${g}`,hint:"Projected points",best:"max",v:p=>p.gw?.[g],d:1,show:p=>p.gw?.[g]==null?null:`${fmt(p.gw[g],1)}<span class="sub">${esc(fixLabel(p,g))}</span>`})),
+    {label:"Projected pts per £m",hint:`Next ${pg.length||5} ÷ price`,best:"max",v:p=>p.proj5!=null&&p.price?p.proj5/p.price:null,d:2},
+    {label:"Expected goals",hint:`Next ${pg.length||5}, penalties included`,best:"max",v:p=>p.xgoals5,d:2,title:"Goals the model expects over the projection window: xG per 90 × fixture strength × expected minutes, plus penalties"},
+    {label:"Chance of 2+ goals",hint:`Next ${pg.length||5}`,best:"max",v:p=>pAtLeast(p.xgoals5,2),fmt:pct},
+    {label:"Chance of 3+ goals",hint:`Next ${pg.length||5}`,best:"max",v:p=>pAtLeast(p.xgoals5,3),fmt:pct},
+    {label:"Chance of starting",hint:g0?`GW${g0}, with availability`:"Next gameweek",best:"max",v:p=>p.pStart==null?null:p.pStart*(p.avail??1),fmt:pct,title:"Recent-starts estimate (adjusted for team news) × chance of being available"},
+    {label:"Expected minutes",hint:g0?`GW${g0}`:"Next gameweek",best:"max",v:p=>p.xmins,d:0},
+    {label:"Penalty order",hint:"FPL's listed takers",best:"min",sole:true,v:p=>p.pens,fmt:v=>v==null?"—":ord(v),title:"1st = first-choice taker. Blank if not on the list"},
+    {label:"Haul chance",hint:g0?`10+ pts in GW${g0}`:"10+ pts next GW",best:"max",sole:true,v:p=>p.haul,fmt:pct,title:"Simulated chance of 10+ points next gameweek. Only worked out for the 40 best captain options"},
+
+    {sec:"Fixtures · next 5"},
+    {label:"Fixtures",hint:"FPL difficulty · opponent xGC per match",show:p=>{const fx=p.fx||[];return fx.length?`<div class="fxs">${fx.map(f=>f.blank?`<div class="fx blank">—<small>GW${f.gw}</small></div>`:`<div class="fx d${f.d}" title="GW${f.gw} · ${esc(f.opp)} ${f.home?"home":"away"} · opponent concedes ${fmt(f.xgc,2)} xG a match">${esc(f.opp)} ${f.home?"H":"A"}<small>${fmt(f.xgc,2)}</small></div>`).join("")}</div>`:"—";}},
+    {label:"Avg FPL difficulty",hint:"Lower is easier",best:"min",v:p=>{const fx=(p.fx||[]).filter(f=>!f.blank);return fx.length?fx.reduce((s,f)=>s+f.d,0)/fx.length:null;},d:2},
+    {label:"Avg opponent xGC",hint:"xG conceded per match",best:"max",v:p=>{const fx=(p.fx||[]).filter(f=>!f.blank&&f.xgc!=null);return fx.length?fx.reduce((s,f)=>s+f.xgc,0)/fx.length:null;},d:2,title:"How many xG a match the opponents concede this season, averaged over the next five fixtures. Higher is better for attackers"},
+
+    {sec:"Finishing · this season vs career"},
+    {label:"Finishing run",hint:"npG vs career-expected",v:p=>p.seasonG!=null&&p.seasonXG!=null?p.seasonG-expGoals(p.seasonXG,p.finishing):null,
+      show:p=>{if(!p.seasonXG)return null;const e=expGoals(p.seasonXG,p.finishing);return `${p.run?`<span class="run ${p.run}">${RUN[p.run]}</span>`:""}${signed(p.seasonG-e,1)}<span class="sub">${p.seasonG} G vs ${fmt(e,1)} expected${p.run?"":" · under 1.5 npxG"}</span>`;},
+      title:"This season's non-penalty goals minus npxG × career finishing. 1.5+ either side is a hot or cold run; those mostly revert, so no winner is highlighted"},
+    {label:"Non-pen goals / 90",hint:"This season",best:"max",v:p=>p.seasonG90,d:2,show:p=>p.seasonG90==null?null:`${p.run==="hot"||p.run==="cold"?`<span class="run ${p.run}">${p.run==="hot"?"Hot":"Cold"}</span>`:""}${fmt(p.seasonG90,2)}`},
+    {label:"Non-pen goals / 90",hint:"Career, before this season",best:"max",v:p=>p.careerG90,d:2},
+    {label:"npxG / 90",hint:"This season",best:"max",v:p=>p.seasonXG90,d:2},
+    {label:"npxG / 90",hint:"Career, before this season",best:"max",v:p=>p.careerXG90,d:2},
+    {label:"Career finishing",hint:"npG vs npxG, damped",best:"max",v:p=>p.finishing,show:p=>p.finishing==null?null:`${signed(p.finishing,0)}%<span class="sub">${p.careerG} G from ${fmt(p.careerXG,1)} npxG</span>`,title:"Premier League non-penalty goals vs xG before this season, damped toward average (0% = average)"},
+
+    {sec:`Output · ${wl}`},
+    {label:"Points",hint:"FPL points",best:"max",v:p=>p.s.pts,d:0,show:p=>`${p.s.pts}<span class="sub">${p.s.games} apps · ${p.s.mins} mins</span>`},
+    {label:"Points per game",best:"max",v:p=>p.s.ppg,d:1},
+    {label:"Points per 90",best:"max",v:p=>p.s.pts90,d:2},
+    {label:"Expected points",hint:"xPts from xG, xA, xGC",best:"max",v:p=>p.s.games?p.s.xpts:null,d:1},
+    {label:"Points vs xPts",hint:"+ = scoring above underlying",v:p=>p.s.delta,show:p=>p.s.delta==null?null:`<span class="${p.s.delta>0.5?"up":p.s.delta<-0.5?"down":""}">${signed(p.s.delta,1)}</span>`},
+    {label:"Goals + assists",best:"max",v:p=>p.s.games?p.s.goals+p.s.assists:null,d:0,show:p=>p.s.games?`${p.s.goals+p.s.assists}<span class="sub">${p.s.goals} G · ${p.s.assists} A</span>`:null},
+    {label:"G+A vs xGI",hint:"+ = returning more than chances",v:p=>p.s.giDelta,show:p=>p.s.giDelta==null?null:`<span class="${p.s.giDelta>0.3?"up":p.s.giDelta<-0.3?"down":""}">${signed(p.s.giDelta,1)}</span>`},
+    {label:"xG / 90",best:"max",v:p=>p.s.xg90,d:2},
+    {label:"npxG / 90",hint:"Penalty xG taken out",best:"max",v:p=>p.s.npxg90,d:2},
+    {label:"xA / 90",best:"max",v:p=>p.s.xa90,d:2},
+    {label:"xGI / 90",best:"max",v:p=>p.s.xgi90,d:2},
+    {label:"DefCon / 90",hint:"Defensive contributions",best:"max",v:p=>p.s.defcon90,d:1},
+    {label:"Bonus",best:"max",v:p=>p.s.games?p.s.bonus:null,d:0},
+
+    {sec:"Value & ownership"},
+    {label:"Price",best:"min",v:p=>p.price,fmt:price},
+    {label:"Points per £m",hint:wl,best:"max",v:p=>p.s.ppm,d:2},
+    {label:"VAPM",hint:"(PPG − 2) ÷ price",best:"max",v:p=>p.s.vapm,d:2},
+    {label:"FPL form",hint:"Avg pts, last 30 days",best:"max",v:p=>p.form,d:1},
+    {label:"Selected by",v:p=>p.own,fmt:v=>v==null?"—":`${v.toFixed(1)}%`},
+    {label:"Net transfers",hint:"This gameweek",v:p=>p.tin-p.tout,show:p=>{const n=p.tin-p.tout;return `<span class="${n>0?"up":n<0?"down":""}">${n>0?"+":""}${n.toLocaleString()}</span>`;}},
+  ];
+}
+function fixLabel(p,g){const fx=(p.fx||[]).filter(f=>f.gw===g&&!f.blank);return fx.length?fx.map(f=>`${f.opp} ${f.home?"H":"A"}`).join(" + "):"Blank";}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function enrich(p){return Object.assign({},p,{s:aggregate(p),fx:nextFixtures(p.teamId)});}
+function render(){
+  renderChips();
+  const ps=state.picked.map(id=>state.byId[id]).filter(Boolean).map(enrich);
+  const tb=$("cmp");
+  if(!ps.length){tb.innerHTML=`<tbody><tr><td class="empty">Pick a player above to start a comparison.</td></tr></tbody>`;return;}
+  const R=rows(),wins=Object.fromEntries(ps.map(p=>[p.id,0]));
+  let body="";
+  for(const r of R){
+    if(r.sec){body+=`<tr class="sec"><th scope="rowgroup">${esc(r.sec)}</th>${ps.map(p=>`<td>${esc(p.name)}</td>`).join("")}</tr>`;continue;}
+    const vals=ps.map(p=>{const v=r.v?r.v(p):null;return v==null||!Number.isFinite(v)?null:v;});
+    // round to what's shown, so a tie on screen is a tie here
+    const d=r.d??2,key=v=>v==null?null:Math.round(v*10**d)/10**d;
+    const keys=vals.map(key),have=keys.filter(v=>v!=null);
+    let best=null;
+    // a sole value wins only on rows where a blank means "no" (not a penalty taker, not a captain option)
+    if(r.best&&ps.length>1&&(have.length>1?new Set(have).size>1:have.length===1&&r.sole))best=r.best==="max"?Math.max(...have):Math.min(...have);
+    body+=`<tr><th scope="row"${r.title?` title="${esc(r.title)}"`:""}>${esc(r.label)}${r.hint?`<small>${esc(r.hint)}</small>`:""}</th>${ps.map((p,i)=>{
+      const isBest=best!=null&&keys[i]===best;if(isBest)wins[p.id]++;
+      let html=r.show?r.show(p):null;if(html==null)html=vals[i]==null?"—":(r.fmt?r.fmt(vals[i]):fmt(vals[i],r.d??1));
+      return `<td class="${isBest?"best":""}${html==="—"?" na":""}">${html}</td>`;}).join("")}</tr>`;
+  }
+  const head=`<thead><tr><th class="corner" scope="col">${ps.length>1?"Best value highlighted":"Add a second player"}</th>${ps.map(p=>`<th scope="col"><div class="ph">
+    <div class="r1"><span><span class="pos ${p.pos}">${p.pos}</span> ${esc(p.team)}</span><button class="x" type="button" data-unpick="${esc(p.id)}" aria-label="Remove ${esc(p.name)}">×</button></div>
+    <div class="who" title="${esc(p.full)}">${esc(p.name)}</div>
+    <div class="meta">${price(p.price)} · ${p.own==null?"—":p.own.toFixed(1)+"%"}</div>
+    ${ps.length>1?`<div class="wins">Best in ${wins[p.id]} row${wins[p.id]===1?"":"s"}</div>`:""}
+    <div class="flags">${flags(p)}</div></div></th>`).join("")}</tr></thead>`;
+  const cols=`<colgroup><col class="lab">${ps.map(()=>'<col class="pl">').join("")}</colgroup>`;
+  tb.style.setProperty("--n",ps.length);tb.innerHTML=cols+head+`<tbody>${body}</tbody>`;
+}
+function flags(p){
+  const out=[];
+  if(p.status!=="a")out.push(`<span class="flag ${p.status==="d"?"doubt":"bad"}" title="${esc(p.news)}">${STATUS[p.status]||p.status.toUpperCase()}${p.chance!=null&&p.chance<100?` ${p.chance}%`:""}</span>`);
+  if(p.run==="hot")out.push(`<span class="flag hot" title="Scoring well above what their finishing and npxG suggest; likely to cool">Running hot</span>`);
+  if(p.run==="cold")out.push(`<span class="flag cold" title="Scoring well below what their finishing and npxG suggest; likely to pick up">Running cold</span>`);
+  if(p.pens===1)out.push(`<span class="flag pen">On pens</span>`);
+  return out.join("");
+}
+$("cmp").addEventListener("click",e=>{const b=e.target.closest("[data-unpick]");if(b)removePick(b.dataset.unpick);});
+
+// ── Picker ───────────────────────────────────────────────────────────────────
+const pick={matches:[],on:0};
+function renderChips(){
+  $("chips").innerHTML=state.picked.filter(id=>state.byId[id]).map(id=>`<span class="chip">${esc(state.byId[id].name)}<button type="button" data-unpick="${esc(id)}" aria-label="Remove ${esc(state.byId[id].name)}">×</button></span>`).join("")
+    +(state.picked.length>1?`<button type="button" class="chip clear" data-unpick="*">Clear</button>`:"");
+  const full=state.picked.length>=MAX;
+  $("search").disabled=full;$("search").placeholder=full?"Five players picked: remove one to swap":state.picked.length?"Add another player":"Search a player or team";
+  $("pickCount").textContent=`· ${state.picked.length} of ${MAX}`;
+}
+function renderPickList(){
+  const q=$("search").value.trim().toLowerCase(),list=$("pickList");
+  if(!q){list.hidden=true;$("search").setAttribute("aria-expanded","false");return;}
+  const picked=new Set(state.picked);
+  const rank=p=>{const n=String(p.name||"").toLowerCase();return n.startsWith(q)?0:n.split(/[\s.\-']/).some(w=>w.startsWith(q))?1:2;};
+  pick.matches=state.players.filter(p=>!picked.has(p.id)&&[p.name,p.full,p.teamName,p.team].some(v=>String(v||"").toLowerCase().includes(q)))
+    .sort((a,b)=>rank(a)-rank(b)||(b.seasonPts||0)-(a.seasonPts||0)).slice(0,8);
+  pick.on=Math.min(pick.on,Math.max(pick.matches.length-1,0));
+  list.innerHTML=pick.matches.length?pick.matches.map((p,i)=>`<li role="option" id="pick${i}" data-pick="${esc(p.id)}" class="${i===pick.on?"on":""}" aria-selected="${i===pick.on}"><span class="pos ${p.pos}">${p.pos}</span>${esc(p.name)}<span class="t">${esc(p.team)} · ${price(p.price)}</span></li>`).join(""):`<li class="none">No players match “${esc(q)}”</li>`;
+  list.hidden=false;$("search").setAttribute("aria-expanded","true");
+}
+function addPick(id){if(!id||state.picked.includes(id)||state.picked.length>=MAX)return;state.picked.push(id);$("search").value="";pick.on=0;save();renderPickList();render();if(state.picked.length<MAX)$("search").focus();}
+function removePick(id){state.picked=id==="*"?[]:state.picked.filter(x=>x!==id);save();render();$("search").focus();}
+$("search").addEventListener("input",()=>{pick.on=0;renderPickList();});
+$("search").addEventListener("keydown",e=>{
+  const open=!$("pickList").hidden&&pick.matches.length;
+  if(e.key==="ArrowDown"&&open){e.preventDefault();pick.on=(pick.on+1)%pick.matches.length;renderPickList();}
+  else if(e.key==="ArrowUp"&&open){e.preventDefault();pick.on=(pick.on-1+pick.matches.length)%pick.matches.length;renderPickList();}
+  else if(e.key==="Enter"&&open){e.preventDefault();addPick(pick.matches[pick.on].id);}
+  else if(e.key==="Escape"){$("pickList").hidden=true;$("search").setAttribute("aria-expanded","false");}
+  else if(e.key==="Backspace"&&!$("search").value&&state.picked.length){removePick(state.picked[state.picked.length-1]);}
+});
+$("search").addEventListener("blur",()=>{$("pickList").hidden=true;$("search").setAttribute("aria-expanded","false");});
+$("pickList").addEventListener("mousedown",e=>{e.preventDefault();const li=e.target.closest("li[data-pick]");if(li)addPick(li.dataset.pick);});
+$("chips").addEventListener("click",e=>{const b=e.target.closest("[data-unpick]");if(b)removePick(b.dataset.unpick);});
+// Quick sets: one click to a sensible starting comparison
+function renderQuick(){
+  const top=(f,n=3)=>state.players.filter(p=>p.proj5!=null&&f(p)).sort((a,b)=>b.proj5-a.proj5).slice(0,n).map(p=>p.id);
+  const sets=[["Top projected",top(()=>true)],["Forwards",top(p=>p.pos==="FWD")],["Midfielders",top(p=>p.pos==="MID")],["Defenders",top(p=>p.pos==="DEF")],["Under £6.5m",top(p=>p.price<6.5&&p.pos!=="GKP")]];
+  $("quick").innerHTML=`<span>Quick start:</span>`+sets.filter(s=>s[1].length).map((s,i)=>`<button type="button" data-set="${i}">${s[0]}</button>`).join("");
+  $("quick").onclick=e=>{const b=e.target.closest("[data-set]");if(!b)return;state.picked=sets[+b.dataset.set][1].slice(0,MAX);save();render();};
+}
+document.querySelectorAll("#win button").forEach(b=>{b.setAttribute("aria-pressed",String(b.dataset.w===state.win));
+  b.addEventListener("click",()=>{state.win=b.dataset.w;document.querySelectorAll("#win button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));save();render();});});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(async()=>{
+  try{
+    const [players,history,teams,events,meta,proj,fx,caps,fin,tr,pens]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("events.csv"),fetchMeta(),fetchCsv("projections.csv").catch(()=>[]),fetchCsv("fixtures_lite.csv").catch(()=>[]),fetchCsv("captains.csv").catch(()=>[]),fetchCsv("finishing.csv").catch(()=>[]),fetchCsv("team_ratings.csv").catch(()=>[]),fetchCsv("../penalties.csv").catch(()=>[])]);
+    teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
+    tr.forEach(t=>{const g=num(t.games);if(g)state.xgc[t.team_id]=num(t.xg_against)/g;});
+    state.fixtures=fx;
+    const next=events.find(e=>truthy(e.is_next));state.nextGw=next?+next.id:null;
+    state.projGws=proj.length?Object.keys(proj[0]).map(k=>/^gw_(\d+)$/.exec(k)).filter(Boolean).map(m=>+m[1]).sort((a,b)=>a-b):[];
+    // Projections: expected goals over the window come from the model (xgoals_n); older exports lack it, so
+    // scale next gameweek's goal + penalty points by the window's share of points as a stand-in
+    const HAUL=Object.fromEntries(caps.map(c=>[c.id,num(c.haul_prob)]));
+    const PJ={};
+    proj.forEach(r=>{
+      const pos=r.pos,nextG=((num(r.next_goals)||0)+(num(r.next_pens)||0))/(MODEL_GOAL[pos]||4),ng=num(r.next_gw),nn=num(r.next_n);
+      const xg5=num(r.xgoals_n)??(ng>0&&nn!=null?nextG*nn/ng:null);
+      PJ[r.id]={proj5:nn,projNext:ng,gw:Object.fromEntries(state.projGws.map(g=>[g,num(r[`gw_${g}`])])),pens:num(r.penalties_order),pStart:num(r.p_start),avail:num(r.avail_next),xmins:num(r.next_xmins),xgoals5:xg5,haul:HAUL[r.id]??null};
+    });
+    const FN={};fin.forEach(r=>{const xg=num(r.career_npxg)||0,sg=num(r.season_npg),sx=num(r.season_npxg),has=xg>=1,cf=has?Math.round((num(r.finishing)-1)*100):0;
+      FN[r.id]={careerG90:has?num(r.career_npg90):null,careerXG90:has?num(r.career_npxg90):null,finishing:has?cf:null,careerG:n0(r.career_npg),careerXG:xg,seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90),seasonG:sg,seasonXG:sx,run:runFlag(sg,sx,cf)};});
+    state.players=players.map(shapePlayer).filter(p=>p.name).map(p=>Object.assign(p,{proj5:null,gw:{},pens:null,pStart:null,avail:null,xmins:null,xgoals5:null,haul:null},PJ[p.id]||{},
+      {careerG90:null,careerXG90:null,finishing:null,seasonG90:null,seasonXG90:null,seasonG:null,seasonXG:null,run:null},FN[p.id]||{}));
+    state.byId=Object.fromEntries(state.players.map(p=>[p.id,p]));
+    const y0=Math.min(...events.map(e=>new Date(e.deadline_time).getUTCFullYear()).filter(Number.isFinite)),season=`${y0}/${String(y0+1).slice(2)}`;
+    const PX={};pens.forEach(r=>{if(r.season===season){const k=`${r.element}-${r.fixture}`;PX[k]=(PX[k]||0)+(num(r.xg)||0);}});
+    const gws=new Set();history.forEach(h=>{const r=shapeHist(h,PX[`${h.player_id}-${h.fixture}`]||0);if(!r.gw)return;gws.add(r.gw);(state.hist[h.player_id]=state.hist[h.player_id]||[]).push(r);});
+    state.gws=gws.size?[...gws].sort((a,b)=>a-b):[1];
+    if(state.nextGw)$("kicker").textContent=`Player comparison · GW${state.nextGw}`;
+    const saved=readPicked();
+    state.picked=(saved??[]).filter(id=>state.byId[id]).slice(0,MAX);
+    renderQuick();
+    if(saved==null)state.picked=state.players.filter(p=>p.proj5!=null&&p.pos==="FWD").sort((a,b)=>b.proj5-a.proj5).slice(0,3).map(p=>p.id);
+    render();
+    setStatus("ok",describeData(events,meta,fx));
+  }catch(err){
+    setStatus("err","Could not load repo data");
+    $("cmp").innerHTML=`<tbody><tr><td class="empty err">Couldn't load data from ${BASE}. ${esc(err.message)}.</td></tr></tbody>`;
+  }
+})();
+</script>
+</body>
+</html>

@@ -120,7 +120,7 @@ for name, snap in pages.items():
 
 # sitemap: the data pages change with every refresh
 sm = DOCS / "sitemap.xml"; s = sm.read_text()
-for path in ("/", "/planner.html", "/projections.html", "/team.html", "/accuracy.html"):
+for path in ("/", "/planner.html", "/projections.html", "/compare.html", "/team.html", "/accuracy.html"):
     loc = f"<loc>{SITE}{path}</loc>"
     s = re.sub(re.escape(loc) + r"(<lastmod>[^<]*</lastmod>)?", f"{loc}<lastmod>{updated}</lastmod>", s, count=1)
 sm.write_text(s)
