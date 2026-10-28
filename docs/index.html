@@ -241,10 +241,10 @@ td.name{font-weight:600;color:var(--ink)}
 .run-flag.hot{background:var(--warn);color:#fff}.run-flag.cold{background:var(--accent);color:#fff}
 .badge.a::before{background:var(--ok)} .badge.d::before{background:var(--warn)} .badge.i::before,.badge.s::before,.badge.u::before,.badge.n::before{background:var(--err)}
 tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;border-bottom:1px solid var(--line-strong)}
-.detail-grid{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start}
+.detail-grid{display:grid;grid-template-columns:minmax(250px,1fr) auto;gap:20px;align-items:start}
 @media (max-width:900px){.detail-grid{grid-template-columns:1fr}}
 .fixrow{display:flex;gap:4px;flex-wrap:wrap}
-.fix{min-width:72px;height:38px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:600 13px "IBM Plex Mono",monospace;line-height:1.1}
+.fix{min-width:72px;padding:5px 6px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:600 13px "IBM Plex Mono",monospace;line-height:1.1}
 .fix small{font:500 10px "IBM Plex Mono",monospace;opacity:.8;margin-top:2px}
 .fix.d1{background:var(--d1);color:var(--d1-ink)} .fix.d2{background:var(--d2);color:var(--d2-ink)} .fix.d3{background:var(--d3);color:var(--d3-ink)} .fix.d4{background:var(--d4);color:var(--d4-ink)} .fix.d5{background:var(--d5);color:var(--d5-ink)}
 .fix.blank{background:transparent;border:1px dashed var(--line);color:var(--ink-3);font-weight:500;font-size:11px;padding:0 10px}
@@ -426,7 +426,7 @@ async function fetchMeta(){try{const r=await fetch(`${BASE}/meta.json`,{cache:"n
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 const charts={};
-const state={players:[],hist:{},teams:{},events:[],future:null,filtered:[],rows:[],
+const state={players:[],hist:{},teams:{},xgc:{},events:[],future:null,filtered:[],rows:[],
   gws:[1],from:1,to:1,preset:"season",venue:"all",basis:"total",valueMode:"xgi",sort:{key:"ppg",dir:"desc"},open:null,picked:[]};
 try{const s=JSON.parse(localStorage.getItem("fpl-dash")||"null");if(s&&typeof s==="object")Object.assign(state,s);}catch(e){}
 if(!Array.isArray(state.picked))state.picked=[];
@@ -487,6 +487,7 @@ function aggregate(p,from=state.from,to=state.to,venue=state.venue){
   a.vapm=a.games&&p.price?(a.ppg-2)/p.price:null;
   a.vapm90=a.mins&&p.price?(a.p90pts-2)/p.price:null;
   a.delta=a.games?a.pts-a.xpts:null;
+  a.giDelta=a.goals+a.assists-a.xgi;
   return Object.assign({},p,a);
 }
 // Finishing run this season: non-penalty goals vs what the player's own career finishing says they should have
@@ -546,7 +547,7 @@ const COLS=[
   {key:"xgi",label:"xGI",num:true,basis:true,render:p=>fmt(per(p,p.xgi),2)},
   {key:"careerG90",label:"Car G/90",num:true,grp:true,title:"Premier League non-penalty goals per 90 before this season (Understat). Compare with this season's goals in the window",render:p=>p.careerG90==null?"—":fmt(p.careerG90,2)},
   {key:"finishing",label:"Finish",num:true,title:"Career finishing: Premier League non-penalty goals vs xG before this season, damped toward average (0% = average). Only a long record moves it far from 0",render:p=>p.finishing==null?"—":`<span class="${p.finishing>=3?"up":p.finishing<=-3?"down":""}">${signed(p.finishing,0)}%</span>`},
-  {key:"ict",label:"ICT",num:true,basis:true,render:p=>fmt(per(p,p.ict),1)},
+  {key:"giDelta",label:"G+A Δ",num:true,basis:true,title:"Goals + assists minus xGI in the window: + = returning more than their chances",render:p=>{const v=per(p,p.giDelta);return v==null?"—":`<span class="${v>0.3?"up":v<-0.3?"down":""}">${signed(v,state.basis==="total"?1:2)}</span>`;}},
   {key:"defcon",label:"DefCon",num:true,basis:true,render:p=>fmt(per(p,p.defcon),state.basis==="total"?0:1)},
   {key:"own",label:"Own %",num:true,grp:true,render:p=>fmt(p.own)},
   {key:"status",label:"Status",render:p=>`<span class="badge ${p.status}" title="${esc(p.news)}">${STATUS[p.status]||p.status.toUpperCase()}${p.chance!=null&&p.chance<100?` ${p.chance}%`:""}</span>`},
@@ -614,7 +615,7 @@ $("chips").addEventListener("click",e=>{const b=e.target.closest("[data-unpick]"
 async function loadFuture(){try{const rows=await fetchCsv("player_future_fixtures.csv");const map={};rows.forEach(f=>{(map[f.player_id]=map[f.player_id]||[]).push(f);});Object.values(map).forEach(l=>l.sort((a,b)=>(num(a.event)||99)-(num(b.event)||99)));state.future=map;}catch(e){state.future={};}}
 function detailRow(p){
   const fixtures=(state.future?.[p.id]||[]).slice(0,5);
-  const fixHtml=fixtures.length?fixtures.map(f=>{const home=truthy(f.is_home);const opp=state.teams[home?f.team_a:f.team_h]?.short||"?";const d=num(f.difficulty)||3;return `<div class="fix d${d}">${opp} <span style="font-size:10px;opacity:.75;margin-left:3px">${home?"H":"A"}</span><small>GW${f.event||"—"}</small></div>`;}).join(""):`<div class="fix blank">No upcoming fixtures loaded</div>`;
+  const fixHtml=fixtures.length?fixtures.map(f=>{const home=truthy(f.is_home);const opp=state.teams[home?f.team_a:f.team_h]?.short||"?";const d=num(f.difficulty)||3;return `<div class="fix d${d}">${opp} <span style="font-size:10px;opacity:.75;margin-left:3px">${home?"H":"A"}</span><small>GW${f.event||"—"}</small><small title="Opponent's xG conceded per match this season">${state.xgc[home?f.team_a:f.team_h]==null?"":fmt(state.xgc[home?f.team_a:f.team_h],2)+" xGC"}</small></div>`;}).join(""):`<div class="fix blank">No upcoming fixtures loaded</div>`;
   const giDiff=p.goals+p.assists-p.xgi;
   return `<tr class="detail"><td colspan="${COLS.length}"><div class="detail-grid">
     <div><div class="label">Next 5 fixtures</div><div class="fixrow">${fixHtml}</div>${p.news?`<div class="news">⚠ ${esc(p.news)}${p.chance!=null?` · ${p.chance}% chance of playing`:""}</div>`:""}</div>
@@ -749,7 +750,7 @@ function onThemeChange(){if(state.rows.length)buildCharts();}
 function fillSelect(id,values){const el=$(id),cur=el.value;el.innerHTML='<option value="">All</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");el.value=values.includes(cur)?cur:"";}
 function bindFilters(){
   ["search","position","team","luck","maxPrice","minMins","hideUnavail"].forEach(id=>$(id).addEventListener("input",renderPlayers));
-  $("exportPlayers").addEventListener("click",()=>{const keys=["name","team","pos","price","games","mins","ppg","pts","xpts","delta","ppm","vapm","proj5","projNext","goals","assists","xg","xa","xgi","xgc","ict","defcon","bonus","careerG90","finishing","own","tin","tout","status","news"];
+  $("exportPlayers").addEventListener("click",()=>{const keys=["name","team","pos","price","games","mins","ppg","pts","xpts","delta","ppm","vapm","proj5","projNext","goals","assists","xg","xa","xgi","giDelta","xgc","ict","defcon","bonus","careerG90","finishing","own","tin","tout","status","news"];
     const lines=[`# window ${windowLabel()} venue ${state.venue}`,keys.join(",")].concat(state.filtered.map(p=>keys.map(k=>`"${String(typeof p[k]==="number"?+p[k].toFixed(3):(p[k]??"")).replace(/"/g,'""')}"`).join(",")));
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8;"}));a.download=`fpl-players-${windowLabel().replace("–","-")}.csv`;a.click();URL.revokeObjectURL(a.href);});
 }
@@ -757,8 +758,9 @@ function bindFilters(){
 // ── Init ─────────────────────────────────────────────────────────────────────
 (async()=>{
   try{
-    const [players,history,teams,events,meta,proj,fx,caps,fin]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("events.csv"),fetchMeta(),fetchCsv("projections.csv").catch(()=>[]),fetchCsv("fixtures_lite.csv").catch(()=>null),fetchCsv("captains.csv").catch(()=>[]),fetchCsv("finishing.csv").catch(()=>[])]);
+    const [players,history,teams,events,meta,proj,fx,caps,fin,tr]=await Promise.all([fetchCsv("players.csv"),fetchCsv("player_history.csv"),fetchCsv("teams.csv"),fetchCsv("events.csv"),fetchMeta(),fetchCsv("projections.csv").catch(()=>[]),fetchCsv("fixtures_lite.csv").catch(()=>null),fetchCsv("captains.csv").catch(()=>[]),fetchCsv("finishing.csv").catch(()=>[]),fetchCsv("team_ratings.csv").catch(()=>[])]);
     teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
+    state.xgc={};tr.forEach(t=>{const g=num(t.games);if(g)state.xgc[t.team_id]=num(t.xg_against)/g;});
     const PJ={};proj.forEach(r=>{PJ[r.id]={proj5:num(r.next_n),projNext:num(r.next_gw),pens:num(r.penalties_order),xgi90:(num(r.xg90)||0)+(num(r.xa90)||0)};});
     // Career finishing (finishing.csv): only shown once a player has some Premier League history
     const FN={};fin.forEach(r=>{const xg=num(r.career_npxg)||0,sg=num(r.season_npg),sx=num(r.season_npxg),cf=xg>=1?Math.round((num(r.finishing)-1)*100):0,run=runFlag(sg,sx,cf);FN[r.id]=xg>=1?{careerG90:num(r.career_npg90),finishing:Math.round((num(r.finishing)-1)*100),careerG:n0(r.career_npg),careerXG:xg,careerXG90:num(r.career_npxg90),seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90),seasonG:sg,seasonXG:sx,run}:{careerG90:null,finishing:null,careerXG90:null,seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90),seasonG:sg,seasonXG:sx,run};});
