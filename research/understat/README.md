@@ -16,6 +16,8 @@ Outputs: `matches.csv`, `team_matches.csv` (xG, npxG, PPDA, deep passes, xPts pe
 
 `player_strength.py` rates each team per match as the sum of its starting XI's npxG and xA per 90 (from all earlier PL appearances, decayed and shrunk towards a new-player prior) and compares that with team xG form on the same hold-out seasons, overall and in matches with big line-up changes. Writes `data/player_strength.md`.
 
+`xg_bounce_back.py <data_dir> <out_dir>` tests whether attackers who underperform their xG later overperform (they don't; they return to their xG rate) against a pure-luck simulation, and lists current players on a cold run. `finishing_backtest.md` has its results, why Understat xG needs rescaling per season, and the model's goal calibration check.
+
 Notes
 - Understat has no official API. These endpoints are what the site's own pages call, and the community libraries (soccerdata, understatapi) use them too. They can change without notice. Keep requests slow (default 1 s apart) and use the data for personal research.
 - Understat's `forecast_*` columns are computed from the shots in that same match, so they are not a pre-match prediction.

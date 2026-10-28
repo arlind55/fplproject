@@ -253,6 +253,13 @@ def main() -> None:
     except Exception:
         traceback.print_exc()
 
+    # Career vs this-season finishing per player (data/finishing.csv). For reading only, not a model input.
+    try:
+        from finishing import build as build_finishing, OUT as FINISHING_OUT
+        build_finishing().to_csv(FINISHING_OUT, index=False)
+    except Exception:
+        traceback.print_exc()
+
     # Expected-points projections, captain ranking and model squad (see fplvalue/). Never blocks the refresh.
     try:
         from fplvalue.publish import write as write_projections
