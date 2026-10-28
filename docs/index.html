@@ -191,7 +191,7 @@ footer a{color:inherit}
 .screener-head h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:22px;margin:0}
 .screener-head p{margin:2px 0 0;color:var(--ink-3);font-size:12px}
 .count{font:500 12px "IBM Plex Mono",monospace;color:var(--ink-3)}
-.filters{display:grid;grid-template-columns:minmax(180px,1.4fr) repeat(4,minmax(110px,.8fr)) auto auto;gap:10px;margin-bottom:12px;align-items:end}
+.filters{display:grid;grid-template-columns:minmax(180px,1.4fr) repeat(5,minmax(110px,.8fr)) auto auto;gap:10px;margin-bottom:12px;align-items:end}
 @media (max-width:1100px){.filters{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:640px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.charts{grid-template-columns:1fr}}
 @media (max-width:1100px){.filters .picker{grid-column:1/-1}}
@@ -237,6 +237,8 @@ td.name{font-weight:600;color:var(--ink)}
 .up{color:var(--ok)} .down{color:var(--err)}
 .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-2)}
 .badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
+.run-flag{font:600 12px "IBM Plex Sans",sans-serif;padding:2px 7px;border-radius:4px;background:var(--line);color:var(--ink)}
+.run-flag.hot{background:var(--warn);color:#fff}.run-flag.cold{background:var(--accent);color:#fff}
 .badge.a::before{background:var(--ok)} .badge.d::before{background:var(--warn)} .badge.i::before,.badge.s::before,.badge.u::before,.badge.n::before{background:var(--err)}
 tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;border-bottom:1px solid var(--line-strong)}
 .detail-grid{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start}
@@ -364,6 +366,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
     </div>
     <div class="field"><label for="position">Position</label><select id="position"><option value="">All</option></select></div>
     <div class="field"><label for="team">Team</label><select id="team"><option value="">All</option></select></div>
+    <div class="field"><label for="luck" title="This season's non-penalty goals vs xG: 1.5+ goals either side of their xG, once they have 1.5+ xG">Finishing run</label><select id="luck"><option value="">All</option><option value="hot">Running hot</option><option value="level">In line with xG</option><option value="cold">Running cold</option></select></div>
     <div class="field"><label for="maxPrice">Max price</label><input id="maxPrice" type="number" step="0.1" min="0" placeholder="8.0"></div>
     <div class="field"><label for="minMins">Min minutes</label><input id="minMins" type="number" step="10" min="0" value="90"></div>
     <div class="field"><label>&nbsp;</label><label class="check"><input type="checkbox" id="hideUnavail"> Hide unavailable</label></div>
@@ -486,6 +489,10 @@ function aggregate(p,from=state.from,to=state.to,venue=state.venue){
   a.delta=a.games?a.pts-a.xpts:null;
   return Object.assign({},p,a);
 }
+// Finishing run this season: non-penalty goals 1.5+ above or below xG, once a player has 1.5+ npxG.
+// Hot and cold runs mostly revert to the xG rate (research/understat/finishing_backtest.md), so they flag luck.
+const RUN={hot:"Running hot",level:"In line with xG",cold:"Running cold"};
+function runFlag(g,x){if(g==null||x==null||x<1.5)return null;const d=g-x;return d>=1.5?"hot":d<=-1.5?"cold":"level";}
 function per(pl,v){if(state.basis==="p90")return pl.mins?v/pl.mins*90:null;if(state.basis==="game")return pl.games?v/pl.games:null;return v;}
 const p90=(pl,v)=>pl.mins?v/pl.mins*90:null;
 const vapm=pl=>state.basis==="p90"?pl.vapm90:pl.vapm;
@@ -552,11 +559,11 @@ $("playersHead").addEventListener("click",e=>{const th=e.target.closest("th[data
   if(state.sort.key===key)state.sort.dir=state.sort.dir==="desc"?"asc":"desc";else state.sort={key,dir:STR.includes(key)?"asc":"desc"};save();renderPlayers();});
 
 function renderPlayers(){
-  const q=$("search").value.trim().toLowerCase(),position=$("position").value,team=$("team").value,maxPrice=num($("maxPrice").value),minMins=num($("minMins").value)||0,hide=$("hideUnavail").checked;
+  const q=$("search").value.trim().toLowerCase(),position=$("position").value,team=$("team").value,maxPrice=num($("maxPrice").value),minMins=num($("minMins").value)||0,hide=$("hideUnavail").checked,luck=$("luck").value;
   // Picked players override the other filters: the table becomes a side-by-side of just those players
   const picked=new Set(state.picked);
   const rows=picked.size?state.rows.filter(p=>picked.has(p.id))
-    :state.rows.filter(p=>(!q||[p.name,p.teamName,p.team].some(v=>String(v||"").toLowerCase().includes(q)))&&(!position||p.pos===position)&&(!team||p.team===team)&&(maxPrice==null||(p.price||0)<=maxPrice)&&p.mins>=minMins&&(!hide||p.status==="a"||p.status==="d"));
+    :state.rows.filter(p=>(!q||[p.name,p.teamName,p.team].some(v=>String(v||"").toLowerCase().includes(q)))&&(!position||p.pos===position)&&(!team||p.team===team)&&(maxPrice==null||(p.price||0)<=maxPrice)&&p.mins>=minMins&&(!hide||p.status==="a"||p.status==="d")&&(!luck||p.run===luck));
   const {key,dir}=state.sort,str=STR.includes(key);
   rows.sort((a,b)=>{const av=sortValue(a,key),bv=sortValue(b,key);const an=av==null||(typeof av==="number"&&!Number.isFinite(av)),bn=bv==null||(typeof bv==="number"&&!Number.isFinite(bv));if(an&&bn)return 0;if(an)return 1;if(bn)return -1;const r=str?String(av).localeCompare(String(bv)):av-bv;return dir==="asc"?r:-r;});
   state.filtered=rows;renderHead();renderChips();$("playerCountStatus").textContent=`${picked.size?`Comparing ${rows.length} · other filters paused`:`${rows.length} players`} · ${windowLabel()}${state.venue!=="all"?(state.venue==="H"?" · home":" · away"):""}`;
@@ -620,6 +627,7 @@ function detailRow(p){
       <div>Non-pen goals / 90<b>${p.careerG90==null?"—":fmt(p.careerG90,2)} → ${fmt(p.seasonG90,2)} <span class="muted">career → this season</span></b></div>
       <div>Non-pen xG / 90<b>${p.careerXG90==null?"—":fmt(p.careerXG90,2)} → ${fmt(p.seasonXG90,2)} <span class="muted">career → this season</span></b></div>
       <div>Goals vs xG / 90<b>${p.seasonG90==null||p.seasonXG90==null?"—":`<span class="delta ${p.seasonG90-p.seasonXG90>0.05?"up":p.seasonG90-p.seasonXG90<-0.05?"down":""}">${signed(p.seasonG90-p.seasonXG90,2)}</span>`} <span class="muted">this season</span></b></div>
+      <div>Finishing run<b>${p.run?`<span class="run-flag ${p.run}">${RUN[p.run]}</span> <span class="muted">${p.seasonG} G from ${fmt(p.seasonXG,1)} npxG${p.run==="hot"?" · likely to cool":p.run==="cold"?(p.finishing!=null&&p.finishing<=-5?" · poor career finisher, partly real":" · likely to pick up"):""}</span>`:`<span class="muted">Under 1.5 npxG so far</span>`}</b></div>
       <div>Career finishing<b>${p.finishing==null?"No PL history":`${signed(p.finishing,0)}% <span class="muted">${p.careerG} G from ${fmt(p.careerXG,1)} npxG</span>`}</b></div>
       <div>Transfers this GW<b><span class="delta up">+${p.tin.toLocaleString()}</span> <span class="delta down">−${p.tout.toLocaleString()}</span></b></div>
     </div></div></td></tr>`;
@@ -737,7 +745,7 @@ function onThemeChange(){if(state.rows.length)buildCharts();}
 // ── Filters / export ─────────────────────────────────────────────────────────
 function fillSelect(id,values){const el=$(id),cur=el.value;el.innerHTML='<option value="">All</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");el.value=values.includes(cur)?cur:"";}
 function bindFilters(){
-  ["search","position","team","maxPrice","minMins","hideUnavail"].forEach(id=>$(id).addEventListener("input",renderPlayers));
+  ["search","position","team","luck","maxPrice","minMins","hideUnavail"].forEach(id=>$(id).addEventListener("input",renderPlayers));
   $("exportPlayers").addEventListener("click",()=>{const keys=["name","team","pos","price","games","mins","ppg","pts","xpts","delta","ppm","vapm","proj5","projNext","goals","assists","xg","xa","xgi","xgc","ict","defcon","bonus","careerG90","finishing","own","tin","tout","status","news"];
     const lines=[`# window ${windowLabel()} venue ${state.venue}`,keys.join(",")].concat(state.filtered.map(p=>keys.map(k=>`"${String(typeof p[k]==="number"?+p[k].toFixed(3):(p[k]??"")).replace(/"/g,'""')}"`).join(",")));
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8;"}));a.download=`fpl-players-${windowLabel().replace("–","-")}.csv`;a.click();URL.revokeObjectURL(a.href);});
@@ -750,7 +758,7 @@ function bindFilters(){
     teams.forEach(t=>{state.teams[t.id]={short:t.short_name,name:t.name};});
     const PJ={};proj.forEach(r=>{PJ[r.id]={proj5:num(r.next_n),projNext:num(r.next_gw),pens:num(r.penalties_order),xgi90:(num(r.xg90)||0)+(num(r.xa90)||0)};});
     // Career finishing (finishing.csv): only shown once a player has some Premier League history
-    const FN={};fin.forEach(r=>{const xg=num(r.career_npxg)||0;FN[r.id]=xg>=1?{careerG90:num(r.career_npg90),finishing:Math.round((num(r.finishing)-1)*100),careerG:n0(r.career_npg),careerXG:xg,careerXG90:num(r.career_npxg90),seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90)}:{careerG90:null,finishing:null,careerXG90:null,seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90)};});
+    const FN={};fin.forEach(r=>{const xg=num(r.career_npxg)||0,sg=num(r.season_npg),sx=num(r.season_npxg),run=runFlag(sg,sx);FN[r.id]=xg>=1?{careerG90:num(r.career_npg90),finishing:Math.round((num(r.finishing)-1)*100),careerG:n0(r.career_npg),careerXG:xg,careerXG90:num(r.career_npxg90),seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90),seasonG:sg,seasonXG:sx,run}:{careerG90:null,finishing:null,careerXG90:null,seasonG90:num(r.season_npg90),seasonXG90:num(r.season_npxg90),seasonG:sg,seasonXG:sx,run};});
     state.players=players.map(shapePlayer).filter(p=>p.name).map(p=>Object.assign(p,PJ[p.id]||{proj5:null,projNext:null},FN[p.id]||{careerG90:null,finishing:null}));
     const gws=new Set();history.forEach(h=>{const r=shapeHist(h);if(!r.gw)return;gws.add(r.gw);(state.hist[h.player_id]=state.hist[h.player_id]||[]).push(r);});
     state.gws=gws.size?[...gws].sort((a,b)=>a-b):[1];
