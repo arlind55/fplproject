@@ -15,7 +15,7 @@ python -m fplvalue.optimise --team-id 1234567 --ft 1  # transfer suggestions for
 import fplvalue as fv
 snap = fv.load()                         # data/current (or any data/history/<date>)
 last = fv.last_season(snap)              # prior season's final snapshot
-proj = fv.project_snapshot(snap, last)   # one row per player: gw_<n>, next_gw, next_n, next_<component>
+proj = fv.project_snapshot(snap, last)   # one row per player: gw_<n>, next_gw, next_n, next_<component>, xgoals_next / xgoals_n (expected goals incl. pens)
 ```
 
 | Module | What it does |

@@ -31,7 +31,7 @@ warnings.simplefilter('ignore', category=FutureWarning)
 LONG_HORIZON = 10
 LONG_COLS = ['id', 'web_name', 'team', 'team_short_name', 'pos', 'price', 'selected_by_percent', 'status', 'avail_next', 'p_start', 'adj_note']
 PROJ_COLS = ['id', 'web_name', 'team_short_name', 'pos', 'price', 'selected_by_percent', 'status', 'next_opp',
-             'avail_next', 'p_start', 'next_xmins', 'xg90', 'xa90', 'penalties_order', 'pens_taken', 'pen90', 'next_gw', 'next_n', 'adj_note']
+             'avail_next', 'p_start', 'next_xmins', 'xg90', 'xa90', 'penalties_order', 'pens_taken', 'pen90', 'next_gw', 'next_n', 'xgoals_next', 'xgoals_n', 'adj_note']
 
 
 def write(out_dirs: list[Path] | None = None, with_backtest: bool = True, prm: Params | None = None) -> dict:

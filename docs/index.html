@@ -69,7 +69,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",
 .brand .mark{flex:none;width:36px;height:36px;border-radius:8px;background:#2f3fa8;color:#ffd60a;display:grid;place-items:center;font:700 23px/1 "Barlow Condensed","Arial Narrow",sans-serif}
 .tabs{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:3px;max-width:100%;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tabs a{padding:7px 12px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
+.tabs a{padding:7px 10px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
 .tabs a:hover{color:var(--ink)}
 .tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
 .right{display:flex;align-items:center;gap:10px}
@@ -204,7 +204,7 @@ footer a{color:inherit}
 .chip{display:inline-flex;align-items:center;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:2px 2px 2px 8px;font-size:12px;font-weight:500;color:var(--ink);white-space:nowrap}
 .chip button{border:0;background:none;color:var(--ink-3);cursor:pointer;font-size:15px;line-height:1;padding:0 4px}
 .chip button:hover{color:var(--err)}
-.chip.clear{background:none;border-color:transparent;color:var(--accent);cursor:pointer;padding:2px 6px;font:inherit;font-size:12px}
+.chip.clear{background:none;border-color:transparent;color:var(--accent);cursor:pointer;padding:2px 6px;font:inherit;font-size:12px;text-decoration:none}
 .pick-list{position:absolute;z-index:5;left:0;right:0;top:100%;margin:4px 0 0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;box-shadow:var(--shadow);max-height:320px;overflow:auto;min-width:260px}
 .pick-list li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;cursor:pointer;font-size:13px}
 .pick-list li.on,.pick-list li:hover{background:var(--muted-cell)}
@@ -266,6 +266,7 @@ tr.detail td{background:var(--muted-cell);padding:14px 18px;white-space:normal;b
     <a href="./" aria-current="page">Home</a>
     <a href="./planner.html">Fixture planner</a>
     <a href="./projections.html">Projections</a>
+    <a href="./compare.html">Compare</a>
     <a href="./team.html">My team</a>
     <a href="./accuracy.html">Track record</a>
     <a href="./metrics.html">Metrics</a>
@@ -583,7 +584,7 @@ const pick={matches:[],on:0};
 function renderChips(){
   const byId=Object.fromEntries(state.rows.map(p=>[p.id,p]));
   $("chips").innerHTML=state.picked.filter(id=>byId[id]).map(id=>`<span class="chip">${esc(byId[id].name)}<button type="button" data-unpick="${esc(id)}" aria-label="Remove ${esc(byId[id].name)}">×</button></span>`).join("")
-    +(state.picked.length>1?`<button type="button" class="chip clear" data-unpick="*">Clear</button>`:"");
+    +(state.picked.length>1?`<button type="button" class="chip clear" data-unpick="*">Clear</button><a class="chip clear" href="./compare.html?p=${state.picked.slice(0,5).map(encodeURIComponent).join(",")}">Compare side by side →</a>`:"");
   $("search").placeholder=state.picked.length?"Add another player":"Search, or pick several to compare";
   document.querySelector(".filters").classList.toggle("comparing",state.picked.length>0);
 }

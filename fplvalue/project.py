@@ -469,6 +469,7 @@ def project(state: State, prm: Params | None = None, gws: list[int] | None = Non
     for c in COMPONENTS + ['xmins']:
         x[c] = x[c] * x['avail']
     x['xp'] = x[COMPONENTS].sum(1)
+    x['xgoals'] = (x['goals'] + x['pens']) / pos.map(GOAL)     # expected goals scored, penalties included
 
     wide = x.pivot_table(index='id', columns='event', values='xp', aggfunc='sum').reindex(columns=gws)
     wide = wide.reindex(P.index).fillna(0.0)
@@ -492,6 +493,9 @@ def project(state: State, prm: Params | None = None, gws: list[int] | None = Non
     out['pens_taken'] = strip_pens(state.history, season_label(state.events)).groupby('player_id')['pens'].sum().reindex(P.index).fillna(0)
     out['next_gw'] = out[f'gw_{gws[0]}']
     out['next_n'] = out[[f'gw_{g}' for g in gws]].sum(1)
+    xg = x.groupby('id')['xgoals'].sum().reindex(P.index).fillna(0)
+    out['xgoals_next'] = x[x['event'] == gws[0]].groupby('id')['xgoals'].sum().reindex(P.index).fillna(0)
+    out['xgoals_n'] = xg
     out['next_n_discounted'] = sum(out[f'gw_{g}'] * 0.9 ** j for j, g in enumerate(gws))
     out.attrs.update(gws=gws, first_gw=gws[0], league_avg_xg=avg)
     out = out.reset_index().sort_values('next_n', ascending=False)
