@@ -1,0 +1,79 @@
+<!--META {"seo_title": "FPL team form: which teams are really improving (GW9)", "title":"Which teams are really in form","description":"Last-five results barely predict the next six games. Twelve seasons of Understat data show what does. On those measures Bournemouth, Brighton and Forest are improving, while Palace, Newcastle and Villa are declining.","date":"2026-10-28","tag":"Team form","kicker":"Team form · GW9"} -->
+<div class="article">
+<article class="prose">
+<div class="kicker"><span>Team form</span><time datetime="2026-10-28">28 October 2026 · planning for GW9</time></div>
+<h1>Which teams are really in form, and which runs to ignore</h1>
+<p class="lede">"Form" usually means the last five results. We tested that against twelve seasons of Premier League data, alongside about thirty other measures of whether a team is getting better or worse. Most of them turned out to be noise. This piece uses the few that aren't to pick out the teams that are genuinely improving or declining, and what that means for your squad.</p>
+
+<h3>What actually predicts form</h3>
+<p>We took every Premier League team-match from 2014/15 onwards (7,388 of them) and asked one question: which numbers, known before kick-off, best predict a team's next six games? We fitted on 2015/16–2020/21 and tested on the five seasons since.</p>
+<div class="tw"><table class="t">
+<thead><tr><th>Predictor of next-6 goal difference</th><th class="n">Error cut</th></tr></thead>
+<tbody>
+<tr class="hl"><td><strong>Long-run xG rating</strong> (opponent-adjusted, half-life 15 matches)</td><td class="n up">35%</td></tr>
+<tr><td>Goal difference, last 10</td><td class="n">23%</td></tr>
+<tr><td>Goal difference, last 5</td><td class="n">15%</td></tr>
+<tr><td>Points, last 5</td><td class="n">12%</td></tr>
+</tbody></table></div>
+<p>A long-run xG rating is roughly three times as useful as last-five points. Adding recent form on top of it doesn't help at all. That's true for last-five points, last-five goal difference, a three-match xG trend and the slope of the last ten games. None of them improved the prediction once the rating was in. A team's last month mostly tells you about its last month.</p>
+<p>Three things are worth knowing beyond the rating:</p>
+<p><strong>The right window is 10–15 matches.</strong> Weighting recent games more heavily makes predictions worse. A half-life of 3 matches was 10% less accurate than 15, and 5 matches was 4% worse. Real change shows up, but it takes a couple of months to separate from noise.</p>
+<p><strong>Territory adds a little.</strong> Teams that take a bigger share of the shots, or get the ball into the final third more often than their opponents (field tilt), do slightly better than their xG rating alone suggests, by about 0.15 goals per game per standard deviation. The effect is small and the confidence interval crosses zero, but it pointed the same way in both halves of the data.</p>
+<p><strong>xG built on big chances fades.</strong> Teams whose xG comes from a few big chances (0.3 xG or more) do slightly worse than their rating says. A rating built on lots of ordinary shots holds up better.</p>
+<p>The site's <a href="../metrics.html#model">fixture model</a> already rates teams this way, so the <a href="../projections.html">projections</a> already reflect it. The rest of this piece shows where that rating and the league table currently disagree.</p>
+
+<h3>Results vs rating, all 20 teams</h3>
+<p>The chart up top plots each team's last five results against its xG rating. Teams above the line and to the left are performing better than their results. Teams to the right and lower down have results that are ahead of their performance. "vs 25/26" is how far the rating has moved since the end of 2025/26. Because it's a 15-match average, a big move means a sustained change rather than one good week.</p>
+<div class="tw"><table class="t">
+<thead><tr><th>Team</th><th>Last 5</th><th class="n">Pts</th><th class="n">Rating</th><th class="n">vs 25/26</th><th class="n">Shots</th><th class="n">Tilt</th></tr></thead>
+<tbody>
+<tr><td>Arsenal</td><td>WLWWW</td><td class="n">21</td><td class="n">+0.97</td><td class="n">−0.07</td><td class="n">60%</td><td class="n">71%</td></tr>
+<tr><td>Man City</td><td>WWWWL</td><td class="n">21</td><td class="n">+0.90</td><td class="n">+0.09</td><td class="n">61%</td><td class="n">72%</td></tr>
+<tr class="hl"><td><strong>Bournemouth</strong></td><td>DLLWW</td><td class="n">9</td><td class="n">+0.51</td><td class="n up">+0.18</td><td class="n">54%</td><td class="n">52%</td></tr>
+<tr><td>Man United</td><td>LDDDL</td><td class="n">7</td><td class="n">+0.42</td><td class="n">−0.09</td><td class="n">57%</td><td class="n">55%</td></tr>
+<tr class="hl"><td><strong>Brighton</strong></td><td>WWWWL</td><td class="n">16</td><td class="n">+0.41</td><td class="n up">+0.18</td><td class="n">57%</td><td class="n">54%</td></tr>
+<tr><td>Liverpool</td><td>DWLWW</td><td class="n">15</td><td class="n">+0.35</td><td class="n">−0.06</td><td class="n">57%</td><td class="n">58%</td></tr>
+<tr><td>Chelsea</td><td>DLWWL</td><td class="n">13</td><td class="n">+0.13</td><td class="n">−0.04</td><td class="n">54%</td><td class="n">54%</td></tr>
+<tr><td>Brentford</td><td>DWDLD</td><td class="n">11</td><td class="n">+0.10</td><td class="n">+0.03</td><td class="n">45%</td><td class="n">46%</td></tr>
+<tr><td>Leeds</td><td>WDLDD</td><td class="n">11</td><td class="n">+0.10</td><td class="n">+0.03</td><td class="n">48%</td><td class="n">42%</td></tr>
+<tr class="hl"><td><strong>Aston Villa</strong></td><td>LWDWW</td><td class="n">11</td><td class="n">+0.02</td><td class="n down">−0.16</td><td class="n">48%</td><td class="n">51%</td></tr>
+<tr class="hl"><td><strong>Nott'm Forest</strong></td><td>WLLLD</td><td class="n">6</td><td class="n">−0.02</td><td class="n up">+0.25</td><td class="n">51%</td><td class="n">47%</td></tr>
+<tr><td>Everton</td><td>DWDLL</td><td class="n">10</td><td class="n">−0.03</td><td class="n">+0.10</td><td class="n">47%</td><td class="n">44%</td></tr>
+<tr class="hl"><td><strong>Newcastle</strong></td><td>LWLLW</td><td class="n">11</td><td class="n">−0.13</td><td class="n down">−0.19</td><td class="n">48%</td><td class="n">52%</td></tr>
+<tr><td>Spurs</td><td>DLDWW</td><td class="n">9</td><td class="n">−0.15</td><td class="n">−0.07</td><td class="n">50%</td><td class="n">49%</td></tr>
+<tr><td>Fulham</td><td>DDLWW</td><td class="n">8</td><td class="n">−0.18</td><td class="n">+0.08</td><td class="n">52%</td><td class="n">55%</td></tr>
+<tr class="hl"><td><strong>Crystal Palace</strong></td><td>LDWLL</td><td class="n">7</td><td class="n">−0.22</td><td class="n down">−0.23</td><td class="n">46%</td><td class="n">49%</td></tr>
+<tr><td>Coventry</td><td>LWWLL</td><td class="n">6</td><td class="n">−0.38</td><td class="n">new</td><td class="n">38%</td><td class="n">39%</td></tr>
+<tr><td>Sunderland</td><td>LLLLD</td><td class="n">5</td><td class="n">−0.38</td><td class="n">+0.01</td><td class="n">44%</td><td class="n">45%</td></tr>
+<tr><td>Hull</td><td>DLDLD</td><td class="n">10</td><td class="n">−0.72</td><td class="n">new</td><td class="n">41%</td><td class="n">32%</td></tr>
+<tr><td>Ipswich</td><td>WLWLD</td><td class="n">10</td><td class="n">−0.83</td><td class="n">new</td><td class="n">41%</td><td class="n">38%</td></tr>
+</tbody></table></div>
+<p class="note">Pts = league points so far. Shots = share of non-penalty shots. Tilt = share of deep completions (field tilt). Rating = expected goal difference per match against an average side at a neutral ground (non-penalty xG, opponent- and venue-adjusted, half-life 15 matches, carried over from last season). Shots and tilt use the same half-life. "New" = promoted, no Premier League history to compare with.</p>
+
+<h3>Picking up: Bournemouth, Brighton, Forest</h3>
+<p><strong>Bournemouth</strong> are the clearest case. Their rating is up 0.18 on last season, level with Brighton and behind only Forest, and at +0.51 they're the third-best team in the league by the numbers. They took 6 points from their first seven games when their chances were worth 12.3, the second-biggest shortfall in the league after Forest. The results have now started to follow: they beat Sunderland 2-0, then won 3-0 at Old Trafford in GW8. One caution is that a lot of their xG comes from big chances, which the research says fades a little. Even with a discount for that, they are a top-five attack with the easiest five fixtures in the league.</p>
+<div class="fixrow"><div class="fix d2">LEE<small>GW9 H</small></div><div class="fix d2">IPS<small>GW10 A</small></div><div class="fix d2">NFO<small>GW11 H</small></div><div class="fix d3">FUL<small>GW12 A</small></div><div class="fix d2">BHA<small>GW13 H</small></div></div>
+<p>The model's picks are <strong>Tavernier</strong> (£6.4m, 24.8 points over GW9–13, second only to Mbeumo among midfielders) and the two cheap defenders, <strong>Silva</strong> (£5.0m, 21.6) and <strong>Hill</strong> (£5.5m, 21.3). Both are owned by fewer than 2% of managers. <strong>Evanilson</strong> is the forward option (18.8) and features in this week's <a href="./gw9-joao-pedro-replacements.html">João Pedro replacements</a>.</p>
+
+<p><strong>Brighton</strong> are the improving side whose results already show it: four straight wins before GW8's 2-0 defeat at Anfield, third in the table, and a rating up 0.18 on last season. Their shot share (57%) backs it up. The thing that won't last is the finishing. They've scored 23 from about 16.6 expected, so expect fewer goals from the same performances. <strong>Groß</strong> (46% owned) and <strong>De Cuyper</strong> (43%) are rightly in the template. After City away this week, GW10–12 (Brentford, Hull, Newcastle) is their best stretch.</p>
+
+<p><strong>Forest</strong> have the biggest improvement of anyone, +0.25 on last season, and the table doesn't show it at all. They're 18th with one win in five. They've scored 6 goals from about 13.8 expected, the worst finishing in the league by a distance. Their xG comes from volume rather than a few big chances, which is the kind that holds up. The problem is the next three: Brentford away, City at home, Bournemouth away. They're a team to buy into from GW12 (Chelsea at home, then Hull away), not this week. <strong>Gibbs-White</strong> (£7.9m, 19.0) is the asset to watch.</p>
+
+<h3>Losing it: Palace, Newcastle, Villa</h3>
+<p><strong>Crystal Palace</strong> have the biggest decline in the league, from level with an average side at the end of last season to −0.22 now. Their chances are worth 0.8 of a goal per game less than their opponents', worse than everyone except Ipswich, and they've conceded 19 in eight. Shot share is down to 46%. No Palace player is owned by more than 6% of managers, so the main point is not to be tempted by Mitchell's price.</p>
+
+<p><strong>Newcastle</strong> are down 0.19, and GW8's 2-0 win at Selhurst Park, against the side in the worst shape, doesn't change that. They've been out-created by half a goal per game, and their next five are the hardest of anyone in this piece.</p>
+<div class="fixrow"><div class="fix d3">EVE<small>GW9 H</small></div><div class="fix d4">FUL<small>GW10 A</small></div><div class="fix d4">ARS<small>GW11 H</small></div><div class="fix d4">BHA<small>GW12 A</small></div><div class="fix d4">MUN<small>GW13 H</small></div></div>
+<p><strong>Hall</strong> is in a fifth of squads. His best week is Everton at home (4.2 points), and every fixture after that is rated 4. He's a sell after GW9.</p>
+
+<p><strong>Aston Villa</strong> are the opposite of Forest: 10 points from their last five, including GW8's 2-1 win over City, but a rating that has slipped 0.16 and sits at roughly average. They've been out-created by 0.59 xG per game this season and their points are bang on their expected points, so the results aren't luck. Villa have simply been winning with poor performances. The saving grace is the fixtures. Fulham, Sunderland, Ipswich and Everton are all in the next five, which is why <strong>N.Jackson</strong> (18.2) still projects reasonably. Own Villa players for the schedule, not the form.</p>
+
+<h3>The bad run that isn't</h3>
+<p><strong>Manchester United</strong> haven't won in five, with three points from those games, and lost 3-0 at home to Bournemouth on Sunday. They're 16th. Their rating is the fourth best in the league, and they take 57% of the shots in their games. Their underlying numbers have dipped slightly since last season, but nowhere near enough to explain the table. They've scored 10 from about 13.2 expected. <strong>Mbeumo</strong> projects 26.1 over the next five, the highest of any midfielder. 177,000 managers sold Fernandes before GW8, and the same logic applies here: a bad month of results is not a reason to sell good underlying numbers.</p>
+
+<div class="callout"><b>What to do with it.</b> Buy into <strong>Bournemouth</strong> now, while the fixtures and the numbers line up (Tavernier, or Silva/Hill at £5.0–5.5m). Hold <strong>Brighton</strong> assets through City away. Watch <strong>Forest</strong> for GW12. Sell <strong>Newcastle</strong> defenders after Everton. Don't let one month of results talk you out of <strong>United</strong> or into <strong>Villa</strong>.</div>
+
+<p class="note">Method: the form-signals backtest uses Understat team-match data from 2014/15 to 2026/27 (7,388 team-matches for teams with at least 10 prior Premier League games). Each signal was tested on whether it predicts goal difference, points and xG difference over the next six matches beyond the long-run rating, controlling for opponents and venue. Fitted on 2015/16–2020/21 and scored on 2021/22 onwards, with team-season bootstrap confidence intervals. Current ratings, shot share and field tilt use Understat data through GW7 (19 October). Results, goals and xG for GW8 come from FPL's data. Projections are from the <a href="../projections.html">model</a> as of 28 October.</p>
+<div class="next"><a href="./gw9-joao-pedro-replacements.html">Next: replacing João Pedro →</a><a href="./">All posts</a></div>
+</article>
+</div>
