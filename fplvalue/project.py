@@ -46,17 +46,20 @@ COMPONENTS = ['app', 'goals', 'pens', 'assists', 'cs', 'conceded', 'saves', 'def
 
 @dataclass
 class Params:
+    # Settings below marked by research/vaastav/tune_params.py were retuned walk-forward on 2023/24-2025/26
+    # (vaastav's FPL archive; see research/vaastav/data/tune_params.md). goal_cal and assist_cal were left alone:
+    # tuning them on squared error shrinks them below the unbiased value, and FPL changed the assist rules in 2025/26.
     # shrinkage strength, in 90-minute units (or 60+ games for DefCon, starts for minutes)
     k_xg: float = 4.0
-    k_xa: float = 4.0
-    k_saves: float = 6.0
-    k_bonus: float = 8.0
-    k_cards: float = 10.0
+    k_xa: float = 2.0
+    k_saves: float = 16.0
+    k_bonus: float = 12.0
+    k_cards: float = 40.0
     k_defcon: float = 4.0
-    k_min: float = 0.5            # minutes-model prior weight, in (recency-weighted) matches
-    lam: float = 0.5              # weight of a last-season 90 relative to a this-season 90
-    decay: float = 0.7            # recency weight per match for the minutes model
-    n_recent: int = 6             # matches looked at for the minutes model
+    k_min: float = 0.25           # minutes-model prior weight, in (recency-weighted) matches
+    lam: float = 0.25             # weight of a last-season 90 relative to a this-season 90
+    decay: float = 0.5            # recency weight per match for the minutes model
+    n_recent: int = 10            # matches looked at for the minutes model
     # FPL non-penalty goals per projected npxG, by position. Fitted walk-forward on 2025/26 (scored on 2026/27
     # so far): one flat 0.93 under-projected MID/FWD goals by ~10% and over-projected DEF by ~10%, in line with
     # Understat finding set-piece headers (most defender xG) the most overrated shot type.
@@ -64,7 +67,7 @@ class Params:
     pen_conv: float = 0.80        # penalties scored per penalty taken (Understat, 1,175 PL penalties since 2014/15)
     k_pens: float = 20.0          # team penalty-rate prior weight, in matches
     assist_cal: float = 1.38      # FPL assists per Opta xA (FPL counts rebounds, pens won, deflections)
-    cs_cal: float = 1.0           # multiplier on xG against inside e^(−xGA)
+    cs_cal: float = 1.1           # multiplier on xG against inside e^(−xGA)
     horizon: int = 5
 
 
