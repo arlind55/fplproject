@@ -1,0 +1,45 @@
+# Temporary: download Club Elo history for every Premier League club since 2014 and commit it.
+name: fetch-clubelo
+on:
+  push:
+    branches: [claude/clubelo-probe]
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download
+        run: |
+          mkdir -p research/clubelo/data
+          python3 - <<'PY'
+          import csv, io, time, urllib.request
+          def get(path):
+              for i in range(4):
+                  try:
+                      with urllib.request.urlopen("http://api.clubelo.com/" + path, timeout=30) as r:
+                          return r.read().decode()
+                  except Exception as e:
+                      print("retry", path, e); time.sleep(5 * (i + 1))
+              raise SystemExit("failed " + path)
+          clubs = set()
+          for y in range(2014, 2027):
+              for md in ("09-15", "03-15"):
+                  rows = list(csv.DictReader(io.StringIO(get(f"{y}-{md}"))))
+                  clubs |= {r["Club"] for r in rows if r["Country"] == "ENG" and r["Level"] == "1"}
+                  time.sleep(1)
+          print(len(clubs), sorted(clubs))
+          out = []
+          for c in sorted(clubs):
+              rows = list(csv.DictReader(io.StringIO(get(c.replace(" ", "")))))
+              out += [r for r in rows if r["To"] >= "2014-07-01"]
+              time.sleep(1)
+          with open("research/clubelo/data/elo_history.csv", "w", newline="") as f:
+              w = csv.DictWriter(f, fieldnames=list(out[0].keys())); w.writeheader(); w.writerows(out)
+          print(len(out), "rows")
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions; git config user.email github-actions@users.noreply.github.com
+          git add research/clubelo/data && git commit -m "Club Elo history snapshot" && git push
