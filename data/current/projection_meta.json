@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-28T21:48:20Z",
+  "generated_at": "2026-10-29T15:21:21Z",
   "gws": [
     9,
     10,
@@ -20,7 +20,12 @@
     "lam": 0.5,
     "decay": 0.7,
     "n_recent": 6,
-    "goal_cal": 0.93,
+    "goal_cal": {
+      "GKP": 0.85,
+      "DEF": 0.85,
+      "MID": 1.03,
+      "FWD": 1.04
+    },
     "pen_conv": 0.8,
     "k_pens": 20.0,
     "assist_cal": 1.38,
@@ -28,10 +33,10 @@
     "horizon": 5
   },
   "squad": {
-    "cost": 100.0,
+    "cost": 99.8,
     "budget": 100.0,
-    "xi_value": 215.4,
-    "xi_next_gw": 58.5,
+    "xi_value": 217.8,
+    "xi_next_gw": 59.2,
     "extra_transfers": 0
   },
   "long_gws": [
