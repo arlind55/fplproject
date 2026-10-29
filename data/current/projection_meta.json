@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-29T15:21:21Z",
+  "generated_at": "2026-10-29T21:54:30Z",
   "gws": [
     9,
     10,
@@ -11,15 +11,15 @@
   "last_season_prior": "2026-07-20",
   "params": {
     "k_xg": 4.0,
-    "k_xa": 4.0,
-    "k_saves": 6.0,
-    "k_bonus": 8.0,
-    "k_cards": 10.0,
+    "k_xa": 2.0,
+    "k_saves": 16.0,
+    "k_bonus": 12.0,
+    "k_cards": 40.0,
     "k_defcon": 4.0,
-    "k_min": 0.5,
-    "lam": 0.5,
-    "decay": 0.7,
-    "n_recent": 6,
+    "k_min": 0.25,
+    "lam": 0.25,
+    "decay": 0.5,
+    "n_recent": 10,
     "goal_cal": {
       "GKP": 0.85,
       "DEF": 0.85,
@@ -29,14 +29,14 @@
     "pen_conv": 0.8,
     "k_pens": 20.0,
     "assist_cal": 1.38,
-    "cs_cal": 1.0,
+    "cs_cal": 1.1,
     "horizon": 5
   },
   "squad": {
     "cost": 99.8,
     "budget": 100.0,
-    "xi_value": 217.8,
-    "xi_next_gw": 59.2,
+    "xi_value": 219.0,
+    "xi_next_gw": 59.7,
     "extra_transfers": 0
   },
   "long_gws": [
