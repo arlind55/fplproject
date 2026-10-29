@@ -29,8 +29,8 @@ import pandas as pd
 
 from . import odds as odds_mod
 
-HALF_LIFE = 15       # matches; a match this many games back counts half
-PRIOR_GAMES = 2
+HALF_LIFE = 10       # matches; a match this many games back counts half (research/vaastav/tune_params.py)
+PRIOR_GAMES = 1
 PRIOR_GAMES_NO_HISTORY = 6   # when there is no last season to carry over (early backtest weeks)
 BANDS = (0.10, 0.30, 0.70, 0.90)   # cumulative quantile cut points for ratings 1..5
 
