@@ -18,9 +18,20 @@ jobs:
             grep -oiE 'just a moment|cf-chl|challenge-platform|data-stat="(possession|touches_def_pen_area|progressive_carries|xg_for)"' out.html | sort | uniq -c | head
             sleep 8
           }
-          probe https://fbref.com/robots.txt
-          probe https://fbref.com/en/comps/9/Premier-League-Stats
-          probe https://fbref.com/en/comps/9/possession/Premier-League-Stats
-          probe "https://www.fotmob.com/api/leagues?id=47"
-          probe https://api.sofascore.com/api/v1/unique-tournament/17/seasons
-          probe https://www.whoscored.com/
+          for u in "https://www.fotmob.com/api/data/leagues?id=47" "https://www.fotmob.com/api/leagues?id=47&ccode3=GBR" "https://www.fotmob.com/api/data/tltable?leagueId=47"; do
+            code=$(curl -sS -o out.json -w "%{http_code}" -A "$UA" "$u" || echo ERR); echo "== $u -> $code $(wc -c < out.json)"; head -c 300 out.json; echo; sleep 5
+          done
+          curl -sS -A "$UA" "https://www.fotmob.com/api/data/leagues?id=47" -o lg.json || true
+          mid=$(python3 -c "import json;d=json.load(open('lg.json'));m=[x for x in d['fixtures']['allMatches'] if x.get('status',{}).get('finished')];print(m[-1]['id'])" 2>&1 | tail -1)
+          echo "match id: $mid"
+          code=$(curl -sS -o md.json -w "%{http_code}" -A "$UA" "https://www.fotmob.com/api/data/matchDetails?matchId=$mid" || echo ERR); echo "== matchDetails -> $code $(wc -c < md.json)"; head -c 300 md.json; echo
+          python3 - <<'PY' || true
+          import json
+          d=json.load(open('md.json'))
+          st=d['content']['stats']['Periods']['All']['stats']
+          for g in st:
+              for s in g['stats'][:6]: print(g['title'],'|',s.get('title'),s.get('stats'))
+          sh=d['content']['shotmap']['shots']
+          from collections import Counter
+          print('shot situations', Counter(x.get('situation') for x in sh))
+          PY
