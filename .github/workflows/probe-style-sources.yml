@@ -1,0 +1,26 @@
+# Temporary probe: can GitHub Actions reach FBref and other style-data sources?
+name: probe-style-sources
+on:
+  push:
+    branches: [claude/probe-style-sources]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe
+        run: |
+          UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36"
+          probe() {
+            code=$(curl -sS -L -o out.html -w "%{http_code}" -A "$UA" "$1" || echo ERR)
+            echo "== $1 -> $code, $(wc -c < out.html 2>/dev/null) bytes"
+            grep -o '<title>[^<]*' out.html | head -1
+            grep -oE 'id="(stats_squads|div_stats_squads)_[a-z_]+' out.html | sort -u | head -20
+            grep -oiE 'just a moment|cf-chl|challenge-platform|data-stat="(possession|touches_def_pen_area|progressive_carries|xg_for)"' out.html | sort | uniq -c | head
+            sleep 8
+          }
+          probe https://fbref.com/robots.txt
+          probe https://fbref.com/en/comps/9/Premier-League-Stats
+          probe https://fbref.com/en/comps/9/possession/Premier-League-Stats
+          probe "https://www.fotmob.com/api/leagues?id=47"
+          probe https://api.sofascore.com/api/v1/unique-tournament/17/seasons
+          probe https://www.whoscored.com/
