@@ -182,6 +182,16 @@ section.card{margin-bottom:16px}
 .pc.sel .nm{background:#ffd54a;color:#171a26}
 .pc.sel .sh{transform:translateY(-2px)}
 .pc.dim{opacity:.35}
+.pc.elig .nm{background:#5fc48f;color:#0f2a1c}
+.pc.elig .sh{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.pc.elig .sh{animation:none}}
+.actbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12.5px;color:var(--ink-2);margin-bottom:8px}
+.actbar[hidden]{display:none}
+.actbar b{color:var(--ink)}
+.actbar .acts{display:flex;gap:6px;flex-wrap:wrap}
+.actbar .err{color:var(--err);font-weight:600;flex-basis:100%}
+.sqmeta .btn{margin-left:4px}
 .pc.new .nm{box-shadow:inset 0 -2px 0 #5fc48f}
 .fxd1{background:var(--d1);color:var(--d1-ink)} .fxd2{background:var(--d2);color:var(--d2-ink)} .fxd3{background:var(--d3);color:var(--d3-ink)} .fxd4{background:var(--d4);color:var(--d4-ink)} .fxd5{background:var(--d5);color:var(--d5-ink)}
 .fxb{color:#7a8096}
@@ -369,6 +379,7 @@ td.total{font-weight:600;color:var(--accent)}
     <div class="card pl-left">
       <div class="pstats" id="pStats"></div>
       <div class="gwnav"><button type="button" id="gwPrev" aria-label="Previous gameweek">←</button><select id="pitchGw" aria-label="Gameweek"></select><button type="button" id="gwNext" aria-label="Next gameweek">→</button></div>
+      <div class="actbar" id="actBar" hidden></div>
       <div id="pitch"></div>
       <div class="sqmeta" id="pitchMeta"></div>
     </div>
@@ -563,7 +574,10 @@ const total=(ids,gws)=>sum(gws.map(g=>bestXI(ids,g).pts));
 function fixedPts(xi,cap,g){const v=id=>D.P[id]?.gw[g]??0;return sum(xi.map(v))+v(cap);}
 
 // ── Team state ───────────────────────────────────────────────────────────────
-const T={id:null,entry:null,picksGw:null,orig:[],squad:[],bank0:0,lastXI:[],lastCap:null,chip:null,history:null,ft:null,manual:false};
+const T={id:null,entry:null,picksGw:null,orig:[],squad:[],bank0:0,lastXI:[],lastCap:null,chip:null,history:null,ft:null,manual:false,pending:0,luBase0:null,luBase:null,lu:{}};
+// Lineups: {xi:[11 ids], bench:[4 ids, keeper first], cap, vice}
+const luClone=l=>l?{xi:[...l.xi],bench:[...l.bench],cap:l.cap,vice:l.vice}:null;
+const luMap=(l,a,b)=>l&&{xi:l.xi.map(x=>x===a?b:x),bench:l.bench.map(x=>x===a?b:x),cap:l.cap===a?b:l.cap,vice:l.vice===a?b:l.vice};
 let tfH="5";
 const G5=()=>D.gws.slice(0,5),G10=()=>D.gws;
 const bank=()=>T.bank0+sum(T.orig.map(id=>D.P[id]?.price))-sum(T.squad.map(id=>D.P[id]?.price));
@@ -574,9 +588,10 @@ function canSwap(ids,outId,inP,budget,ignoreBudget){
   const c=clubCount(ids);return inP.team===D.P[outId].team||(c[inP.team]||0)<3;
 }
 const swapIn=(ids,outId,inId)=>ids.map(x=>x===outId?inId:x);
-function saveEdits(){try{localStorage.setItem("fpl-team-edits",JSON.stringify({id:T.id,gw:T.picksGw,squad:T.squad}));}catch(e){}}
+function saveEdits(){try{localStorage.setItem("fpl-team-edits",JSON.stringify({id:T.id,gw:T.picksGw,orig:T.orig,squad:T.squad,lu:T.lu,luBase:T.luBase}));}catch(e){}}
 function loadEdits(){try{const s=JSON.parse(localStorage.getItem("fpl-team-edits")||"null");
-  if(s&&s.id===T.id&&s.gw===T.picksGw&&Array.isArray(s.squad)&&s.squad.length===15&&s.squad.every(id=>D.P[id]))return s.squad;}catch(e){}return null;}
+  if(s&&s.id===T.id&&s.gw===T.picksGw&&String(s.orig)===String(T.orig)&&Array.isArray(s.squad)&&s.squad.length===15&&s.squad.every(id=>D.P[id])){
+    T.lu=s.lu&&typeof s.lu==="object"?s.lu:{};if(s.luBase)T.luBase=s.luBase;return s.squad;}}catch(e){}return null;}
 
 // Free transfers banked for the next deadline, from the season history: one a week, up to five, unused
 // ones roll over, and a Wildcard or Free Hit week leaves the count unchanged.
@@ -603,24 +618,34 @@ async function loadTeam(id){
     let picks=await fplGet(`/api/entry/${id}/event/${gw}/picks/`),fromGw=gw,fh=false;
     // A Free Hit squad reverts at the next deadline, so project the squad from the week before
     if(picks.active_chip==="freehit"&&gw>1){fh=true;fromGw=gw-1;picks=await fplGet(`/api/entry/${id}/event/${fromGw}/picks/`);}
-    let hist=null;try{hist=await fplGet(`/api/entry/${id}/history/`);}catch(e){}
-    usePicks(id,picks,gw,{entry,fh,hist});
+    const [hist,trs]=await Promise.all([fplGet(`/api/entry/${id}/history/`).catch(()=>null),fplGet(`/api/entry/${id}/transfers/`).catch(()=>null)]);
+    usePicks(id,picks,gw,{entry,fh,hist,trs});
   }catch(e){
     if(e instanceof NotFound){msg.className="loadmsg err";msg.textContent=`No FPL team with ID ${id}. Check the number in your Points page address.`;return;}
     if(e instanceof BadSquad){msg.className="loadmsg err";msg.textContent=e.message;return;}
     showPaste(id);
   }
 }
-function usePicks(id,picks,gw,{entry=null,fh=false,hist=null}={}){
-  const ids=(picks.picks||[]).map(p=>p.element);
+function usePicks(id,picks,gw,{entry=null,fh=false,hist=null,trs=null}={}){
+  const pk=[...(picks.picks||[])].sort((a,b)=>a.position-b.position);
+  let ids=pk.map(p=>p.element),bk=(picks.entry_history?.bank??entry?.last_deadline_bank??0)/10;
   if(ids.length!==15)throw new BadSquad("That doesn't look like an FPL picks page");
+  let lu={xi:pk.slice(0,11).map(p=>p.element),bench:pk.slice(11).map(p=>p.element),
+    cap:pk.find(p=>p.is_captain)?.element??null,vice:pk.find(p=>p.is_vice_captain)?.element??null};
+  // Transfers already made on FPL for the next deadline aren't in the picks yet: apply them, oldest first
+  const pend=(Array.isArray(trs)?trs:[]).filter(t=>t.event>gw).sort((a,b)=>new Date(a.time)-new Date(b.time));
+  let applied=[];
+  for(const t of pend){
+    if(!ids.includes(t.element_out)||ids.includes(t.element_in))continue;
+    ids=swapIn(ids,t.element_out,t.element_in);lu=luMap(lu,t.element_out,t.element_in);
+    bk+=((t.element_out_cost||0)-(t.element_in_cost||0))/10;applied.push(t);
+  }
   const missing=ids.filter(x=>!D.P[x]);
   if(missing.length)throw new BadSquad(`${missing.length} of your players aren't in the projections file yet`);
-  Object.assign(T,{id,entry,picksGw:gw,fh,manual:false,history:hist,
-    orig:ids,bank0:(picks.entry_history?.bank??entry?.last_deadline_bank??0)/10,
-    lastXI:picks.picks.filter(p=>p.position<=11).map(p=>p.element),
-    lastCap:picks.picks.find(p=>p.is_captain)?.element??null,chip:picks.active_chip||null,ft:estimateFT(hist)});
-  T.squad=loadEdits()||[...T.orig];SEL.out=SEL.inn=null;SEL.err="";
+  Object.assign(T,{id,entry,picksGw:gw,fh,manual:false,history:hist,pending:applied.length,
+    orig:ids,bank0:bk,lastXI:[...lu.xi],lastCap:lu.cap,chip:picks.active_chip||null,ft:estimateFT(hist),
+    luBase0:luClone(lu),luBase:luClone(lu),lu:{}});
+  T.squad=loadEdits()||[...T.orig];SEL.out=SEL.inn=null;SEL.err="";ACT.id=ACT.mode=null;
   $("loadMsg").className="loadmsg";$("loadMsg").innerHTML=entry?"":`Loaded from the pasted page. Team name, rank and free transfers need the live connection.`;
   try{localStorage.setItem("fpl-team-id",String(id));}catch(e){}
   try{window.history.replaceState(null,"",`?id=${id}`);}catch(e){}
@@ -646,7 +671,7 @@ function showPaste(id){
 }
 function startManual(id){
   if(D.model.length!==15){$("loadMsg").textContent="The model squad isn't available either. Try again later.";return;}
-  Object.assign(T,{id:id||0,entry:null,picksGw:-1,fh:false,manual:true,history:null,orig:[...D.model],
+  Object.assign(T,{id:id||0,entry:null,picksGw:-1,fh:false,manual:true,history:null,pending:0,luBase0:null,luBase:null,lu:{},orig:[...D.model],
     bank0:Math.max(0,+(100-sum(D.model.map(x=>D.P[x].price))).toFixed(1)),lastXI:[],lastCap:null,chip:null,ft:null});
   T.squad=loadEdits()||[...T.orig];SEL.out=SEL.inn=null;SEL.err="";
   $("loadMsg").className="loadmsg";$("loadMsg").textContent="Showing the model's £100m squad. Use Swap on each row to turn it into yours.";
@@ -677,6 +702,7 @@ function renderHeader(){
   f.push(`Bank <b class="${b<-1e-9?"down":""}">${price(b)}</b>`);
   f.push(`Squad value <b>${price(sum(T.squad.map(id=>P(id).price)))}</b>`);
   if(T.ft!=null)f.push(`Free transfers <b title="Estimated from your transfer history">≈${T.ft}</b>`);
+  if(T.pending)f.push(`Made for GW${T.picksGw+1} <b>${T.pending}</b>`);
   $("tFacts").innerHTML=f.map(x=>`<span>${x}</span>`).join("");
 }
 
@@ -684,7 +710,7 @@ function renderBanner(){
   const outs=T.orig.filter(id=>!T.squad.includes(id)),ins=T.squad.filter(id=>!T.orig.includes(id));
   $("editBanner").hidden=!outs.length;
   if(!outs.length)return;
-  const hits=T.ft!=null?Math.max(0,outs.length-T.ft)*4:null;
+  const hits=T.ft!=null?Math.max(0,outs.length+T.pending-T.ft)*4:null;
   const d5=total(T.squad,G5())-total(T.orig,G5()),d10=total(T.squad,G10())-total(T.orig,G10());
   $("editText").innerHTML=`<b>${outs.length} transfer${outs.length>1?"s":""}:</b> ${outs.map(x=>esc(P(x).name)).join(", ")} → ${ins.map(x=>esc(P(x).name)).join(", ")} · next 5 <b>${signed(d5)}</b> · next ${G10().length} <b>${signed(d10)}</b>${hits?` · costs a <b>−${hits}</b> hit`:""}${hits!=null&&!hits?" · within your free transfers":""}`;
 }
@@ -708,6 +734,45 @@ function renderTiles(){
 // ── Planner: pitch + player list ─────────────────────────────────────────────
 const pitchSel=$("pitchGw");
 const SEL={out:null,inn:null,err:""};
+const ACT={id:null,mode:null,err:""};   // a tapped pitch card: mode "menu" (choose an action) or "sub" (pick who to swap with)
+function legalXI(xi){const c={GKP:0,DEF:0,MID:0,FWD:0};xi.forEach(id=>c[P(id).pos]++);return xi.length===11&&c.GKP===1&&c.DEF>=3&&c.MID>=2&&c.FWD>=1;}
+function fixArmband(l,g){
+  const v=id=>P(id).gw[g]??0,byV=[...l.xi].sort((a,b)=>v(b)-v(a));
+  if(!l.xi.includes(l.cap))l.cap=l.xi.includes(l.vice)?l.vice:byV[0];
+  if(!l.xi.includes(l.vice)||l.vice===l.cap)l.vice=byV.find(x=>x!==l.cap);
+  return l;
+}
+function bestLU(g){const b=bestXI(T.squad,g),v=id=>P(id).gw[g]??0;
+  return {xi:[...b.xi],bench:[...b.bench].sort((a,c)=>(P(a).pos==="GKP"?-1:0)-(P(c).pos==="GKP"?-1:0)||v(c)-v(a)),cap:b.cap,vice:b.vice};}
+const luOk=l=>l&&l.xi?.length===11&&l.bench?.length===4&&[...l.xi,...l.bench].every(x=>T.squad.includes(x))&&new Set([...l.xi,...l.bench]).size===15&&legalXI(l.xi);
+// The lineup shown for a gameweek: one you've set here, else your FPL lineup for the next gameweek, else the best XI
+function getLU(g){
+  if(luOk(T.lu[g]))return fixArmband(luClone(T.lu[g]),g);
+  if(g===D.gws[0]&&luOk(T.luBase))return fixArmband(luClone(T.luBase),g);
+  return bestLU(g);
+}
+const luPts=(l,g)=>{const v=id=>P(id).gw[g]??0;return sum(l.xi.map(v))+v(l.cap);};
+// Swapping a and b between the XI and the bench (or reordering the bench); returns an error or ""
+function subProblem(l,a,b){
+  if(a===b)return "same player";
+  const ax=l.xi.includes(a),bx=l.xi.includes(b);
+  if(ax&&bx)return "both are already starting";
+  if(!ax&&!bx){const ka=P(a).pos==="GKP",kb=P(b).pos==="GKP";return ka!==kb?"the keeper stays first on the bench":"";}
+  const [st,bn]=ax?[a,b]:[b,a],xi=l.xi.map(x=>x===st?bn:x);
+  return legalXI(xi)?"":"that breaks the formation (1 GK, at least 3 DEF, 2 MID and 1 FWD)";
+}
+function doSub(a,b){
+  const g=viewGw(),l=getLU(g),e=subProblem(l,a,b);
+  if(e){ACT.err=e;renderPlanner();return;}
+  const swap=x=>x===a?b:x===b?a:x;
+  l.xi=l.xi.map(swap);l.bench=l.bench.map(swap);
+  T.lu[g]=fixArmband(l,g);ACT.id=ACT.mode=null;ACT.err="";saveEdits();renderPlanner();
+}
+function setArm(id,role){
+  const g=viewGw(),l=getLU(g);
+  if(role==="cap"){if(l.vice===id)l.vice=l.cap;l.cap=id;}else{if(l.cap===id)l.cap=l.vice;l.vice=id;}
+  T.lu[g]=fixArmband(l,g);ACT.id=ACT.mode=null;saveEdits();renderPlanner();
+}
 const UI={pos:"",team:"",max:"",sort:"xp",q:"",afford:false,limit:60};
 const viewGw=()=>+pitchSel.value||D.gws[0];
 // FPL's own shirt images; a plain shirt in the position colour if they don't load
@@ -734,11 +799,13 @@ function swapProblem(outId,c){
   return "";
 }
 function doSwap(outId,inId){
-  T.squad=swapIn(T.squad,outId,inId);SEL.out=SEL.inn=null;SEL.err="";saveEdits();renderAll();
+  T.squad=swapIn(T.squad,outId,inId);T.luBase=luMap(T.luBase,outId,inId);
+  for(const g in T.lu)T.lu[g]=luMap(T.lu[g],outId,inId);
+  SEL.out=SEL.inn=null;SEL.err="";ACT.id=ACT.mode=null;saveEdits();renderAll();
   if(matchMedia("(max-width:1100px)").matches)$("planner").scrollIntoView({behavior:"smooth",block:"start"});
 }
 function selectOut(id){
-  SEL.inn=null;SEL.err="";
+  SEL.inn=null;SEL.err="";ACT.id=ACT.mode=null;
   if(SEL.out===id){SEL.out=null;}else{SEL.out=id;UI.pos=P(id).pos;UI.afford=true;UI.limit=60;}
   renderPlanner();
   if(SEL.out&&matchMedia("(max-width:1100px)").matches)$("plPanel").scrollIntoView({behavior:"smooth",block:"start"});
@@ -747,42 +814,64 @@ function clickCard(id){
   if(SEL.inn){const c=P(SEL.inn),e=swapProblem(id,c);
     if(e){SEL.err=e;renderPlanner();return;}
     doSwap(id,c.id);return;}
-  selectOut(id);
+  if(ACT.mode==="sub"&&ACT.id&&ACT.id!==id){doSub(ACT.id,id);return;}
+  if(ACT.id===id){ACT.id=ACT.mode=null;ACT.err="";}else{ACT.id=id;ACT.mode="menu";ACT.err="";SEL.out=null;}
+  renderPlanner();
 }
+function renderActBar(){
+  const el=$("actBar");
+  if(!ACT.id){el.hidden=true;return;}
+  const p=P(ACT.id),l=getLU(viewGw()),st=l.xi.includes(ACT.id);
+  el.hidden=false;
+  const err=ACT.err?`<span class="err">Can't: ${esc(ACT.err)}</span>`:"";
+  el.innerHTML=ACT.mode==="sub"
+    ?`<span><b>${esc(p.name)}</b>: tap the highlighted player to swap with. ${err}</span><button class="btn small" type="button" data-act="cancel">Cancel</button>`
+    :`<b>${esc(p.name)}</b><span class="acts"><button class="btn small" type="button" data-act="sub">Substitute</button><button class="btn small" type="button" data-act="out">Transfer out</button>${st&&l.cap!==ACT.id?`<button class="btn small" type="button" data-act="cap">Captain</button>`:""}${st&&l.vice!==ACT.id?`<button class="btn small" type="button" data-act="vice">Vice</button>`:""}<button class="btn small" type="button" data-act="cancel" aria-label="Close">✕</button></span>${err}`;
+}
+$("actBar").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act,id=ACT.id;
+  if(a==="cancel"){ACT.id=ACT.mode=null;ACT.err="";renderPlanner();}
+  else if(a==="sub"){ACT.mode="sub";ACT.err="";renderPlanner();}
+  else if(a==="out"){ACT.id=ACT.mode=null;selectOut(id);}
+  else setArm(id,a);});
 function clickRow(id){
   if(T.squad.includes(id)){selectOut(id);return;}
   if(SEL.out){const e=swapProblem(SEL.out,P(id));if(e){SEL.err=e;renderSelBar();return;}doSwap(SEL.out,id);return;}
   SEL.inn=SEL.inn===id?null:id;SEL.err="";renderPlanner();
   if(SEL.inn&&matchMedia("(max-width:1100px)").matches)$("planner").scrollIntoView({behavior:"smooth",block:"start"});
 }
-function renderPlanner(){renderPStats();renderTurf();renderSelBar();renderFilters();renderPlayers();}
+function renderPlanner(){renderPStats();renderActBar();renderTurf();renderSelBar();renderFilters();renderPlayers();}
 function renderPStats(){
-  const g=viewGw(),b=bestXI(T.squad,g);
-  const n=T.orig.filter(id=>!T.squad.includes(id)).length,hits=T.ft!=null?Math.max(0,n-T.ft)*4:0,bk=bank();
-  $("pStats").innerHTML=`<div>Transfers<b>${n}${T.ft!=null?` / ${T.ft}`:""}</b></div><div>Cost<b class="${hits?"down":""}">${hits?"−"+hits:0}</b></div>`+
-    `<div>Bank<b class="${bk<-1e-9?"down":""}">£${bk.toFixed(1)}</b></div><div>xP GW${g}<b>${fmt(b.pts)}</b></div>`;
+  const g=viewGw(),l=getLU(g);
+  const n=T.pending+T.orig.filter(id=>!T.squad.includes(id)).length,hits=T.ft!=null?Math.max(0,n-T.ft)*4:0,bk=bank();
+  $("pStats").innerHTML=`<div title="Transfers made for GW${D.gws[0]} (on FPL and here) / free transfers">Transfers<b>${n}${T.ft!=null?` / ${T.ft}`:""}</b></div><div>Cost<b class="${hits?"down":""}">${hits?"−"+hits:0}</b></div>`+
+    `<div>Bank<b class="${bk<-1e-9?"down":""}">£${bk.toFixed(1)}</b></div><div>xP GW${g}<b>${fmt(luPts(l,g))}</b></div>`;
 }
 function pcard(id,g,b){
   const p=P(id),v=p.gw[g]??0;
-  const cls=["pc",p.pos,SEL.out===id?"sel":"",SEL.inn&&P(SEL.inn).pos!==p.pos?"dim":"",isNew(id)?"new":""].join(" ");
+  const sub=ACT.mode==="sub"&&ACT.id&&ACT.id!==id;
+  const cls=["pc",p.pos,SEL.out===id||ACT.id===id?"sel":"",(SEL.inn&&P(SEL.inn).pos!==p.pos)||(sub&&subProblem(b,ACT.id,id))?"dim":"",sub&&!subProblem(b,ACT.id,id)?"elig":"",isNew(id)?"new":""].join(" ");
   const badge=id===b.cap?'<span class="c">C</span>':id===b.vice?'<span class="c v">V</span>':"";
   const fl=p.avail!=null&&p.avail<.99?`<span class="fl ${p.avail<.5?"a0":""}" title="${esc(p.news)}">${Math.round(p.avail*100)}</span>`:"";
-  return `<button type="button" class="${cls}" data-card="${id}" title="${esc(p.name)} · ${esc(p.club)} · ${price(p.price)} · GW${g}: ${esc(oppOf(p,g)||"no fixture")} · tap to swap">${badge}${fl}<span class="sw">⇄</span>
+  return `<button type="button" class="${cls}" data-card="${id}" title="${esc(p.name)} · ${esc(p.club)} · ${price(p.price)} · GW${g}: ${esc(oppOf(p,g)||"no fixture")} · tap for options">${badge}${fl}<span class="sw">⇄</span>
     <span class="sh">${shirt(p)}<span class="pr">£${fmt(p.price)}</span></span><span class="nm">${esc(p.name)}</span><span class="xp">${fmt(v)}</span><span class="fx">${fx3(p,g)}</span></button>`;
 }
 function renderTurf(){
   if(!pitchSel.options.length)pitchSel.innerHTML=D.gws.map(g=>`<option value="${g}">Gameweek ${g}</option>`).join("");
-  const g=viewGw(),b=bestXI(T.squad,g),v=id=>P(id).gw[g]??0;
+  const g=viewGw(),b=getLU(g),best=bestXI(T.squad,g),v=id=>P(id).gw[g]??0;
   $("gwPrev").disabled=g<=D.gws[0];$("gwNext").disabled=g>=D.gws.at(-1);
-  const rows=["GKP","DEF","MID","FWD"].map(pos=>`<div class="row">${b.xi.filter(id=>P(id).pos===pos).sort((a,c)=>v(c)-v(a)).map(id=>pcard(id,g,b)).join("")}</div>`).join("");
-  const bench=[...b.bench].sort((a,c)=>(P(a).pos==="GKP"?-1:0)-(P(c).pos==="GKP"?-1:0)||v(c)-v(a));
-  $("pitch").innerHTML=`<div class="turf">${rows}</div><div class="benchbox"><div class="row">${bench.map(id=>`<div><span class="bl">${P(id).pos==="GKP"?"GK":P(id).pos}</span>${pcard(id,g,b)}</div>`).join("")}</div></div>`;
-  const shape=["DEF","MID","FWD"].map(pos=>b.xi.filter(id=>P(id).pos===pos).length).join("-");
-  $("pitchMeta").innerHTML=`<span>Best XI <b>${shape}</b></span><span>XI incl. captain <b>${fmt(b.pts)}</b></span><span>Bench <b>${fmt(b.benchPts)}</b></span><span>Captain <b>${esc(P(b.cap).name)}</b></span>`;
+  const rows=["GKP","DEF","MID","FWD"].map(pos=>`<div class="row">${b.xi.filter(id=>P(id).pos===pos).map(id=>pcard(id,g,b)).join("")}</div>`).join("");
+  $("pitch").innerHTML=`<div class="turf">${rows}</div><div class="benchbox"><div class="row">${b.bench.map((id,i)=>`<div><span class="bl">${P(id).pos==="GKP"?"GK":i+". "+P(id).pos}</span>${pcard(id,g,b)}</div>`).join("")}</div></div>`;
+  const shape=["DEF","MID","FWD"].map(pos=>b.xi.filter(id=>P(id).pos===pos).length).join("-"),mine=luPts(b,g),gap=best.pts-mine;
+  const custom=luOk(T.lu[g]),fromFpl=!custom&&g===D.gws[0]&&luOk(T.luBase);
+  $("pitchMeta").innerHTML=`<span>${custom?"Your lineup":fromFpl?"Your FPL lineup":"Best XI"} <b>${shape}</b></span><span>XI incl. captain <b>${fmt(mine)}</b></span><span>Bench <b>${fmt(sum(b.bench.map(v)))}</b></span>`+
+    (gap>.05?`<span>Best XI would score <b>${fmt(best.pts)}</b> <span class="up">(${signed(gap)})</span> <button class="btn small" type="button" data-lu="best">Use best XI</button></span>`:"")+
+    (custom?`<button class="btn small" type="button" data-lu="reset">${g===D.gws[0]&&luOk(T.luBase)?"Back to FPL lineup":"Reset lineup"}</button>`:"");
 }
-pitchSel.addEventListener("change",renderPlanner);
-$("gwPrev").addEventListener("click",()=>{const i=D.gws.indexOf(viewGw());if(i>0){pitchSel.value=D.gws[i-1];renderPlanner();}});
-$("gwNext").addEventListener("click",()=>{const i=D.gws.indexOf(viewGw());if(i<D.gws.length-1){pitchSel.value=D.gws[i+1];renderPlanner();}});
+pitchSel.addEventListener("change",()=>{ACT.id=ACT.mode=null;renderPlanner();});
+$("pitchMeta").addEventListener("click",e=>{const b=e.target.closest("[data-lu]");if(!b)return;const g=viewGw();
+  if(b.dataset.lu==="best")T.lu[g]=bestLU(g);else delete T.lu[g];saveEdits();renderPlanner();});
+$("gwPrev").addEventListener("click",()=>{const i=D.gws.indexOf(viewGw());if(i>0){pitchSel.value=D.gws[i-1];ACT.id=ACT.mode=null;renderPlanner();}});
+$("gwNext").addEventListener("click",()=>{const i=D.gws.indexOf(viewGw());if(i<D.gws.length-1){pitchSel.value=D.gws[i+1];ACT.id=ACT.mode=null;renderPlanner();}});
 $("pitch").addEventListener("click",e=>{const c=e.target.closest("[data-card]");if(c)clickCard(+c.dataset.card);});
 function renderSelBar(){
   const el=$("selBar");
@@ -932,7 +1021,7 @@ function renderTransfers(){
       <button class="btn small" type="button" data-apply="${t.out.id},${t.inp.id}">Try</button></div>`).join("")+
     `<p class="note">Gains are for your best XI and captain each week, so a bench upgrade only counts when it would start. A transfer beyond your free ones costs 4 points: "worth a −4" marks moves that gain more than that over five weeks.</p>`;
 }
-$("tfList").addEventListener("click",e=>{const b=e.target.closest("[data-apply]");if(!b)return;const [o,i]=b.dataset.apply.split(",").map(Number);T.squad=swapIn(T.squad,o,i);saveEdits();renderAll();});
+$("tfList").addEventListener("click",e=>{const b=e.target.closest("[data-apply]");if(!b)return;const [o,i]=b.dataset.apply.split(",").map(Number);doSwap(o,i);});
 document.querySelectorAll("#tfSeg button").forEach(b=>b.addEventListener("click",()=>{tfH=b.dataset.h;document.querySelectorAll("#tfSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderTransfers();}));
 
 // chips
@@ -982,7 +1071,7 @@ function renderRisks(){
       flags.length?flags.map(f=>li(`${esc(f.p.name)} ${f.why.join("")}`,esc(f.sub||`${f.p.club} · ${f.p.pos} · ${price(f.p.price)}`),fmt(f.p.n5),"next 5")).join(""):`<div class="empty">No flags in your squad.</div>`);
 }
 
-$("resetBtn").addEventListener("click",()=>{T.squad=[...T.orig];SEL.out=SEL.inn=null;saveEdits();renderAll();});
+$("resetBtn").addEventListener("click",()=>{T.squad=[...T.orig];T.luBase=luClone(T.luBase0);T.lu={};SEL.out=SEL.inn=null;ACT.id=ACT.mode=null;saveEdits();renderAll();});
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
 $("idForm").addEventListener("submit",e=>{e.preventDefault();const id=parseInt(($("teamId").value.match(/\d+/)||[""])[0],10);
