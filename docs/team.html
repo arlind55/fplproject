@@ -144,26 +144,95 @@ footer a{color:inherit}
 @media (max-width:980px){.grid2,.intro{grid-template-columns:1fr}}
 section.card{margin-bottom:16px}
 .grid2>section.card{margin-bottom:0}
-/* pitch (as projections.html) */
-.pitch{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:14px 8px;display:grid;gap:12px}
-.line{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-.pl{width:98px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 6px 5px;text-align:center;position:relative;box-shadow:var(--shadow)}
-.pl b{display:block;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pl small{display:block;color:var(--ink-3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pl .xp{font:600 12px "IBM Plex Mono",monospace;color:var(--accent);margin-top:2px}
-.pl .c{position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--surface);font:700 11px "IBM Plex Mono",monospace;display:grid;place-items:center}
-.pl .c.v{background:var(--surface);color:var(--ink);border:1px solid var(--ink)}
-.pl .fl{position:absolute;top:-8px;left:-8px;min-width:20px;height:20px;padding:0 4px;border-radius:10px;font:600 10px "IBM Plex Mono",monospace;display:grid;place-items:center;background:var(--warn);color:#1b1407}
-.pl .fl.a0{background:var(--d5);color:var(--d5-ink)}
-.pl::before{content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:3px;border-radius:6px 6px 0 0;background:var(--line)}
-.pl.GKP::before{background:var(--gkp)} .pl.DEF::before{background:var(--def)} .pl.MID::before{background:var(--mid)} .pl.FWD::before{background:var(--fwd)}
-.pl.new{border-color:var(--accent)}
-.bench{border-top:1px dashed var(--line-strong);padding-top:12px}
-.bench .pl{opacity:.75}
+/* planner: pitch + player list, laid out like the FPL transfers screen */
+.planner{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:12px;margin-bottom:16px;align-items:start}
+@media (max-width:1100px){.planner{grid-template-columns:1fr}}
+.pstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.pstats div{background:var(--surface-2);border-radius:6px;padding:6px 6px 5px;text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;min-width:0}
+.pstats b{display:block;font:600 17px "IBM Plex Mono",monospace;letter-spacing:0;color:var(--ink);text-transform:none;margin-top:1px;white-space:nowrap}
+.pstats b.down{color:var(--err)}
+.gwnav{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:10px}
+.gwnav button{width:36px;height:34px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;font-size:16px}
+.gwnav button:disabled{opacity:.35;cursor:default}
+.gwnav select{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font:700 20px "Barlow Condensed","Arial Narrow",sans-serif;color:var(--ink);cursor:pointer}
+.turf{position:relative;border-radius:8px 8px 0 0;overflow:hidden;padding:10px 4px 6px;
+  background:repeating-linear-gradient(180deg,#3c9447 0 56px,#43a04f 56px 112px)}
+.turf::before{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:46%;height:74px;border:2px solid rgba(255,255,255,.35);border-top:0;pointer-events:none}
+.turf::after{content:"";position:absolute;left:50%;bottom:-62px;transform:translateX(-50%);width:124px;height:124px;border:2px solid rgba(255,255,255,.35);border-radius:50%;pointer-events:none}
+.turf .row,.benchbox .row{position:relative;z-index:1;display:flex;justify-content:space-evenly;margin:4px 0 12px}
+.benchbox{background:#2d6e36;border-radius:0 0 8px 8px;padding:6px 4px 4px}
+.benchbox .row{margin:0 0 6px}
+.benchbox .bl{display:block;text-align:center;font:600 9.5px "IBM Plex Mono",monospace;letter-spacing:.06em;color:rgba(255,255,255,.75);margin-bottom:2px}
+.pc{position:relative;width:92px;background:none;border:0;padding:0;cursor:pointer;font:inherit;color:inherit;display:flex;flex-direction:column;align-items:center;border-radius:6px;transition:opacity .15s}
+.pc:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.pc .sh{position:relative;width:56px;height:56px;margin-bottom:2px}
+.pc .sh img,.pc .sh .fb{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.fb{display:none}.fb svg{display:block;width:100%;height:100%}
+.pc .pr{position:absolute;bottom:0;left:50%;transform:translateX(-50%);background:rgba(10,12,20,.75);color:#fff;font:600 9.5px "IBM Plex Mono",monospace;padding:0 4px;border-radius:3px;white-space:nowrap}
+.pc .nm{width:100%;background:#171a26;color:#fff;font:600 11.5px "IBM Plex Sans",sans-serif;padding:3px 3px 2px;border-radius:4px 4px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.pc .xp{width:100%;background:#fff;color:#171a26;font:600 11px "IBM Plex Mono",monospace;padding:1px 0;text-align:center}
+.pc .fx{display:flex;width:100%;border-radius:0 0 4px 4px;overflow:hidden;background:#e9ebf2}
+.pc .fx i{flex:1;min-width:0;font:600 8.5px "IBM Plex Mono",monospace;font-style:normal;padding:2px 0;text-align:center;overflow:hidden;white-space:nowrap}
+.pc .c{position:absolute;top:0;right:10px;width:18px;height:18px;border-radius:50%;background:#171a26;color:#fff;font:700 10px "IBM Plex Mono",monospace;display:grid;place-items:center;z-index:2}
+.pc .c.v{background:#fff;color:#171a26;border:1px solid #171a26}
+.pc .fl{position:absolute;top:0;left:10px;min-width:18px;height:18px;padding:0 3px;border-radius:9px;font:600 9.5px "IBM Plex Mono",monospace;display:grid;place-items:center;background:#e0a24a;color:#1b1407;z-index:2}
+.pc .fl.a0{background:#a8323f;color:#fff}
+.pc .sw{position:absolute;top:22px;right:6px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.92);color:#171a26;font-size:11px;line-height:18px;text-align:center;z-index:2;opacity:0;transition:opacity .15s}
+.pc:hover .sw,.pc.sel .sw{opacity:1}
+.pc.sel .nm{background:#ffd54a;color:#171a26}
+.pc.sel .sh{transform:translateY(-2px)}
+.pc.dim{opacity:.35}
+.pc.new .nm{box-shadow:inset 0 -2px 0 #5fc48f}
+.fxd1{background:var(--d1);color:var(--d1-ink)} .fxd2{background:var(--d2);color:var(--d2-ink)} .fxd3{background:var(--d3);color:var(--d3-ink)} .fxd4{background:var(--d4);color:var(--d4-ink)} .fxd5{background:var(--d5);color:var(--d5-ink)}
+.fxb{color:#7a8096}
 .sqmeta{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--ink-3)}
 .sqmeta b{font:600 13px "IBM Plex Mono",monospace;color:var(--ink)}
+@media (max-width:560px){
+  .planner .pl-left{padding:10px 8px}
+  .pstats{gap:5px}.pstats div{font-size:9px;padding:5px 3px}.pstats b{font-size:14px}
+  .pc{width:66px}.pc .sh,.pc .sh img,.pc .sh .fb{width:42px;height:42px}
+  .pc .nm{font-size:10px;padding:2px 2px 1px}.pc .xp{font-size:10px}.pc .fx i{font-size:7.5px}
+  .pc .c,.pc .fl{top:-2px}.pc .c{right:4px}.pc .fl{left:4px}.pc .sw{display:none}
+  .turf .row{margin:2px 0 9px}
+}
+@media (max-width:420px){.pc{width:60px}.turf{padding:8px 1px 4px}.benchbox{padding:6px 1px 4px}}
+/* player list */
+.pl-right .seg{margin-bottom:8px}
+.pfilt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.pfilt label{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:4px}
+.pfilt select,.pfilt input[type=search]{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 8px;font:500 13px "IBM Plex Sans",sans-serif;color:var(--ink);min-width:0}
+.pfilt .wide{grid-column:span 2}
+.pfilt label.check{align-self:end;padding-bottom:7px;text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:500;color:var(--ink-2);margin:0}
+@media (max-width:560px){.pfilt{grid-template-columns:repeat(2,minmax(0,1fr))}.pfilt .wide{grid-column:1/-1}}
+.selbar{border:1px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:8px 10px;font-size:12.5px;color:var(--ink-2);margin-bottom:8px;display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.selbar[hidden]{display:none}
+.selbar b{color:var(--ink)}
+.selbar .err{color:var(--err);font-weight:600}
+.plist{border:1px solid var(--line);border-radius:8px;overflow:auto;max-height:640px}
+.prh,.pri{display:grid;grid-template-columns:minmax(0,1fr) 52px 54px 46px 90px;gap:6px;align-items:center;padding:0 10px}
+.prh{position:sticky;top:0;z-index:1;background:var(--surface-2);font:600 10px "IBM Plex Mono",monospace;letter-spacing:.05em;color:var(--ink-3);text-transform:uppercase;height:30px;border-bottom:1px solid var(--line-strong)}
+.prh span,.pri .n{text-align:right}
+.prh span:last-child{text-align:center}
+.prh span:first-child{text-align:left}
+.pri{width:100%;min-height:48px;background:var(--surface);border:0;border-bottom:1px solid var(--line);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.pri:hover{background:var(--muted-cell)}
+.pri.insq{background:var(--muted-cell);cursor:pointer}
+.pri.no{opacity:.45}
+.pri.sel{box-shadow:inset 3px 0 0 var(--accent);background:var(--surface-2)}
+.pri .who{display:flex;gap:8px;align-items:center;min-width:0}
+.pri .who img,.pri .who .fb{width:26px;height:26px;flex:none;object-fit:contain}
+.pri .who div{min-width:0}
+.pri .who b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pri .who small{display:block;font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pri .n{font:600 12.5px "IBM Plex Mono",monospace}
+.pri .n small{display:block;font:500 10.5px "IBM Plex Mono",monospace}
+.pri .fx3{display:flex;gap:2px}
+.pri .fx3 i{flex:1;font:600 9.5px "IBM Plex Mono",monospace;font-style:normal;text-align:center;padding:3px 0;border-radius:3px}
+.pri .fx3 i.fxb{background:var(--surface-2)}
+.more{display:block;width:100%;padding:10px;border:0;background:var(--surface);color:var(--accent);font:600 13px "IBM Plex Sans",sans-serif;cursor:pointer}
+@media (max-width:560px){.prh,.pri{grid-template-columns:minmax(0,1fr) 48px 44px 78px;padding:0 8px}.prh .own,.pri .own{display:none}.plist{max-height:70vh}}
 .field select{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:500 13px "IBM Plex Sans",sans-serif;color:var(--ink)}
-@media (max-width:520px){.pl{width:66px;padding:6px 3px 4px}.pl b{font-size:11.5px}.pl small{font-size:10px}.line{gap:5px}}
+.grid2 .risks{grid-template-columns:1fr}
 /* lists */
 .list{display:grid;gap:0}
 .li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
@@ -246,22 +315,6 @@ td.total{font-weight:600;color:var(--accent)}
 .weeks .b i{display:block;width:100%;background:var(--accent);opacity:.55;border-radius:3px 3px 0 0}
 .weeks .b.best i{opacity:1}
 .weeks .v{color:var(--ink-2);font-weight:600}
-/* swap dialog */
-dialog{border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);color:var(--ink);padding:0;width:min(560px,calc(100vw - 24px));max-height:min(80vh,720px);box-shadow:var(--shadow)}
-dialog::backdrop{background:rgba(10,12,20,.55)}
-.dlg{display:flex;flex-direction:column;max-height:min(80vh,720px)}
-.dlg header{padding:14px 16px 10px;border-bottom:1px solid var(--line)}
-.dlg header h4{margin:0;font:600 20px "Barlow Condensed","Arial Narrow",sans-serif}
-.dlg header p{margin:2px 0 8px;color:var(--ink-3);font-size:12px}
-.dlg header .row{display:flex;gap:8px;align-items:center}
-.dlg header input[type=text]{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font:inherit;color:var(--ink)}
-.dlg .opts{overflow:auto;padding:0 16px}
-.dlg .opts button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:9px 0;color:var(--ink);font:inherit;cursor:pointer}
-.dlg .opts button:hover b{color:var(--accent)}
-.dlg .opts button[disabled]{opacity:.45;cursor:not-allowed}
-.dlg .opts small{display:block;color:var(--ink-3);font-size:12px}
-.dlg .opts .n{font:600 13px "IBM Plex Mono",monospace;text-align:right}
-.dlg footer{padding:10px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
 .check{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);white-space:nowrap;cursor:pointer}
 .check input{accent-color:var(--accent);margin:0}
 .note{color:var(--ink-3);font-size:12px;margin:10px 0 0}
@@ -312,52 +365,62 @@ dialog::backdrop{background:rgba(10,12,20,.55)}
   <div class="banner" id="editBanner" hidden><span id="editText"></span><button class="btn small" id="resetBtn" type="button">Reset to my squad</button></div>
   <div class="tiles" id="tiles"></div>
 
-  <div class="grid2">
-    <section class="card">
-      <div class="head"><div><h3>Best XI</h3><p id="pitchSub">Highest-projected legal lineup</p></div>
-        <div class="field"><select id="pitchGw" aria-label="Gameweek"></select></div></div>
+  <section class="planner" id="planner">
+    <div class="card pl-left">
+      <div class="pstats" id="pStats"></div>
+      <div class="gwnav"><button type="button" id="gwPrev" aria-label="Previous gameweek">←</button><select id="pitchGw" aria-label="Gameweek"></select><button type="button" id="gwNext" aria-label="Next gameweek">→</button></div>
       <div id="pitch"></div>
+      <div class="sqmeta" id="pitchMeta"></div>
+    </div>
+    <section class="card pl-right" id="plPanel">
+      <div class="head"><div><h3>Players</h3><p id="plSub">Tap a player on the pitch, then pick a replacement here (or the other way round)</p></div></div>
+      <div class="selbar" id="selBar" hidden></div>
+      <div class="seg" id="pPos" role="group" aria-label="Position"><button data-p="" aria-pressed="true">All</button><button data-p="GKP" aria-pressed="false">GK</button><button data-p="DEF" aria-pressed="false">DEF</button><button data-p="MID" aria-pressed="false">MID</button><button data-p="FWD" aria-pressed="false">FWD</button></div>
+      <div class="pfilt">
+        <div><label for="pTeam">Team</label><select id="pTeam"></select></div>
+        <div><label for="pMax">Max price</label><select id="pMax"></select></div>
+        <div><label for="pSort">Sort by</label><select id="pSort"></select></div>
+        <div class="wide"><label for="pSearch">Player name</label><input type="search" id="pSearch" placeholder="Search" autocomplete="off"></div>
+        <label class="check"><input type="checkbox" id="pAfford"> Affordable only</label>
+      </div>
+      <div class="plist" id="pList"></div>
     </section>
+  </section>
+
+  <div class="grid2">
     <section class="card">
       <div class="head"><div><h3>Lineup and players</h3><p>Next gameweek's calls, and who's carrying the squad</p></div></div>
       <div id="advice"></div>
     </section>
+    <section class="card">
+      <div class="head"><div><h3>Best transfers</h3><p id="tfSub">One-for-one swaps you can afford</p></div>
+        <div class="seg" id="tfSeg" role="group" aria-label="Rank transfers by"><button data-h="5" aria-pressed="true">Next 5</button><button data-h="10" aria-pressed="false">Next 10</button></div></div>
+      <div id="tfList"></div>
+    </section>
   </div>
-
-  <section class="card">
-    <div class="head"><div><h3>Squad projections</h3><p>Projected points per gameweek · tap Swap to try a transfer</p></div><span class="count" id="sqCount"></span></div>
-    <div class="tablewrap"><table><thead><tr id="sqHead"></tr></thead><tbody id="sqBody"></tbody></table></div>
-  </section>
 
   <section class="card">
     <div class="head"><div><h3>Captain rotation</h3><p id="rotSub">Top four armband options each week, and a transfer when your best option is weak</p></div></div>
     <div class="rot" id="rot"></div>
   </section>
 
+  <section class="card">
+    <div class="head"><div><h3>Squad projections</h3><p>Projected points per gameweek · Swap jumps to the planner with that player selected</p></div><span class="count" id="sqCount"></span></div>
+    <div class="tablewrap"><table><thead><tr id="sqHead"></tr></thead><tbody id="sqBody"></tbody></table></div>
+  </section>
+
   <div class="grid2">
-    <section class="card">
-      <div class="head"><div><h3>Best transfers</h3><p id="tfSub">One-for-one swaps you can afford</p></div>
-        <div class="seg" id="tfSeg" role="group" aria-label="Rank transfers by"><button data-h="5" aria-pressed="true">Next 5</button><button data-h="10" aria-pressed="false">Next 10</button></div></div>
-      <div id="tfList"></div>
-    </section>
     <section class="card">
       <div class="head"><div><h3>Chip timing</h3><p>Where your current squad gets the most from each chip</p></div></div>
       <div id="chips"></div>
     </section>
+    <section class="card">
+      <div class="head"><div><h3>Ownership and risk</h3><p>Who can cost you rank, where you can gain it, and the players most likely to let you down</p></div></div>
+      <div class="risks" id="risks"></div>
+    </section>
   </div>
-
-  <section class="card">
-    <div class="head"><div><h3>Ownership and risk</h3><p>Who can cost you rank, where you can gain it, and the players most likely to let you down</p></div></div>
-    <div class="risks" id="risks"></div>
-  </section>
 </div>
 
-<dialog id="swapDlg"><div class="dlg">
-  <header><h4 id="swapTitle">Swap</h4><p id="swapSub"></p>
-    <div class="row"><input type="text" id="swapSearch" placeholder="Search name or club" aria-label="Search players"><label class="check"><input type="checkbox" id="swapAll"> Over budget too</label></div></header>
-  <div class="opts" id="swapOpts"></div>
-  <footer><button class="btn" type="button" id="swapClose">Close</button></footer>
-</div></dialog>
 
 <footer>
   <span>Projections are averages, not predictions. Totals assume you field the best legal XI each week and captain its top scorer; transfers use current prices (your real selling price can be a little lower). Your squad is the one you fielded at the last deadline: transfers made since then show once the next deadline passes, or add them with Swap. <a href="./metrics.html#projections">Method →</a></span>
@@ -443,7 +506,7 @@ async function fplGet(path){
 }
 
 // ── Model data ───────────────────────────────────────────────────────────────
-const D={P:{},gws:[],opp:{},nfix:{},caps:{},model:[],nextGw:null};
+const D={P:{},gws:[],opp:{},nfix:{},caps:{},model:[],nextGw:null,tcode:{},teams:[],fx:{}};
 const POS_ORDER={GKP:0,DEF:1,MID:2,FWD:3};
 function shape(r){
   const o={id:+r.id,name:r.web_name,team:+r.team||null,club:r.team_short_name,pos:r.pos,price:num(r.price),own:num(r.selected_by_percent)??0,status:r.status,
@@ -456,7 +519,11 @@ async function loadModel(){
   try{rows=await fetchCsv("projections_long.csv");}catch(e){long=false;rows=await fetchCsv("projections.csv");}
   const [teams,fx,events,meta,caps,squad]=await Promise.all([fetchCsv("teams.csv"),fetchCsv("fixtures_lite.csv").catch(()=>fetchCsv("fixtures.csv")),
     fetchCsv("events.csv"),fetchJson("meta.json"),fetchCsv("captains.csv").catch(()=>[]),fetchCsv("model_squad.csv").catch(()=>[])]);
-  const tshort={},tid={};teams.forEach(t=>{tshort[t.id]=t.short_name;tid[t.short_name]=+t.id;});
+  const tshort={},tid={};teams.forEach(t=>{tshort[t.id]=t.short_name;tid[t.short_name]=+t.id;D.tcode[+t.id]=t.code;});
+  D.teams=teams.map(t=>({id:+t.id,name:t.name})).sort((a,b)=>a.name.localeCompare(b.name));
+  for(const f of fx){const g=+f.event;if(!g)continue;
+    for(const [t,o,v,d] of [[+f.team_h,f.team_a,"H",f.team_h_difficulty],[+f.team_a,f.team_h,"A",f.team_a_difficulty]]){
+      D.fx[t]=D.fx[t]||{};(D.fx[t][g]=D.fx[t][g]||[]).push({o:tshort[o],v,d:parseInt(d,10)||3});}}
   rows.forEach(r=>{const p=shape(r);if(!p.team)p.team=tid[p.club]||null;D.P[p.id]=p;});
   D.gws=Object.keys(rows[0]||{}).filter(k=>k.startsWith("gw_")).map(k=>+k.slice(3)).sort((a,b)=>a-b);
   D.long=long;D.nextGw=D.gws[0];
@@ -553,7 +620,7 @@ function usePicks(id,picks,gw,{entry=null,fh=false,hist=null}={}){
     orig:ids,bank0:(picks.entry_history?.bank??entry?.last_deadline_bank??0)/10,
     lastXI:picks.picks.filter(p=>p.position<=11).map(p=>p.element),
     lastCap:picks.picks.find(p=>p.is_captain)?.element??null,chip:picks.active_chip||null,ft:estimateFT(hist)});
-  T.squad=loadEdits()||[...T.orig];
+  T.squad=loadEdits()||[...T.orig];SEL.out=SEL.inn=null;SEL.err="";
   $("loadMsg").className="loadmsg";$("loadMsg").innerHTML=entry?"":`Loaded from the pasted page. Team name, rank and free transfers need the live connection.`;
   try{localStorage.setItem("fpl-team-id",String(id));}catch(e){}
   try{window.history.replaceState(null,"",`?id=${id}`);}catch(e){}
@@ -581,7 +648,7 @@ function startManual(id){
   if(D.model.length!==15){$("loadMsg").textContent="The model squad isn't available either. Try again later.";return;}
   Object.assign(T,{id:id||0,entry:null,picksGw:-1,fh:false,manual:true,history:null,orig:[...D.model],
     bank0:Math.max(0,+(100-sum(D.model.map(x=>D.P[x].price))).toFixed(1)),lastXI:[],lastCap:null,chip:null,ft:null});
-  T.squad=loadEdits()||[...T.orig];
+  T.squad=loadEdits()||[...T.orig];SEL.out=SEL.inn=null;SEL.err="";
   $("loadMsg").className="loadmsg";$("loadMsg").textContent="Showing the model's £100m squad. Use Swap on each row to turn it into yours.";
   renderAll();
 }
@@ -596,7 +663,7 @@ const isNew=id=>!T.orig.includes(id);
 
 function renderAll(){
   $("app").hidden=false;
-  renderHeader();renderBanner();renderTiles();renderPitch();renderAdvice();renderSquad();renderRotation();renderTransfers();renderChips();renderRisks();
+  renderHeader();renderBanner();renderTiles();renderPlanner();renderAdvice();renderSquad();renderRotation();renderTransfers();renderChips();renderRisks();
 }
 
 function renderHeader(){
@@ -638,26 +705,136 @@ function renderTiles(){
     tile(`Captain · GW${g1}`,esc(cap.name),`${esc(oppOf(cap,g1)||"no fixture")} · <b>${fmt(b1.capPts)}</b> ×2${D.caps[cap.id]?.haul!=null?` · haul ${pct(D.caps[cap.id].haul)}`:""}`);
 }
 
-// pitch
+// ── Planner: pitch + player list ─────────────────────────────────────────────
 const pitchSel=$("pitchGw");
-pitchSel.addEventListener("change",renderPitch);
-function plCard(id,g,b){
-  const p=P(id),v=p.gw[g]??0,o=oppShort(p,g);
+const SEL={out:null,inn:null,err:""};
+const UI={pos:"",team:"",max:"",sort:"xp",q:"",afford:false,limit:60};
+const viewGw=()=>+pitchSel.value||D.gws[0];
+// FPL's own shirt images; a plain shirt in the position colour if they don't load
+const SHIRT_SVG='<svg viewBox="0 0 56 56" aria-hidden="true"><path d="M19 7 7 14l5 11 6-3v28h20V22l6 3 5-11-12-7c-2 4-5 6-9 6s-7-2-9-6z" fill="var(--sc)" stroke="rgba(0,0,0,.3)"/></svg>';
+function shirt(p,size=110){
+  const code=D.tcode[p.team],fb=`<span class="fb" style="--sc:var(--${p.pos.toLowerCase()})${code?"":";display:block"}">${SHIRT_SVG}</span>`;
+  return code?`<img src="${FPL}/dist/img/shirts/standard/shirt_${code}${p.pos==="GKP"?"_1":""}-${size}.webp" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">${fb}`:fb;
+}
+// next three gameweeks' fixtures from g, coloured by FPL difficulty
+function fx3(p,g){
+  return [g,g+1,g+2].map(gg=>{const l=D.fx[p.team]?.[gg]||[];
+    if(!l.length)return `<i class="fxb" title="GW${gg}: no fixture">–</i>`;
+    const d=Math.max(...l.map(f=>f.d||3));
+    return `<i class="fxd${d}" title="GW${gg}: ${esc(l.map(f=>`${f.o} (${f.v})`).join(" + "))}">${esc(l.map(f=>f.v==="H"?f.o:f.o.toLowerCase()).join("+"))}</i>`;}).join("");
+}
+function swapProblem(outId,c){
+  const o=P(outId);
+  if(c.id===outId)return "same player";
+  if(o.pos!==c.pos)return `${c.name} is a ${c.pos}, ${o.name} a ${o.pos}`;
+  if(T.squad.includes(c.id))return `${c.name} is already in your squad`;
+  const short=c.price-(o.price+bank());
+  if(short>1e-9)return `£${short.toFixed(1)}m short`;
+  const cc=clubCount(T.squad);if(c.team!==o.team&&(cc[c.team]||0)>=3)return `you already have three ${c.club} players`;
+  return "";
+}
+function doSwap(outId,inId){
+  T.squad=swapIn(T.squad,outId,inId);SEL.out=SEL.inn=null;SEL.err="";saveEdits();renderAll();
+  if(matchMedia("(max-width:1100px)").matches)$("planner").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function selectOut(id){
+  SEL.inn=null;SEL.err="";
+  if(SEL.out===id){SEL.out=null;}else{SEL.out=id;UI.pos=P(id).pos;UI.afford=true;UI.limit=60;}
+  renderPlanner();
+  if(SEL.out&&matchMedia("(max-width:1100px)").matches)$("plPanel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function clickCard(id){
+  if(SEL.inn){const c=P(SEL.inn),e=swapProblem(id,c);
+    if(e){SEL.err=e;renderPlanner();return;}
+    doSwap(id,c.id);return;}
+  selectOut(id);
+}
+function clickRow(id){
+  if(T.squad.includes(id)){selectOut(id);return;}
+  if(SEL.out){const e=swapProblem(SEL.out,P(id));if(e){SEL.err=e;renderSelBar();return;}doSwap(SEL.out,id);return;}
+  SEL.inn=SEL.inn===id?null:id;SEL.err="";renderPlanner();
+  if(SEL.inn&&matchMedia("(max-width:1100px)").matches)$("planner").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function renderPlanner(){renderPStats();renderTurf();renderSelBar();renderFilters();renderPlayers();}
+function renderPStats(){
+  const g=viewGw(),b=bestXI(T.squad,g);
+  const n=T.orig.filter(id=>!T.squad.includes(id)).length,hits=T.ft!=null?Math.max(0,n-T.ft)*4:0,bk=bank();
+  $("pStats").innerHTML=`<div>Transfers<b>${n}${T.ft!=null?` / ${T.ft}`:""}</b></div><div>Cost<b class="${hits?"down":""}">${hits?"−"+hits:0}</b></div>`+
+    `<div>Bank<b class="${bk<-1e-9?"down":""}">£${bk.toFixed(1)}</b></div><div>xP GW${g}<b>${fmt(b.pts)}</b></div>`;
+}
+function pcard(id,g,b){
+  const p=P(id),v=p.gw[g]??0;
+  const cls=["pc",p.pos,SEL.out===id?"sel":"",SEL.inn&&P(SEL.inn).pos!==p.pos?"dim":"",isNew(id)?"new":""].join(" ");
   const badge=id===b.cap?'<span class="c">C</span>':id===b.vice?'<span class="c v">V</span>':"";
-  const fl=p.avail!=null&&p.avail<.99?`<span class="fl ${p.avail<.3?"a0":""}" title="${esc(p.news)}">${Math.round(p.avail*100)}</span>`:"";
-  return `<div class="pl ${p.pos}${isNew(id)?" new":""}" title="${esc(p.name)} · ${esc(p.club)} · ${price(p.price)} · ${esc(oppOf(p,g)||"no fixture")}">${badge}${fl}<b>${esc(p.name)}</b><small>${o?esc(o):"—"}</small><div class="xp">${fmt(v)}</div></div>`;
+  const fl=p.avail!=null&&p.avail<.99?`<span class="fl ${p.avail<.5?"a0":""}" title="${esc(p.news)}">${Math.round(p.avail*100)}</span>`:"";
+  return `<button type="button" class="${cls}" data-card="${id}" title="${esc(p.name)} · ${esc(p.club)} · ${price(p.price)} · GW${g}: ${esc(oppOf(p,g)||"no fixture")} · tap to swap">${badge}${fl}<span class="sw">⇄</span>
+    <span class="sh">${shirt(p)}<span class="pr">£${fmt(p.price)}</span></span><span class="nm">${esc(p.name)}</span><span class="xp">${fmt(v)}</span><span class="fx">${fx3(p,g)}</span></button>`;
 }
-function renderPitch(){
-  if(!pitchSel.options.length)pitchSel.innerHTML=D.gws.map(g=>`<option value="${g}">GW${g}</option>`).join("");
-  const g=+pitchSel.value||D.gws[0],b=bestXI(T.squad,g);
-  const v=id=>P(id).gw[g]??0;
-  const lines=["GKP","DEF","MID","FWD"].map(pos=>`<div class="line">${b.xi.filter(id=>P(id).pos===pos).map(id=>plCard(id,g,b)).join("")}</div>`).join("");
+function renderTurf(){
+  if(!pitchSel.options.length)pitchSel.innerHTML=D.gws.map(g=>`<option value="${g}">Gameweek ${g}</option>`).join("");
+  const g=viewGw(),b=bestXI(T.squad,g),v=id=>P(id).gw[g]??0;
+  $("gwPrev").disabled=g<=D.gws[0];$("gwNext").disabled=g>=D.gws.at(-1);
+  const rows=["GKP","DEF","MID","FWD"].map(pos=>`<div class="row">${b.xi.filter(id=>P(id).pos===pos).sort((a,c)=>v(c)-v(a)).map(id=>pcard(id,g,b)).join("")}</div>`).join("");
   const bench=[...b.bench].sort((a,c)=>(P(a).pos==="GKP"?-1:0)-(P(c).pos==="GKP"?-1:0)||v(c)-v(a));
+  $("pitch").innerHTML=`<div class="turf">${rows}</div><div class="benchbox"><div class="row">${bench.map(id=>`<div><span class="bl">${P(id).pos==="GKP"?"GK":P(id).pos}</span>${pcard(id,g,b)}</div>`).join("")}</div></div>`;
   const shape=["DEF","MID","FWD"].map(pos=>b.xi.filter(id=>P(id).pos===pos).length).join("-");
-  $("pitchSub").textContent=`GW${g} · ${shape} · number = projected points`;
-  $("pitch").innerHTML=`<div class="pitch">${lines}<div class="line bench">${bench.map(id=>plCard(id,g,b)).join("")}</div></div>
-    <div class="sqmeta"><span>XI incl. captain <b>${fmt(b.pts)}</b></span><span>Bench <b>${fmt(b.benchPts)}</b></span><span>Captain <b>${esc(P(b.cap).name)}</b></span><span>Vice <b>${esc(P(b.vice).name)}</b></span></div>`;
+  $("pitchMeta").innerHTML=`<span>Best XI <b>${shape}</b></span><span>XI incl. captain <b>${fmt(b.pts)}</b></span><span>Bench <b>${fmt(b.benchPts)}</b></span><span>Captain <b>${esc(P(b.cap).name)}</b></span>`;
 }
+pitchSel.addEventListener("change",renderPlanner);
+$("gwPrev").addEventListener("click",()=>{const i=D.gws.indexOf(viewGw());if(i>0){pitchSel.value=D.gws[i-1];renderPlanner();}});
+$("gwNext").addEventListener("click",()=>{const i=D.gws.indexOf(viewGw());if(i<D.gws.length-1){pitchSel.value=D.gws[i+1];renderPlanner();}});
+$("pitch").addEventListener("click",e=>{const c=e.target.closest("[data-card]");if(c)clickCard(+c.dataset.card);});
+function renderSelBar(){
+  const el=$("selBar");
+  if(!SEL.out&&!SEL.inn){el.hidden=true;return;}
+  el.hidden=false;
+  const err=SEL.err?` <span class="err">Can't swap: ${esc(SEL.err)}</span>`:"";
+  if(SEL.out){const o=P(SEL.out);
+    el.innerHTML=`<span>Replacing <b>${esc(o.name)}</b> (${price(o.price)}) · up to <b>${price(o.price+bank())}</b>. Pick a ${o.pos} below.${err}</span><button class="btn small" type="button" data-cancel>Cancel</button>`;}
+  else{const c=P(SEL.inn);
+    el.innerHTML=`<span>Bringing in <b>${esc(c.name)}</b> (${price(c.price)}). Now tap the ${c.pos} on the pitch to take out.${err}</span><button class="btn small" type="button" data-cancel>Cancel</button>`;}
+}
+$("selBar").addEventListener("click",e=>{if(e.target.closest("[data-cancel]")){SEL.out=SEL.inn=null;SEL.err="";renderPlanner();}});
+const SORTS={xp:["xP next GW",(p,g)=>p.gw[g]??0],n5:["xP next 5",p=>p.n5],n10:["xP next 10",p=>p.n10],price:["Price",p=>p.price],own:["Ownership",p=>p.own]};
+function renderFilters(){
+  const g=viewGw();
+  if(!$("pTeam").options.length){
+    $("pTeam").innerHTML=`<option value="">All teams</option>`+D.teams.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("");
+    const mx=Math.ceil(Math.max(...Object.values(D.P).map(p=>p.price||0))*2)/2;
+    let o=`<option value="">Any</option>`;for(let v=mx;v>=4;v-=.5)o+=`<option value="${v}">£${v.toFixed(1)}m</option>`;$("pMax").innerHTML=o;
+  }
+  $("pSort").innerHTML=Object.entries(SORTS).map(([k,[l]])=>`<option value="${k}">${k==="xp"?`xP GW${g}`:k==="n10"?`xP next ${D.gws.length}`:l}</option>`).join("");
+  $("pSort").value=UI.sort;$("pTeam").value=UI.team;$("pMax").value=UI.max;$("pAfford").checked=UI.afford;
+  $("pAfford").disabled=!SEL.out;$("pAfford").parentElement.style.opacity=SEL.out?1:.5;
+  document.querySelectorAll("#pPos button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.p===UI.pos)));
+}
+function renderPlayers(){
+  const g=viewGw(),key=SORTS[UI.sort][1],q=UI.q.trim().toLowerCase(),o=SEL.out?P(SEL.out):null;
+  const list=Object.values(D.P).filter(p=>(!UI.pos||p.pos===UI.pos)&&(!UI.team||p.team===+UI.team)&&(!UI.max||(p.price||0)<=+UI.max+1e-9)
+      &&(!q||p.name.toLowerCase().includes(q)||p.club.toLowerCase().includes(q))&&(!(UI.afford&&o)||(!swapProblem(o.id,p)||p.id===o.id)))
+    .sort((a,b)=>key(b,g)-key(a,g)||b.n10-a.n10);
+  const xpHead=UI.sort==="n5"?"Nx 5":UI.sort==="n10"?`Nx ${D.gws.length}`:`xP ${g}`;
+  const val=p=>UI.sort==="n5"?p.n5:UI.sort==="n10"?p.n10:(p.gw[g]??0);
+  const rows=list.slice(0,UI.limit).map(p=>{
+    const insq=T.squad.includes(p.id),no=o&&!insq&&swapProblem(o.id,p);
+    const d=o&&!insq?val(p)-val(o):null;
+    const flags=(p.avail!=null&&p.avail<.99?` <span class="flag ${p.avail<.3?"a0":p.avail<.7?"a1":"a2"}">${pct(p.avail)}</span>`:"");
+    return `<button type="button" class="pri${insq?" insq":""}${no?" no":""}${SEL.inn===p.id||SEL.out===p.id?" sel":""}" data-p="${p.id}" ${no?`title="${esc(no)}"`:""}>
+      <span class="who">${shirt(p,66)}
+        <div><b>${esc(p.name)}${flags}</b><small>${p.pos} · ${esc(p.club)}${insq?" · in your squad":""}</small></div></span>
+      <span class="n own">${fmt(p.own)}%</span><span class="n">${fmt(val(p))}${d!=null?`<small class="${d>=0?"up":"down"}">${signed(d)}</small>`:""}</span><span class="n">${fmt(p.price)}</span><span class="fx3">${fx3(p,g)}</span></button>`;}).join("");
+  $("pList").innerHTML=`<div class="prh"><span>Player</span><span class="own">Owned</span><span>${xpHead}</span><span>£</span><span>Next 3</span></div>`+
+    (rows||`<div class="empty" style="padding:18px 10px">No players match${UI.afford&&o?" within budget":""}.</div>`)+
+    (list.length>UI.limit?`<button type="button" class="more" data-more>Show more (${list.length-UI.limit} left)</button>`:"");
+  $("plSub").textContent=o?`${list.length} ${o.pos==="GKP"?"goalkeepers":o.pos==="DEF"?"defenders":o.pos==="MID"?"midfielders":"forwards"}${UI.afford?" you can afford":""} · the small number is the gain over ${o.name}`:"Tap a player on the pitch, then pick a replacement here (or the other way round)";
+}
+$("pList").addEventListener("click",e=>{if(e.target.closest("[data-more]")){UI.limit+=60;renderPlayers();return;}const r=e.target.closest("[data-p]");if(r)clickRow(+r.dataset.p);});
+document.querySelectorAll("#pPos button").forEach(b=>b.addEventListener("click",()=>{UI.pos=b.dataset.p;UI.limit=60;renderFilters();renderPlayers();}));
+$("pTeam").addEventListener("change",e=>{UI.team=e.target.value;UI.limit=60;renderPlayers();});
+$("pMax").addEventListener("change",e=>{UI.max=e.target.value;UI.limit=60;renderPlayers();});
+$("pSort").addEventListener("change",e=>{UI.sort=e.target.value;renderPlayers();});
+$("pSearch").addEventListener("input",e=>{UI.q=e.target.value;UI.limit=60;renderPlayers();});
+$("pAfford").addEventListener("change",e=>{UI.afford=e.target.checked;renderPlayers();});
 
 // advice
 function li(main,sub,n,nsub){return `<div class="li"><div><b>${main}</b>${sub?`<small>${sub}</small>`:""}</div><div class="n">${n}${nsub?`<br><small>${nsub}</small>`:""}</div></div>`;}
@@ -701,7 +878,7 @@ function renderSquad(){
       <td><button class="btn small" type="button" data-swap="${id}">Swap</button></td></tr>`;}).join("");
   $("sqCount").textContent=`${order.length} players · bench shaded`;
 }
-$("sqBody").addEventListener("click",e=>{const b=e.target.closest("[data-swap]");if(b)openSwap(+b.dataset.swap);});
+$("sqBody").addEventListener("click",e=>{const b=e.target.closest("[data-swap]");if(!b)return;SEL.out=null;selectOut(+b.dataset.swap);$("planner").scrollIntoView({behavior:"smooth",block:"start"});});
 
 // captain rotation
 function capIdea(g,best){
@@ -805,29 +982,7 @@ function renderRisks(){
       flags.length?flags.map(f=>li(`${esc(f.p.name)} ${f.why.join("")}`,esc(f.sub||`${f.p.club} · ${f.p.pos} · ${price(f.p.price)}`),fmt(f.p.n5),"next 5")).join(""):`<div class="empty">No flags in your squad.</div>`);
 }
 
-// swap dialog
-const dlg=$("swapDlg");let swapOut=null;
-function openSwap(id){
-  swapOut=id;$("swapSearch").value="";$("swapAll").checked=false;
-  $("swapTitle").textContent=`Swap out ${P(id).name}`;
-  renderSwap();
-  if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");
-  setTimeout(()=>$("swapSearch").focus(),30);
-}
-function renderSwap(){
-  const o=P(swapOut),bud=bank(),q=$("swapSearch").value.trim().toLowerCase(),all=$("swapAll").checked;
-  $("swapSub").textContent=`${o.pos} · up to ${price(o.price+bud)} (${price(o.price)} + ${price(bud)} bank) · ranked by projected points over the next ${D.gws.length} gameweeks`;
-  const back=T.orig.filter(x=>!T.squad.includes(x)&&P(x).pos===o.pos).map(P);
-  const list=[...back,...D.byPos[o.pos].filter(c=>!back.includes(c))].filter(c=>!T.squad.includes(c.id)&&(!q||c.name.toLowerCase().includes(q)||c.club.toLowerCase().includes(q)))
-    .filter(c=>all||canSwap(T.squad,swapOut,c,bud)).slice(0,60);
-  $("swapOpts").innerHTML=list.length?list.map(c=>{const ok=canSwap(T.squad,swapOut,c,bud,true),d=c.n10-o.n10;
-    return `<button type="button" data-in="${c.id}" ${ok?"":"disabled title=\"Already three from this club\""}><div><b>${esc(c.name)}</b>${back.includes(c)?' <span class="tag">your original</span>':""}<small>${esc(c.club)} · ${price(c.price)} · own ${fmt(c.own)}%${c.avail!=null&&c.avail<.99?` · ${pct(c.avail)} fit`:""} · next: ${esc(oppOf(c,D.gws[0])||"blank")}</small></div><div class="n">${fmt(c.n10)}<br><small class="${d>=0?"up":"down"}">${signed(d)}</small></div></button>`;}).join("")
-    :`<div class="empty">No ${o.pos} matches${all?"":" within budget"}.</div>`;
-}
-$("swapSearch").addEventListener("input",renderSwap);$("swapAll").addEventListener("change",renderSwap);
-$("swapOpts").addEventListener("click",e=>{const b=e.target.closest("[data-in]");if(!b||b.disabled)return;T.squad=swapIn(T.squad,swapOut,+b.dataset.in);saveEdits();dlg.close?dlg.close():dlg.removeAttribute("open");renderAll();});
-$("swapClose").addEventListener("click",()=>dlg.close?dlg.close():dlg.removeAttribute("open"));
-$("resetBtn").addEventListener("click",()=>{T.squad=[...T.orig];saveEdits();renderAll();});
+$("resetBtn").addEventListener("click",()=>{T.squad=[...T.orig];SEL.out=SEL.inn=null;saveEdits();renderAll();});
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
 $("idForm").addEventListener("submit",e=>{e.preventDefault();const id=parseInt(($("teamId").value.match(/\d+/)||[""])[0],10);
