@@ -1,12 +1,12 @@
 {
   "summary": {
-    "weeks": 3,
-    "model_mae": 2.008,
-    "captain_points": 14,
-    "head_to_head_weeks": 3,
-    "model_wins": 3,
-    "fpl_mae": 2.32,
-    "model_mae_same_weeks": 2.008
+    "weeks": 4,
+    "model_mae": 1.959,
+    "captain_points": 16,
+    "head_to_head_weeks": 4,
+    "model_wins": 4,
+    "fpl_mae": 2.225,
+    "model_mae_same_weeks": 1.959
   },
   "weeks": [
     {
@@ -95,7 +95,36 @@
           "actual": 1
         }
       }
+    },
+    {
+      "gw": 9,
+      "snapshot": "2026-10-27",
+      "n": 346,
+      "model": {
+        "mae": 1.81,
+        "bias": -0.22,
+        "spearman": 0.382,
+        "top20_actual": 5.65,
+        "captain": {
+          "name": "Haaland",
+          "team": "MCI",
+          "projected": 6.49,
+          "actual": 2
+        }
+      },
+      "fpl": {
+        "mae": 1.94,
+        "bias": -0.086,
+        "spearman": 0.329,
+        "top20_actual": 4.9,
+        "captain": {
+          "name": "Haaland",
+          "team": "MCI",
+          "projected": 9.0,
+          "actual": 2
+        }
+      }
     }
   ],
-  "generated_at": "2026-11-03T02:59:39Z"
+  "generated_at": "2026-11-03T13:45:18Z"
 }

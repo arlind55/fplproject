@@ -14,7 +14,7 @@
       "kickoff_time": "2026-11-08T14:00:00Z",
       "event_name": "Gameweek 10",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 107,
@@ -30,7 +30,7 @@
       "kickoff_time": "2026-11-22T16:30:00Z",
       "event_name": "Gameweek 11",
       "is_home": true,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 114,
@@ -62,7 +62,7 @@
       "kickoff_time": "2026-12-02T19:30:00Z",
       "event_name": "Gameweek 13",
       "is_home": true,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 134,
@@ -110,7 +110,7 @@
       "kickoff_time": "2026-12-19T17:30:00Z",
       "event_name": "Gameweek 16",
       "is_home": true,
-      "difficulty": 2
+      "difficulty": 3
     },
     {
       "id": 166,
@@ -206,7 +206,7 @@
       "kickoff_time": "2027-01-23T15:00:00Z",
       "event_name": "Gameweek 22",
       "is_home": false,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 227,
@@ -366,7 +366,7 @@
       "kickoff_time": "2027-04-17T14:00:00Z",
       "event_name": "Gameweek 32",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 326,
@@ -833,20 +833,20 @@
       "red_cards": 0,
       "saves": 0,
       "bonus": 0,
-      "bps": 11,
-      "influence": "0.0",
-      "creativity": "0.0",
-      "threat": "0.0",
-      "ict_index": "0.0",
-      "clearances_blocks_interceptions": 5,
+      "bps": 14,
+      "influence": "17.2",
+      "creativity": "48.0",
+      "threat": "8.0",
+      "ict_index": "7.3",
+      "clearances_blocks_interceptions": 6,
       "recoveries": 3,
       "tackles": 1,
-      "defensive_contribution": 6,
+      "defensive_contribution": 7,
       "starts": 1,
-      "expected_goals": "0.17",
+      "expected_goals": "0.12",
       "expected_assists": "0.18",
-      "expected_goal_involvements": "0.35",
-      "expected_goals_conceded": "0.96",
+      "expected_goal_involvements": "0.30",
+      "expected_goals_conceded": "0.98",
       "value": 53,
       "transfers_balance": -7338,
       "selected": 209380,

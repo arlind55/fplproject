@@ -1,16 +1,16 @@
 id,web_name,team_short_name,pos,price,next_opp,next_gw,next_n,is_starter,is_captain
-1,Raya,ARS,GKP,6.2,HUL (H),4.63,20.25,True,False
-4,Gabriel,ARS,DEF,8.0,HUL (H),6.74,28.58,True,True
-566,Silva,BOU,DEF,5.0,IPS (A),4.4,22.2,True,False
-60,Hill,BOU,DEF,5.5,IPS (A),4.25,21.76,True,False
-115,De Cuyper,BHA,DEF,5.4,BRE (H),4.41,21.09,True,False
-427,Mbeumo,MUN,MID,7.9,AVL (H),5.9,28.31,True,False
-68,Tavernier,BOU,MID,6.6,IPS (A),5.7,26.67,True,False
-124,Groß,BHA,MID,6.2,BRE (H),5.05,23.53,True,False
-15,Ødegaard,ARS,MID,6.7,HUL (H),5.21,22.91,True,False
-411,Haaland,MCI,FWD,15.8,NFO (A),6.32,32.19,True,False
-346,Calvert-Lewin,LEE,FWD,6.1,TOT (H),4.31,22.78,True,False
-385,Trafford,LEE,GKP,5.0,TOT (H),3.69,16.92,False,False
-112,Van Hecke,TOT,DEF,5.0,LEE (A),3.79,20.38,False,False
-183,Rudoni,COV,MID,4.9,EVE (A),3.78,20.22,False,False
-249,Barry,EVE,FWD,5.6,COV (H),4.5,21.31,False,False
+1,Raya,ARS,GKP,6.2,HUL (H),4.72,20.1,True,False
+4,Gabriel,ARS,DEF,8.0,HUL (H),6.76,28.09,True,True
+112,Van Hecke,TOT,DEF,5.0,LEE (A),4.21,22.33,True,False
+31,Konsa,ARS,DEF,4.7,HUL (H),5.23,21.59,True,False
+427,Mbeumo,MUN,MID,7.9,AVL (H),5.81,27.57,True,False
+68,Tavernier,BOU,MID,6.6,IPS (A),5.42,25.67,True,False
+154,Palmer,CHE,MID,9.8,SUN (A),4.84,24.97,True,False
+124,Groß,BHA,MID,6.2,BRE (H),4.86,22.84,True,False
+411,Haaland,MCI,FWD,15.8,NFO (A),6.04,31.5,True,False
+249,Barry,EVE,FWD,5.6,COV (H),4.98,23.02,True,False
+346,Calvert-Lewin,LEE,FWD,6.1,TOT (H),4.16,22.4,True,False
+496,Kinsky,TOT,GKP,4.4,LEE (A),3.25,16.62,False,False
+332,Justin,LEE,DEF,4.5,TOT (H),4.11,19.23,False,False
+502,Robertson,TOT,DEF,4.3,LEE (A),3.44,18.31,False,False
+183,Rudoni,COV,MID,4.9,EVE (A),3.79,20.57,False,False

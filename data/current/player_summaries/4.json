@@ -62,7 +62,7 @@
       "kickoff_time": "2026-12-02T20:15:00Z",
       "event_name": "Gameweek 13",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 4
     },
     {
       "id": 140,
@@ -110,7 +110,7 @@
       "kickoff_time": "2026-12-20T16:30:00Z",
       "event_name": "Gameweek 16",
       "is_home": true,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 163,
@@ -126,7 +126,7 @@
       "kickoff_time": "2026-12-27T19:00:00Z",
       "event_name": "Gameweek 17",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 175,
@@ -286,7 +286,7 @@
       "kickoff_time": "2027-02-27T15:00:00Z",
       "event_name": "Gameweek 27",
       "is_home": false,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 271,
@@ -334,7 +334,7 @@
       "kickoff_time": "2027-03-20T15:00:00Z",
       "event_name": "Gameweek 30",
       "is_home": true,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 304,
@@ -382,7 +382,7 @@
       "kickoff_time": "2027-04-24T14:00:00Z",
       "event_name": "Gameweek 33",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 4
     },
     {
       "id": 331,
@@ -398,7 +398,7 @@
       "kickoff_time": "2027-05-01T14:00:00Z",
       "event_name": "Gameweek 34",
       "is_home": true,
-      "difficulty": 2
+      "difficulty": 3
     },
     {
       "id": 346,
@@ -462,7 +462,7 @@
       "kickoff_time": "2027-05-30T15:00:00Z",
       "event_name": "Gameweek 38",
       "is_home": true,
-      "difficulty": 3
+      "difficulty": 4
     }
   ],
   "history": [
@@ -834,10 +834,10 @@
       "saves": 0,
       "bonus": 0,
       "bps": 29,
-      "influence": "0.0",
-      "creativity": "0.0",
+      "influence": "29.4",
+      "creativity": "0.8",
       "threat": "0.0",
-      "ict_index": "0.0",
+      "ict_index": "3.0",
       "clearances_blocks_interceptions": 7,
       "recoveries": 1,
       "tackles": 2,
@@ -846,7 +846,7 @@
       "expected_goals": "0.00",
       "expected_assists": "0.00",
       "expected_goal_involvements": "0.00",
-      "expected_goals_conceded": "1.15",
+      "expected_goals_conceded": "1.05",
       "value": 80,
       "transfers_balance": 291562,
       "selected": 2724192,

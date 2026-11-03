@@ -12,12 +12,12 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 9,Hincapie,Arsenal,ARS,2,5.2,0,-3
 5,J.Timber,Arsenal,ARS,2,6.5,0,0
 31,Konsa,Arsenal,ARS,2,4.7,0,2
-7,Lewis-Skelly,Arsenal,ARS,3,5.4,0,-1
+7,Lewis-Skelly,Arsenal,ARS,3,5.3,-1,-2
 16,Madueke,Arsenal,ARS,3,6.2,0,-3
 18,Martinelli,Arsenal,ARS,3,6.3,0,-2
 17,Merino,Arsenal,ARS,3,5.7,0,-3
 3,Meslier,Arsenal,ARS,1,4.9,0,-1
-11,Mosquera,Arsenal,ARS,2,5.2,0,-3
+11,Mosquera,Arsenal,ARS,2,5.1,-1,-4
 24,Nelson,Arsenal,ARS,3,5.5,0,0
 22,Nwaneri,Arsenal,ARS,3,5.4,0,-1
 1,Raya,Arsenal,ARS,1,6.2,0,2
@@ -162,7 +162,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 151,Acheampong,Chelsea,CHE,2,4.5,0,0
 561,Anselmino,Chelsea,CHE,2,4.5,0,0
 146,B.Badiashile,Chelsea,CHE,2,4.5,0,0
-568,Barco,Chelsea,CHE,3,5.4,0,-1
+568,Barco,Chelsea,CHE,3,5.3,-1,-2
 159,Caicedo,Chelsea,CHE,3,5.3,0,-2
 143,Chalobah,Chelsea,CHE,2,5.5,0,0
 583,Chavarria,Chelsea,CHE,2,4.9,0,-1
@@ -302,7 +302,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 258,Castagne,Fulham,FUL,2,4.5,0,0
 580,Charles,Fulham,FUL,3,5.0,0,0
 610,De Fougerolles,Fulham,FUL,2,4.0,0,0
-569,Gonzalo,Fulham,FUL,4,6.0,0,0
+569,Gonzalo,Fulham,FUL,4,5.9,-1,-1
 261,Iwobi,Fulham,FUL,3,5.4,0,-1
 255,J.Cuenca,Fulham,FUL,2,4.4,0,-1
 263,Kevin,Fulham,FUL,3,5.2,0,-3
@@ -349,7 +349,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 291,Matazo,Hull City,HUL,3,4.5,0,0
 295,McBurnie,Hull City,HUL,4,5.5,0,0
 284,McCarthy,Hull City,HUL,2,4.0,0,0
-285,McNair,Hull City,HUL,2,4.0,0,0
+285,McNair,Hull City,HUL,2,3.9,-1,-1
 586,Mendy,Hull City,HUL,2,4.1,0,1
 287,Millar,Hull City,HUL,3,5.0,0,0
 563,Morita,Hull City,HUL,3,4.9,0,-1
@@ -453,7 +453,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,cost_change_event,co
 358,Kerkez,Liverpool,LIV,2,5.3,0,-2
 381,Koumas,Liverpool,LIV,3,5.0,0,0
 363,Leoni,Liverpool,LIV,2,3.9,0,-1
-361,Lucky,Liverpool,LIV,2,4.0,0,0
+361,Lucky,Liverpool,LIV,2,3.9,-1,-1
 372,Mac Allister,Liverpool,LIV,3,5.4,0,-1
 351,Mamardashvili,Liverpool,LIV,1,4.8,0,-2
 378,McConnell,Liverpool,LIV,3,4.4,0,-1

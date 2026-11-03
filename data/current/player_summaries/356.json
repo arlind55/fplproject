@@ -14,7 +14,7 @@
       "kickoff_time": "2026-11-08T14:00:00Z",
       "event_name": "Gameweek 10",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 107,
@@ -30,7 +30,7 @@
       "kickoff_time": "2026-11-22T16:30:00Z",
       "event_name": "Gameweek 11",
       "is_home": true,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 114,
@@ -62,7 +62,7 @@
       "kickoff_time": "2026-12-02T19:30:00Z",
       "event_name": "Gameweek 13",
       "is_home": true,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 134,
@@ -110,7 +110,7 @@
       "kickoff_time": "2026-12-19T17:30:00Z",
       "event_name": "Gameweek 16",
       "is_home": true,
-      "difficulty": 2
+      "difficulty": 3
     },
     {
       "id": 166,
@@ -206,7 +206,7 @@
       "kickoff_time": "2027-01-23T15:00:00Z",
       "event_name": "Gameweek 22",
       "is_home": false,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 227,
@@ -366,7 +366,7 @@
       "kickoff_time": "2027-04-17T14:00:00Z",
       "event_name": "Gameweek 32",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 326,
@@ -834,19 +834,19 @@
       "saves": 0,
       "bonus": 0,
       "bps": 6,
-      "influence": "0.0",
-      "creativity": "0.0",
-      "threat": "0.0",
-      "ict_index": "0.0",
+      "influence": "20.8",
+      "creativity": "23.9",
+      "threat": "12.0",
+      "ict_index": "5.7",
       "clearances_blocks_interceptions": 7,
       "recoveries": 5,
       "tackles": 0,
       "defensive_contribution": 7,
       "starts": 1,
       "expected_goals": "0.05",
-      "expected_assists": "0.09",
-      "expected_goal_involvements": "0.14",
-      "expected_goals_conceded": "0.96",
+      "expected_assists": "0.11",
+      "expected_goal_involvements": "0.16",
+      "expected_goals_conceded": "0.98",
       "value": 64,
       "transfers_balance": -7200,
       "selected": 1680854,

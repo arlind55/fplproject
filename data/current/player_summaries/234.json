@@ -1,22 +1,6 @@
 {
   "fixtures": [
     {
-      "id": 89,
-      "code": 2645283,
-      "team_h": 17,
-      "team_h_score": null,
-      "team_a": 9,
-      "team_a_score": null,
-      "event": 9,
-      "finished": false,
-      "minutes": 0,
-      "provisional_start_time": false,
-      "kickoff_time": "2026-11-02T20:00:00Z",
-      "event_name": "Gameweek 9",
-      "is_home": false,
-      "difficulty": 3
-    },
-    {
       "id": 94,
       "code": 2645288,
       "team_h": 9,
@@ -46,7 +30,7 @@
       "kickoff_time": "2026-11-23T20:00:00Z",
       "event_name": "Gameweek 11",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 4
     },
     {
       "id": 114,
@@ -126,7 +110,7 @@
       "kickoff_time": "2026-12-19T15:00:00Z",
       "event_name": "Gameweek 16",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 164,
@@ -142,7 +126,7 @@
       "kickoff_time": "2026-12-26T15:00:00Z",
       "event_name": "Gameweek 17",
       "is_home": true,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 174,
@@ -334,7 +318,7 @@
       "kickoff_time": "2027-03-13T15:00:00Z",
       "event_name": "Gameweek 29",
       "is_home": false,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 294,
@@ -350,7 +334,7 @@
       "kickoff_time": "2027-03-20T15:00:00Z",
       "event_name": "Gameweek 30",
       "is_home": true,
-      "difficulty": 2
+      "difficulty": 3
     },
     {
       "id": 305,
@@ -366,7 +350,7 @@
       "kickoff_time": "2027-04-10T14:00:00Z",
       "event_name": "Gameweek 31",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 314,
@@ -398,7 +382,7 @@
       "kickoff_time": "2027-04-24T14:00:00Z",
       "event_name": "Gameweek 33",
       "is_home": true,
-      "difficulty": 3
+      "difficulty": 4
     },
     {
       "id": 335,
@@ -833,8 +817,8 @@
       "total_points": 0,
       "was_home": false,
       "kickoff_time": "2026-11-02T20:00:00Z",
-      "team_h_score": null,
-      "team_a_score": null,
+      "team_h_score": 0,
+      "team_a_score": 1,
       "round": 9,
       "modified": false,
       "minutes": 0,

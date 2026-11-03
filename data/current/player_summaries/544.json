@@ -46,7 +46,7 @@
       "kickoff_time": "2026-11-29T14:05:00Z",
       "event_name": "Gameweek 12",
       "is_home": true,
-      "difficulty": 2
+      "difficulty": 3
     },
     {
       "id": 127,
@@ -142,7 +142,7 @@
       "kickoff_time": "2026-12-30T19:30:00Z",
       "event_name": "Gameweek 18",
       "is_home": false,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 190,
@@ -286,7 +286,7 @@
       "kickoff_time": "2027-02-27T15:00:00Z",
       "event_name": "Gameweek 27",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 280,
@@ -302,7 +302,7 @@
       "kickoff_time": "2027-03-03T20:00:00Z",
       "event_name": "Gameweek 28",
       "is_home": true,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 289,
@@ -382,7 +382,7 @@
       "kickoff_time": "2027-04-24T14:00:00Z",
       "event_name": "Gameweek 33",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 340,
@@ -834,10 +834,10 @@
       "saves": 0,
       "bonus": 0,
       "bps": 19,
-      "influence": "0.0",
-      "creativity": "0.0",
+      "influence": "21.2",
+      "creativity": "40.2",
       "threat": "0.0",
-      "ict_index": "0.0",
+      "ict_index": "6.1",
       "clearances_blocks_interceptions": 5,
       "recoveries": 10,
       "tackles": 1,

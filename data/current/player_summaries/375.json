@@ -14,7 +14,7 @@
       "kickoff_time": "2026-11-08T14:00:00Z",
       "event_name": "Gameweek 10",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 107,
@@ -30,7 +30,7 @@
       "kickoff_time": "2026-11-22T16:30:00Z",
       "event_name": "Gameweek 11",
       "is_home": true,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 114,
@@ -62,7 +62,7 @@
       "kickoff_time": "2026-12-02T19:30:00Z",
       "event_name": "Gameweek 13",
       "is_home": true,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 134,
@@ -110,7 +110,7 @@
       "kickoff_time": "2026-12-19T17:30:00Z",
       "event_name": "Gameweek 16",
       "is_home": true,
-      "difficulty": 2
+      "difficulty": 3
     },
     {
       "id": 166,
@@ -206,7 +206,7 @@
       "kickoff_time": "2027-01-23T15:00:00Z",
       "event_name": "Gameweek 22",
       "is_home": false,
-      "difficulty": 4
+      "difficulty": 3
     },
     {
       "id": 227,
@@ -366,7 +366,7 @@
       "kickoff_time": "2027-04-17T14:00:00Z",
       "event_name": "Gameweek 32",
       "is_home": false,
-      "difficulty": 3
+      "difficulty": 2
     },
     {
       "id": 326,
@@ -821,7 +821,7 @@
       "team_a_score": 1,
       "round": 9,
       "modified": false,
-      "minutes": 58,
+      "minutes": 57,
       "goals_scored": 0,
       "assists": 0,
       "clean_sheets": 0,
@@ -834,10 +834,10 @@
       "saves": 0,
       "bonus": 0,
       "bps": 10,
-      "influence": "0.0",
-      "creativity": "0.0",
+      "influence": "5.8",
+      "creativity": "3.1",
       "threat": "0.0",
-      "ict_index": "0.0",
+      "ict_index": "0.9",
       "clearances_blocks_interceptions": 1,
       "recoveries": 4,
       "tackles": 1,
@@ -846,7 +846,7 @@
       "expected_goals": "0.00",
       "expected_assists": "0.08",
       "expected_goal_involvements": "0.08",
-      "expected_goals_conceded": "0.84",
+      "expected_goals_conceded": "0.86",
       "value": 48,
       "transfers_balance": -36,
       "selected": 5240,
