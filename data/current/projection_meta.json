@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-11-06T16:04:17Z",
+  "generated_at": "2026-11-10T13:12:44Z",
   "gws": [
-    10,
     11,
     12,
     13,
-    14
+    14,
+    15
   ],
-  "first_gw": 10,
+  "first_gw": 11,
   "last_season_prior": "2026-07-20",
   "params": {
     "k_xg": 4.0,
@@ -35,12 +35,11 @@
   "squad": {
     "cost": 100.0,
     "budget": 100.0,
-    "xi_value": 223.2,
-    "xi_next_gw": 65.6,
+    "xi_value": 220.6,
+    "xi_next_gw": 62.4,
     "extra_transfers": 0
   },
   "long_gws": [
-    10,
     11,
     12,
     13,
@@ -49,7 +48,8 @@
     16,
     17,
     18,
-    19
+    19,
+    20
   ],
   "backtest": {
     "last_season": {
@@ -61,7 +61,7 @@
           "rmse": 2.93,
           "bias": 0.047,
           "spearman": 0.383,
-          "top20_actual": 4.64
+          "top20_actual": 4.643
         },
         "ppm": {
           "weeks": 34.0,
@@ -69,7 +69,7 @@
           "rmse": 3.099,
           "bias": 0.028,
           "spearman": 0.257,
-          "top20_actual": 4.237
+          "top20_actual": 4.231
         },
         "form": {
           "weeks": 34.0,
@@ -77,7 +77,7 @@
           "rmse": 3.275,
           "bias": 0.357,
           "spearman": 0.253,
-          "top20_actual": 3.937
+          "top20_actual": 3.881
         },
         "ep_next": {
           "weeks": 7.0,
@@ -85,7 +85,7 @@
           "rmse": 3.194,
           "bias": 0.222,
           "spearman": 0.384,
-          "top20_actual": 4.614
+          "top20_actual": 4.707
         }
       },
       "vs_fpl": {
@@ -93,9 +93,9 @@
           "weeks": 7.0,
           "mae": 2.001,
           "rmse": 2.811,
-          "bias": 0.045,
+          "bias": 0.044,
           "spearman": 0.491,
-          "top20_actual": 5.05
+          "top20_actual": 5.064
         },
         "ep_next": {
           "weeks": 7.0,
@@ -103,7 +103,7 @@
           "rmse": 3.194,
           "bias": 0.222,
           "spearman": 0.384,
-          "top20_actual": 4.614
+          "top20_actual": 4.707
         },
         "form": {
           "weeks": 7.0,
@@ -111,7 +111,7 @@
           "rmse": 3.205,
           "bias": 0.45,
           "spearman": 0.337,
-          "top20_actual": 4.264
+          "top20_actual": 4.286
         }
       }
     },
@@ -119,62 +119,62 @@
       "label": "2026/27",
       "regulars": {
         "model": {
-          "weeks": 8.0,
-          "mae": 2.193,
-          "rmse": 2.948,
-          "bias": -0.015,
-          "spearman": 0.378,
-          "top20_actual": 4.975
+          "weeks": 9.0,
+          "mae": 2.178,
+          "rmse": 2.939,
+          "bias": -0.02,
+          "spearman": 0.394,
+          "top20_actual": 5.128
         },
         "ppm": {
-          "weeks": 8.0,
-          "mae": 2.614,
-          "rmse": 3.505,
-          "bias": 0.357,
-          "spearman": 0.216,
-          "top20_actual": 3.806
+          "weeks": 9.0,
+          "mae": 2.563,
+          "rmse": 3.451,
+          "bias": 0.332,
+          "spearman": 0.234,
+          "top20_actual": 3.983
         },
         "form": {
-          "weeks": 8.0,
-          "mae": 2.628,
-          "rmse": 3.533,
-          "bias": 0.392,
-          "spearman": 0.221,
-          "top20_actual": 3.744
+          "weeks": 9.0,
+          "mae": 2.594,
+          "rmse": 3.495,
+          "bias": 0.367,
+          "spearman": 0.232,
+          "top20_actual": 3.911
         },
         "ep_next": {
-          "weeks": 8.0,
-          "mae": 2.463,
-          "rmse": 3.404,
-          "bias": 0.073,
-          "spearman": 0.289,
-          "top20_actual": 4.381
+          "weeks": 9.0,
+          "mae": 2.438,
+          "rmse": 3.375,
+          "bias": 0.074,
+          "spearman": 0.299,
+          "top20_actual": 4.428
         }
       },
       "vs_fpl": {
         "model": {
-          "weeks": 8.0,
-          "mae": 2.193,
-          "rmse": 2.948,
-          "bias": -0.015,
-          "spearman": 0.378,
-          "top20_actual": 4.975
+          "weeks": 9.0,
+          "mae": 2.178,
+          "rmse": 2.939,
+          "bias": -0.02,
+          "spearman": 0.394,
+          "top20_actual": 5.128
         },
         "ep_next": {
-          "weeks": 8.0,
-          "mae": 2.463,
-          "rmse": 3.404,
-          "bias": 0.073,
-          "spearman": 0.289,
-          "top20_actual": 4.381
+          "weeks": 9.0,
+          "mae": 2.438,
+          "rmse": 3.375,
+          "bias": 0.074,
+          "spearman": 0.299,
+          "top20_actual": 4.428
         },
         "form": {
-          "weeks": 8.0,
-          "mae": 2.628,
-          "rmse": 3.533,
-          "bias": 0.392,
-          "spearman": 0.221,
-          "top20_actual": 3.744
+          "weeks": 9.0,
+          "mae": 2.594,
+          "rmse": 3.495,
+          "bias": 0.367,
+          "spearman": 0.232,
+          "top20_actual": 3.911
         }
       }
     }

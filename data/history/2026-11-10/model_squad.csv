@@ -1,0 +1,16 @@
+id,web_name,team_short_name,pos,price,next_opp,next_gw,next_n,is_starter,is_captain
+1,Raya,ARS,GKP,6.2,NEW (A),3.94,19.45,True,False
+4,Gabriel,ARS,DEF,8.1,NEW (A),5.55,27.05,True,False
+112,Van Hecke,TOT,DEF,5.1,IPS (H),5.15,23.1,True,False
+115,De Cuyper,BHA,DEF,5.5,HUL (A),5.03,22.65,True,False
+427,Mbeumo,MUN,MID,7.9,LIV (A),4.6,26.73,True,False
+124,Groß,BHA,MID,6.3,HUL (A),4.85,24.44,True,False
+68,Tavernier,BOU,MID,6.7,NFO (H),5.09,24.14,True,False
+542,E.Le Fée,SUN,MID,5.7,AVL (A),4.58,22.27,True,False
+411,Haaland,MCI,FWD,15.8,FUL (H),6.89,31.92,True,True
+379,Isak,LIV,FWD,9.3,MUN (H),5.27,24.22,True,False
+249,Barry,EVE,FWD,5.7,BRE (A),4.6,23.22,True,False
+496,Kinsky,TOT,GKP,4.4,IPS (H),3.44,16.76,False,False
+502,Robertson,TOT,DEF,4.3,IPS (H),4.3,19.2,False,False
+277,Egan,HUL,DEF,4.1,BHA (H),2.87,14.8,False,False
+183,Rudoni,COV,MID,4.9,CRY (H),4.65,21.26,False,False

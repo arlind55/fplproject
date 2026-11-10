@@ -1,14 +1,4 @@
 id,event,kickoff_time,team_h,team_h_name,team_h_short,team_h_difficulty,team_a,team_a_name,team_a_short,team_a_difficulty
-94,10,2026-11-06T20:00:00Z,9,Everton,EVE,2,7,Coventry City,COV,3
-97,10,2026-11-07T12:30:00Z,13,Leeds,LEE,3,19,Spurs,TOT,3
-91,10,2026-11-07T15:00:00Z,1,Arsenal,ARS,2,11,Hull City,HUL,5
-95,10,2026-11-07T15:00:00Z,10,Fulham,FUL,3,17,Newcastle,NEW,3
-99,10,2026-11-07T17:30:00Z,18,Nott'm Forest,NFO,4,15,Man City,MCI,2
-92,10,2026-11-08T14:00:00Z,5,Brighton,BHA,3,4,Brentford,BRE,4
-93,10,2026-11-08T14:00:00Z,8,Crystal Palace,CRY,4,14,Liverpool,LIV,2
-96,10,2026-11-08T14:00:00Z,12,Ipswich Town,IPS,3,3,Bournemouth,BOU,2
-100,10,2026-11-08T14:00:00Z,20,Sunderland,SUN,4,6,Chelsea,CHE,3
-98,10,2026-11-08T16:30:00Z,16,Man Utd,MUN,3,2,Aston Villa,AVL,3
 108,11,2026-11-21T12:30:00Z,15,Man City,MCI,2,10,Fulham,FUL,5
 101,11,2026-11-21T15:00:00Z,2,Aston Villa,AVL,2,20,Sunderland,SUN,3
 102,11,2026-11-21T15:00:00Z,3,Bournemouth,BOU,3,18,Nott'm Forest,NFO,4
@@ -63,9 +53,9 @@ id,event,kickoff_time,team_h,team_h_name,team_h_short,team_h_difficulty,team_a,t
 152,16,2026-12-19T15:00:00Z,3,Bournemouth,BOU,2,7,Coventry City,COV,4
 156,16,2026-12-19T15:00:00Z,13,Leeds,LEE,2,10,Fulham,FUL,3
 158,16,2026-12-19T15:00:00Z,15,Man City,MCI,2,11,Hull City,HUL,5
-159,16,2026-12-19T15:00:00Z,18,Nott'm Forest,NFO,3,9,Everton,EVE,2
 157,16,2026-12-19T17:30:00Z,14,Liverpool,LIV,3,19,Spurs,TOT,4
 154,16,2026-12-20T14:00:00Z,5,Brighton,BHA,2,12,Ipswich Town,IPS,4
+159,16,2026-12-20T14:00:00Z,18,Nott'm Forest,NFO,3,9,Everton,EVE,2
 160,16,2026-12-20T14:00:00Z,20,Sunderland,SUN,2,8,Crystal Palace,CRY,3
 151,16,2026-12-20T16:30:00Z,1,Arsenal,ARS,3,16,Man Utd,MUN,5
 155,16,2026-12-21T20:00:00Z,6,Chelsea,CHE,3,2,Aston Villa,AVL,4

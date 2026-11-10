@@ -1,11 +1,11 @@
 {
   "summary": {
-    "weeks": 4,
+    "weeks": 5,
     "model_mae": 1.959,
-    "captain_points": 16,
-    "head_to_head_weeks": 4,
-    "model_wins": 4,
-    "fpl_mae": 2.225,
+    "captain_points": 24,
+    "head_to_head_weeks": 5,
+    "model_wins": 5,
+    "fpl_mae": 2.206,
     "model_mae_same_weeks": 1.959
   },
   "weeks": [
@@ -124,7 +124,36 @@
           "actual": 2
         }
       }
+    },
+    {
+      "gw": 10,
+      "snapshot": "2026-11-03",
+      "n": 335,
+      "model": {
+        "mae": 1.959,
+        "bias": -0.279,
+        "spearman": 0.412,
+        "top20_actual": 6.25,
+        "captain": {
+          "name": "Gabriel",
+          "team": "ARS",
+          "projected": 6.76,
+          "actual": 8
+        }
+      },
+      "fpl": {
+        "mae": 2.129,
+        "bias": -0.245,
+        "spearman": 0.303,
+        "top20_actual": 4.85,
+        "captain": {
+          "name": "Konsa",
+          "team": "ARS",
+          "projected": 9.2,
+          "actual": 8
+        }
+      }
     }
   ],
-  "generated_at": "2026-11-06T16:04:17Z"
+  "generated_at": "2026-11-10T13:12:44Z"
 }
