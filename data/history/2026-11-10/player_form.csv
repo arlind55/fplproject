@@ -5,7 +5,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 166,N.Jackson,Aston Villa,AVL,4,7.1,8.8,6.0,54,30.7,722,6,1,2,12,a
 504,Vuskovic,Brighton,BHA,2,5.3,7.5,7.0,70,9.0,887,1,2,7,5,a
 112,Van Hecke,Spurs,TOT,2,5.1,7.5,5.7,57,14.4,900,2,0,4,6,a
-249,Barry,Everton,EVE,4,5.7,7.2,5.5,55,10.5,851,6,1,4,8,a
+249,Barry,Everton,EVE,4,5.7,7.2,5.5,55,10.6,851,6,1,4,8,a
 129,Ayari,Brighton,BHA,3,5.5,7.0,5.1,46,2.3,741,3,1,7,4,a
 60,Hill,Bournemouth,BOU,2,5.6,7.0,4.2,42,3.0,900,0,0,3,4,a
 1,Raya,Arsenal,ARS,1,6.2,6.8,6.0,60,47.5,900,0,0,7,6,a
@@ -171,7 +171,7 @@ id,web_name,team_name,team_short_name,element_type,now_cost,form,points_per_game
 447,Botman,Newcastle,NEW,2,5.0,2.2,3.7,26,0.7,630,1,0,1,0,a
 123,Hinshelwood,Brighton,BHA,3,5.9,2.2,5.0,25,0.6,157,3,0,1,3,a
 580,Charles,Fulham,FUL,3,5.0,2.2,2.5,25,0.1,733,0,0,4,0,a
-200,Lacroix,Chelsea,CHE,2,5.8,2.2,3.0,24,4.6,634,0,1,1,0,i
+200,Lacroix,Chelsea,CHE,2,5.8,2.2,3.0,24,4.5,634,0,1,1,0,i
 389,Matheus N.,Man City,MCI,2,5.9,2.2,3.1,22,0.9,513,0,0,2,1,a
 315,Fatawu,Ipswich Town,IPS,3,5.4,2.2,1.9,17,0.1,537,0,2,0,0,a
 246,Röhl,Everton,EVE,3,4.9,2.2,2.1,15,0.0,591,0,0,2,0,a
