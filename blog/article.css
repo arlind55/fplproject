@@ -148,3 +148,7 @@ table.tgt .tag{font-size:9.5px;padding:1px 5px;margin-left:4px;text-transform:up
 .tiles b{display:block;font:700 30px/1.1 "Barlow Condensed","Arial Narrow",sans-serif;margin:4px 0 2px}
 .tiles small{color:var(--ink-3);font-size:11.5px}
 .brief-post .callout{border-left:3px solid var(--accent)}
+/* wildcard squads */
+table.wc .sub{display:block;font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3);margin-top:2px}
+table.wc .fixrow.mini .fix{min-width:36px}
+h4.sq{margin:22px 0 4px;font-size:15px} h4.sq small{font:500 11px "IBM Plex Mono",monospace;color:var(--ink-3);margin-left:6px}
