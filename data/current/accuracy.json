@@ -1,12 +1,12 @@
 {
   "summary": {
-    "weeks": 5,
-    "model_mae": 1.959,
-    "captain_points": 24,
-    "head_to_head_weeks": 5,
-    "model_wins": 5,
-    "fpl_mae": 2.206,
-    "model_mae_same_weeks": 1.959
+    "weeks": 6,
+    "model_mae": 1.995,
+    "captain_points": 26,
+    "head_to_head_weeks": 6,
+    "model_wins": 6,
+    "fpl_mae": 2.218,
+    "model_mae_same_weeks": 1.995
   },
   "weeks": [
     {
@@ -153,7 +153,36 @@
           "actual": 8
         }
       }
+    },
+    {
+      "gw": 11,
+      "snapshot": "2026-11-17",
+      "n": 348,
+      "model": {
+        "mae": 2.177,
+        "bias": -0.332,
+        "spearman": 0.255,
+        "top20_actual": 4.0,
+        "captain": {
+          "name": "Haaland",
+          "team": "MCI",
+          "projected": 6.89,
+          "actual": 2
+        }
+      },
+      "fpl": {
+        "mae": 2.277,
+        "bias": -0.249,
+        "spearman": 0.262,
+        "top20_actual": 4.55,
+        "captain": {
+          "name": "N.Jackson",
+          "team": "AVL",
+          "projected": 11.0,
+          "actual": 2
+        }
+      }
     }
   ],
-  "generated_at": "2026-11-20T23:13:56Z"
+  "generated_at": "2026-11-24T10:52:31Z"
 }
