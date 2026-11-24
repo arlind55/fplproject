@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Numbers and hero chart for the international-break planner post.
-Usage (from repo root): python3 blog/planner.py [FIRST_GW] [N_GWS]   (defaults: next GW, 6 weeks)
+Usage (from repo root): python3 blog/planner.py [FIRST_GW] [N_GWS] [SLUG]   (defaults: next GW, 6 weeks, gw<FIRST>-break-planner)
 
 Fixture swing = how much easier (or harder) a team's next N fixtures are than the average game it has
 played so far: model xG for minus its season xG per game, plus its season xGA per game minus model xGA.
 Difficulty colours are the model's 1-5 ratings from data/current/fixture_model.csv (the planner's Rating view).
-Writes docs/blog/img/gw<FIRST>-break-planner.png and prints the tables used in the post."""
+Writes docs/blog/img/<SLUG>.png and prints the tables used in the post."""
 import json, sys
 from pathlib import Path
 import numpy as np, pandas as pd
@@ -29,6 +29,7 @@ meta = json.load(open(DATA / "meta.json"))
 FIRST = int(sys.argv[1]) if len(sys.argv) > 1 else int(meta["next_event"])
 N = int(sys.argv[2]) if len(sys.argv) > 2 else 6
 LAST = FIRST + N - 1
+SLUG = sys.argv[3] if len(sys.argv) > 3 else f"gw{FIRST}-break-planner"
 
 tn = pd.read_csv(DATA / "teams.csv").set_index("id").short_name
 fm_ = pd.read_csv(DATA / "fixture_model.csv"); fm_ = fm_[(fm_.event >= FIRST) & (fm_.event <= LAST)]
@@ -64,10 +65,10 @@ for i, tm in enumerate(teams):
     ax.text(N + .55, i + .5, f"{s.loc[tm, 'xgf']:.2f}", ha="center", va="center", color=INK2, fontproperties=MONO, fontsize=9.5)
     ax.text(N + 1.55, i + .5, f"{s.loc[tm, 'cs']:.1f}", ha="center", va="center", color=INK2, fontproperties=MONO, fontsize=9.5)
 fig.text(.045, .95, f"GW{FIRST}–{LAST}: who has the fixtures", fontproperties=DISP, fontsize=26, color=INK, va="top")
-fig.text(.045, .875, "Model difficulty, easiest run at the top. xG/g: model goals per game. CS: expected clean sheets over the six games.",
+fig.text(.045, .875, f"Model difficulty, easiest run at the top. xG/g: model goals per game. CS: expected clean sheets over the {N} games.",
          fontproperties=BODY, fontsize=11.5, color=INK2, va="top")
 fig.text(.955, .03, "fplvalue.co", fontproperties=DISP, fontsize=14, color=ACCENT, ha="right")
-fig.savefig(OUT / f"gw{FIRST}-break-planner.png", facecolor=BG, dpi=100); plt.close(fig); print("wrote", f"gw{FIRST}-break-planner")
+fig.savefig(OUT / f"{SLUG}.png", facecolor=BG, dpi=100); plt.close(fig); print("wrote", SLUG)
 
 # players: best over the projection window, by position, plus budget options and big-owned laggards
 p = pd.read_csv(DATA / "projections.csv"); gws = [c for c in p.columns if c.startswith("gw_")]

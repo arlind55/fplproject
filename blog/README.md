@@ -20,6 +20,16 @@ A post whose slug matches an image in `docs/blog/img/` gets it as the hero figur
 To add a chart for a new post, add a block to `charts.py` that saves `<slug>.png`.
 `shell.css` is the shared header/theme CSS copied from `docs/planner.html` — re-copy it if the shell changes.
 
+## Post-gameweek review set (value, form, fixtures, targets)
+
+    python3 blog/charts.py <GW>                     # gw<GW>-value-report.png (+ template-check, only needed for a template post)
+    python3 blog/review.py <GW>                     # gw<GW+1>-team-form.png and gw<GW+1>-targets.png, prints the form/target tables
+    python3 blog/planner.py <GW+1> 6 gw<GW+1>-fixtures  # fixture grid + swing table, picks, sells, captain
+    python3 blog/build.py blog/shell.css docs
+
+Posts: `gw<GW>-value-report`, `gw<GW+1>-team-form`, `gw<GW+1>-fixtures`, `gw<GW+1>-targets` (see the GW11 set). Names in the
+prose and in `TARGETS` inside `review.py` are chosen by hand from the printed tables, so re-check them each week.
+
 ## Deadline brief (the weekly gameweek preview)
 
 One post per gameweek, built by `blog/preview.py` from `data/current` plus a short notes file. Every table, chart and
